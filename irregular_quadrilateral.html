@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساحة رباعي غير منتظم</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+            direction: rtl;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: center;
+            max-width: 90%;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            margin: 5px 0;
+        }
+        input {
+            width: 100px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .result, .units {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .canvas-container {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            overflow: auto;
+            margin: 20px auto;
+            border: 1px solid black;
+            background: white;
+        }
+        canvas {
+            display: block;
+        }
+        .back-button {
+      margin-top: 20px;
+    }
+    .back-button button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-button button:hover {
+      background-color: #5a6268;
+    }
+    /* Remove built-in number spinner controls */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+    </style>
+</head>
+<body>
+  <!-- Added font size controls -->
+  <div class="controls">
+    <button class="font-increase" onclick="increaseFontSize()">+</button>
+    <button class="font-decrease" onclick="decreaseFontSize()">–</button>
+  </div>
+
+    <h1>حساب مساحة رباعي غير منتظم</h1>
+    <div class="container">
+        <div class="input-grid">
+            <!-- First group: four sides -->
+            <div class="sides" style="display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="a" oninput="calculateAndDraw()">
+                    <label for="a">الأول (a)</label>
+                </div>
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="b" oninput="calculateAndDraw()">
+                    <label for="b">الثاني (b)</label>
+                </div>
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="c" oninput="calculateAndDraw()">
+                    <label for="c">الثالث (c)</label>
+                </div>
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="d" oninput="calculateAndDraw()">
+                    <label for="d">الرابع (d)</label>
+                </div>
+            </div>
+
+            <!-- Second group: diagonals with top margin -->
+            <div class="diagonals" style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="d1" oninput="calculateAndDraw()">
+                    <label for="d1">القطر الأول (d1)</label>
+                </div>
+                <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+                    <input type="number" id="d2" oninput="calculateAndDraw()">
+                    <label for="d2">القطر الثاني (d2)</label>
+                </div>
+            </div>
+        </div>
+
+        <p class="result" id="areaResult">المساحة: --</p>
+        <p class="units" id="convertedUnits">الفدان: -- | القيراط: -- | السهم: --</p>
+
+        <div class="canvas-container">
+            <canvas id="quadCanvas" width="800" height="800"></canvas>
+        </div>
+        <button onclick="saveResult()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;">
+            حفظ النتيجة
+        </button>
+    </div>
+    <div class="back-button">
+        <button onclick="goBack()">العودة إلى الصفحة الرئيسية</button>
+      </div>
+
+    <script src="mini-calculator.js"></script>
+    <script>
+        function calculateAndDraw() {
+            let a = parseFloat(document.getElementById("a").value);
+            let b = parseFloat(document.getElementById("b").value);
+            let c = parseFloat(document.getElementById("c").value);
+            let d = parseFloat(document.getElementById("d").value);
+            let d1 = parseFloat(document.getElementById("d1").value);
+            let d2 = parseFloat(document.getElementById("d2").value);
+
+            // التأكد من إدخال الأضلاع الأربعة
+            if (!a || !b || !c || !d) {
+                document.getElementById("areaResult").innerText = "المساحة: --";
+                document.getElementById("convertedUnits").innerText = "الفدان: -- | القيراط: -- | السهم: --";
+                clearCanvas();
+                return;
+            }
+
+            let area;
+
+            // إذا تم إدخال كلا القطرين
+            if (d1 && d2) {
+                area = (d1 * d2) / 2; // استخدام الصيغة مع القطرين
+            }
+            // إذا تم إدخال قطر واحد فقط
+            else if (d1 || d2) {
+                let diagonal = d1 || d2; // استخدام القطر المدخل
+                // استخدام صيغة براهماجوبتا
+                let s = (a + b + c + d) / 2;
+                area = Math.sqrt((s - a) * (s - b) * (s - c) * (s - d) - (a * c + b * d - diagonal * diagonal) ** 2 / 4);
+            }
+            // إذا لم يتم إدخال أي قطر
+            else {
+                document.getElementById("areaResult").innerText = "المساحة: غير صالحة (أدخل قطرًا واحدًا على الأقل)";
+                document.getElementById("convertedUnits").innerText = "الفدان: -- | القيراط: -- | السهم: --";
+                clearCanvas();
+                return;
+            }
+
+            if (!isNaN(area)) {
+                let feddan = Math.floor(area / 4200.83);
+                let remaining_after_feddan = area % 4200.83;
+
+                let qirat = Math.floor(remaining_after_feddan / 175.034);
+                let remaining_after_qirat = remaining_after_feddan % 175.034;
+
+                let saham = Math.round(remaining_after_qirat / 7.293);
+
+                document.getElementById("areaResult").innerText = `المساحة: ${area.toFixed(2)} متر²`;
+                document.getElementById("convertedUnits").innerText = `الفدان: ${feddan} | القيراط: ${qirat} | السهم: ${saham}`;
+
+                drawQuadrilateral(a, b, c, d, d1, d2);
+            } else {
+                document.getElementById("areaResult").innerText = "المساحة: غير صالحة";
+            }
+        }
+
+        function clearCanvas() {
+            let canvas = document.getElementById("quadCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawQuadrilateral(a, b, c, d, d1, d2) {
+            let canvas = document.getElementById("quadCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // تحديد مقياس الرسم بناءً على أكبر ضلع
+            let maxSide = Math.max(a, b, c, d, d1 || 0, d2 || 0);
+            let scale = 200 / maxSide; // زيادة المقياس لضمان وضوح الرسم
+
+            // تحديد مركز الرسم
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+
+            // حساب إحداثيات الرؤوس
+            let x1 = centerX - (a * scale) / 2, y1 = centerY - (d * scale) / 2;
+            let x2 = x1 + a * scale, y2 = y1;
+            let x3 = x2 + (d1 || d2) * scale * 0.5, y3 = y2 + c * scale;
+            let x4 = x1 - (d1 || d2) * scale * 0.5, y4 = y3 + d * scale;
+
+            // رسم الشكل الرباعي
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineTo(x3, y3);
+            ctx.lineTo(x4, y4);
+            ctx.closePath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // رسم القطر الأول (إذا تم إدخاله)
+            if (d1) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x3, y3);
+                ctx.strokeStyle = "red";
+                ctx.stroke();
+            }
+
+            // رسم القطر الثاني (إذا تم إدخاله)
+            if (d2) {
+                ctx.beginPath();
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(x4, y4);
+                ctx.strokeStyle = "green";
+                ctx.stroke();
+            }
+
+            // وضع أسماء الأبعاد
+            ctx.fillStyle = "blue";
+            ctx.font = "14px Arial";
+            ctx.fillText("a", (x1 + x2) / 2, y1 - 10);
+            ctx.fillText("b", x2 + 5, (y2 + y3) / 2);
+            ctx.fillText("c", (x3 + x4) / 2, y4 + 15);
+            ctx.fillText("d", x1 - 20, (y1 + y4) / 2);
+            if (d1) ctx.fillText("d1", (x1 + x3) / 2, (y1 + y3) / 2 - 10);
+            if (d2) ctx.fillText("d2", (x2 + x4) / 2, (y2 + y4) / 2 - 10);
+        }
+        function goBack() {
+      // العودة إلى الصفحة الرئيسية
+      window.location.href = "index.html";
+    }
+    function increaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize + 1) + 'px';
+    }
+    function decreaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize - 1) + 'px';
+    }
+    // Auto-resize any input field based on its content
+    function adjustInputSize() {
+      this.style.width = ((this.value.length || 1) + 1) + "ch";
+    }
+    
+    document.querySelectorAll("input").forEach(input => {
+      adjustInputSize.call(input);
+      input.addEventListener("input", adjustInputSize);
+    });
+
+    function saveResult() {
+        const areaText = document.getElementById("areaResult").innerText;
+        const unitsText = document.getElementById("convertedUnits").innerText;
+        
+        const result = {
+            type: "رباعي غير منتظم",
+            date: new Date().toLocaleString('ar'),
+            result: areaText,
+            details: unitsText
+        };
+
+        let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+        savedResults.push(result);
+        localStorage.setItem('calculationResults', JSON.stringify(savedResults));
+
+        alert('تم حفظ النتيجة بنجاح');
+    }
+    </script>
+    <footer>
+        <p>حقوق النشر والملكية © 2025 يوسف الزغبي</p>
+    </footer>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>

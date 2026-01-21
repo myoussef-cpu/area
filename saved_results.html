@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النتائج المحفوظة</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="stylesheet" href="css/common-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%);
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .result-card {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-details {
+            position: relative;
+            padding: 20px;
+            margin-top: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transform-origin: top;
+            transition: all 0.3s ease;
+        }
+        .result-details.show {
+            animation: expandDetails 0.3s ease-out forwards;
+        }
+
+        @keyframes expandDetails {
+            from { transform: scaleY(0); opacity: 0; }
+            to { transform: scaleY(1); opacity: 1; }
+        }
+
+        .expand-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .expand-icon::before,
+        .expand-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .summary-text {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .delete-btn {
+            background: linear-gradient(145deg, #ff4b4b, #dc3545);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            float: left;
+            opacity: 0.8;
+        }
+        .delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .back-button {
+            margin: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+        h1 {
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .result-details {
+            white-space: pre-line; /* Changed from pre-wrap to pre-line */
+            text-align: right;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Add loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <h1>النتائج المحفوظة</h1>
+        <div id="savedResults"></div>
+        <button class="back-button" onclick="window.location.href='index.html'">العودة للصفحة الرئيسية</button>
+    </div>
+
+    <script src="mini-calculator.js"></script>
+    <script>
+        // Add loading animation
+        window.addEventListener('load', function() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 300);
+            }, 500);
+        });
+
+        function loadSavedResults() {
+            const resultsContainer = document.getElementById('savedResults');
+            const savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+            
+            if (savedResults.length === 0) {
+                resultsContainer.innerHTML = '<p>لا توجد نتائج محفوظة</p>';
+                return;
+            }
+
+            resultsContainer.innerHTML = savedResults.map((result, index) => {
+                const mainArea = extractMainArea(result.result);
+                return `
+                    <div class="result-card" onclick="toggleDetails(${index})">
+                        <div class="result-summary">
+                            <div class="summary-text">
+                                <strong>${result.type}</strong> - ${result.date}<br>
+                                ${mainArea}
+                            </div>
+                            <button class="delete-btn" onclick="deleteResult(${index}); event.stopPropagation();">حذف</button>
+                            <span class="expand-icon" id="icon-${index}">▼</span>
+                        </div>
+                        <div class="result-details" id="details-${index}">
+                            ${formatResult(result.result)}
+                            ${result.details ? `<hr>${formatResult(result.details)}` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleDetails(index) {
+            const detailsDiv = document.getElementById(`details-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            detailsDiv.classList.toggle('show');
+            icon.classList.toggle('rotate');
+        }
+
+        function extractMainArea(text) {
+            // استخراج المساحة الرئيسية فقط
+            const areaMatch = text.match(/المساحة الكلية:([^(]+)/);
+            return areaMatch ? areaMatch[1].trim() : text;
+        }
+
+        function formatResult(text) {
+            if (!text) return '';
+            return text
+                .replace(/\n/g, '<br>')
+                .replace(/:/g, ':<br>')
+                .replace(/،/g, '،<br>')
+                .replace(/\s*\|\s*/g, ' | ')
+                .trim();
+        }
+
+        function deleteResult(index) {
+            let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+            savedResults.splice(index, 1);
+            localStorage.setItem('calculationResults', JSON.stringify(savedResults));
+            loadSavedResults();
+        }
+
+        // Load results when page loads
+        loadSavedResults();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>

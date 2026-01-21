@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حساب مساحة شبه المنحرف</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3498db">
+  <link rel="stylesheet" href="css/common-styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    h2 {
+      color: #444;
+    }
+    label {
+      display: block;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    input {
+      margin: 10px;
+      padding: 8px;
+      width: 100px;
+      border: 1px solid #f3f0f0;
+      border-radius: 4px;
+    }
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      text-align: right;
+      max-width: 500px;
+    }
+    .results p {
+      margin: 10px 0;
+    }
+    .results span {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .back-button {
+      margin-top: 20px;
+    }
+    .back-button button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-button button:hover {
+      background-color: #5a6268;
+    }
+    
+    /* Remove number spinners from number inputs */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    /* Enhanced Visual Design */
+    body {
+      background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%);
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h2 {
+      color: #2c3e50;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    input, select {
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    input:focus, select:focus {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      border-color: #007bff;
+    }
+
+    .results {
+      animation: fadeIn 0.5s ease-out;
+      transition: all 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    button {
+      transition: all 0.3s ease;
+      background: linear-gradient(145deg, #007bff, #0056b3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+
+    .controls button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .input-container {
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .input-container input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .input-container input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+    }
+
+    .calculate-btn {
+      background: var(--primary-color);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin: 20px;
+      transform-origin: center;
+      transition: all 0.3s ease;
+    }
+
+    .calculate-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+    }
+
+    .results-container {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    footer {
+      margin-top: 50px;
+      padding: 20px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 10px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .loading div {
+      display: inline-block;
+      position: absolute;
+      left: 8px;
+      width: 16px;
+      background: #007bff;
+      animation: loading 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+
+    @keyframes loading {
+      0% { top: 8px; height: 64px; }
+      50%, 100% { top: 24px; height: 32px; }
+    }
+
+    /* Tooltip Styles */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+
+    [data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    [data-tooltip]:hover:before {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <!-- Added font size controls -->
+  <div class="controls">
+    <button class="font-increase" onclick="increaseFontSize()">+</button>
+    <button class="font-decrease" onclick="decreaseFontSize()">–</button>
+  </div>
+  <h2>حساب مساحة شبه المنحرف</h2>
+
+  <!-- Wrapped input fields in a grid container -->
+  <div class="input-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
+    <!-- Updated labels: removed the first word -->
+    <label for="a">الصغرى (a):</label>
+    <input type="number" id="a" step="any" required oninput="calculateArea()">
+    <label for="b">الكبرى (b):</label>
+    <input type="number" id="b" step="any" required oninput="calculateArea()">
+    <label for="L1">المائل الأول (L1):</label>
+    <input type="number" id="L1" step="any" required oninput="calculateArea()">
+    <label for="L2">المائل الثاني (L2):</label>
+    <input type="number" id="L2" step="any" required oninput="calculateArea()">
+  </div>
+
+  <div class="initial-area" id="initialArea"></div>
+
+  <!-- قسم اختيار طريقة التقسيم -->
+  <div id="divisionSection">
+    <label for="divisionType">اختر طريقة التقسيم:</label>
+    <select id="divisionType" onchange="calculate()">
+      <option value="manual">يدوياً</option>
+      <option value="auto">تلقائياً بالتساوي</option>
+    </select>
+    <br>
+
+    <!-- حقول إدخال إضافية بناءً على طريقة التقسيم -->
+    <div id="divisionInputs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
+      <label for="manualAreas">مساحة كل قسم (مفصولة بفاصلة):</label>
+      <input type="text" id="manualAreas" oninput="calculate()">
+      <label for="parts">عدد الأقسام:</label>
+      <input type="number" id="parts" step="1" oninput="calculate()">
+    </div>
+
+    <button onclick="calculate()">حساب الأقسام</button>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <!-- Add save button -->
+  <button onclick="saveResult()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;">
+    حفظ النتيجة
+  </button>
+
+  <div class="back-button">
+    <button onclick="goBack()">العودة إلى الصفحة الرئيسية</button>
+  </div>
+
+  <script src="mini-calculator.js"></script>
+  <script>
+    function calculateArea() {
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const L1 = parseFloat(document.getElementById("L1").value);
+      const L2 = parseFloat(document.getElementById("L2").value);
+
+      if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2)) return;
+
+      // حساب المساحة كشبه منحرف
+      const baseDifference = (b - a) / 2;
+      const h1 = Math.sqrt(L1 * L1 - baseDifference * baseDifference);
+      const h2 = Math.sqrt(L2 * L2 - baseDifference * baseDifference);
+      const h = (h1 + h2) / 2;
+      const area = ((a + b) / 2) * h;
+
+      const areaConverted = convertToFeddans(area);
+      const diagonals = calculateDiagonals(a, b, h);
+
+      const initialAreaDiv = document.getElementById("initialArea");
+      initialAreaDiv.innerHTML = `<h3>المساحة الأولية:</h3>
+        <p>المساحة الكلية: <span>${area.toFixed(2)}</span> متر² (${areaConverted.feddan} فدان، ${areaConverted.qirat} قيراط، ${areaConverted.sahm} سهم)</p>
+        <p>القطر الأول: <span>${diagonals.diagonal1.toFixed(2)}</span> متر</p>
+        <p>القطر الثاني: <span>${diagonals.diagonal2.toFixed(2)}</span> متر</p>`;
+
+      calculate();
+    }
+
+    function calculateDiagonals(a, b, h) {
+      const baseDifference = (b - a) / 2;
+      const diagonal1 = Math.sqrt(a * a + h * h - 2 * a * baseDifference);
+      const diagonal2 = Math.sqrt(b * b + h * h + 2 * b * baseDifference);
+      return { diagonal1, diagonal2 };
+    }
+
+    function convertToFeddans(m2) {
+      const feddan = 4200; // 1 فدان = 4200 متر مربع
+      const qirat = 175;   // 1 قيراط = 175 متر مربع
+      const sahm = 7.2917; // 1 سهم = 7.2917 متر مربع
+
+      let remaining = m2;
+      let f = Math.floor(remaining / feddan);
+      remaining -= f * feddan;
+      let q = Math.floor(remaining / qirat);
+      remaining -= q * qirat;
+      let s = remaining / sahm;
+
+      return { feddan: f, qirat: q, sahm: s.toFixed(2) };
+    }
+
+    async function calculate() {
+      const loading = showLoading();
+      
+      // Simulate calculation delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const divisionType = document.getElementById("divisionType").value;
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const L1 = parseFloat(document.getElementById("L1").value);
+      const L2 = parseFloat(document.getElementById("L2").value);
+
+      if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2)) return;
+
+      const baseDifference = (b - a) / 2;
+      const h1 = Math.sqrt(L1 * L1 - baseDifference * baseDifference);
+      const h2 = Math.sqrt(L2 * L2 - baseDifference * baseDifference);
+      const h = (h1 + h2) / 2;
+      const totalArea = ((a + b) / 2) * h;
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = `<h3>النتائج:</h3>
+        <p>المساحة الكلية: <span>${totalArea.toFixed(2)}</span> متر²</p>
+        <hr>
+        <h4>تفاصيل الأقسام:</h4>`;
+
+      if (divisionType === "manual") {
+        const manualAreas = document.getElementById("manualAreas").value.split(',').map(Number);
+        const sumAreas = manualAreas.reduce((sum, area) => sum + area, 0);
+
+        if (sumAreas > totalArea) {
+          alert("مجموع مساحات الأقسام أكبر من المساحة الكلية!");
+          return;
+        }
+
+        let currentTopBase = a;
+        let currentBottomBase = b;
+        let remainingHeight = h;
+        let totalUsedArea = 0;
+
+        for (let i = 0; i < manualAreas.length; i++) {
+          const area = manualAreas[i];
+          const x = computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, area);
+
+          if (x === null || x <= 0 || x > remainingHeight) {
+            resultsDiv.innerHTML += `<p>لا يمكن حساب القسم رقم ${i + 1} بشكل صحيح.</p>`;
+            break;
+          }
+
+          const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
+          const sectionAreaConverted = convertToFeddans(area);
+
+          resultsDiv.innerHTML += `
+            <p>القسم ${i + 1}:</p>
+            <ul>
+              <li>المساحة: <span>${area.toFixed(2)}</span> متر² (${sectionAreaConverted.feddan} فدان، ${sectionAreaConverted.qirat} قيراط، ${sectionAreaConverted.sahm} سهم)</li>
+              <li>الارتفاع: <span>${x.toFixed(2)}</span> متر</li>
+              <li>القاعدة العلوية الجديدة: <span>${currentTopBase.toFixed(2)}</span> متر</li>
+              <li>القاعدة السفلية الجديدة: <span>${newBase.toFixed(2)}</span> متر</li>
+            </ul>
+          `;
+
+          currentTopBase = newBase;
+          remainingHeight -= x;
+          totalUsedArea += area;
+        }
+
+        if (remainingHeight > 0) {
+          const remainingArea = totalArea - totalUsedArea;
+          const remainingAreaConverted = convertToFeddans(remainingArea);
+          resultsDiv.innerHTML += `
+            <h4>المساحة والارتفاع المتبقي:</h4>
+            <p>المساحة المتبقية: <span>${remainingArea.toFixed(2)}</span> متر² (${remainingAreaConverted.feddan} فدان، ${remainingAreaConverted.qirat} قيراط، ${remainingAreaConverted.sahm} سهم)</p>
+            <p>الارتفاع المتبقي: <span>${remainingHeight.toFixed(2)}</span> متر</p>
+          `;
+        }
+      } else if (divisionType === "auto") {
+        const parts = parseInt(document.getElementById("parts").value);
+        if (isNaN(parts) || parts <= 0) {
+          alert("يرجى إدخال عدد صحيح للأقسام.");
+          return;
+        }
+
+        const partArea = totalArea / parts;
+        const partAreaConverted = convertToFeddans(partArea);
+
+        resultsDiv.innerHTML += `
+          <p>عدد الأقسام: <span>${parts}</span></p>
+          <p>مساحة كل قسم: <span>${partArea.toFixed(2)}</span> متر² (${partAreaConverted.feddan} فدان، ${partAreaConverted.qirat} قيراط، ${partAreaConverted.sahm} سهم)</p>
+        `;
+
+        let currentTopBase = a;
+        let currentBottomBase = b;
+        let remainingHeight = h;
+
+        for (let i = 0; i < parts; i++) {
+          const x = computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, partArea);
+
+          if (x === null || x <= 0 || x > remainingHeight) {
+            resultsDiv.innerHTML += `<p>لا يمكن حساب القسم رقم ${i + 1} بشكل صحيح.</p>`;
+            break;
+          }
+
+          const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
+
+          resultsDiv.innerHTML += `
+            <p>القسم ${i + 1}:</p>
+            <ul>
+              <li>الارتفاع: <span>${x.toFixed(2)}</span> متر</li>
+              <li>القاعدة العلوية الجديدة: <span>${currentTopBase.toFixed(2)}</span> متر</li>
+              <li>القاعدة السفلية الجديدة: <span>${newBase.toFixed(2)}</span> متر</li>
+            </ul>
+          `;
+
+          currentTopBase = newBase;
+          remainingHeight -= x;
+        }
+      }
+
+      hideLoading(loading);
+    }
+
+    function computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, area) {
+      const k = (currentBottomBase - currentTopBase) / remainingHeight;
+      const Acoef = k;
+      const Bcoef = 2 * currentTopBase;
+      const Ccoef = -2 * area;
+      const disc = Bcoef * Bcoef - 4 * Acoef * Ccoef;
+      if (disc < 0) return null;
+      const x1 = (-Bcoef + Math.sqrt(disc)) / (2 * Acoef);
+      const x2 = (-Bcoef - Math.sqrt(disc)) / (2 * Acoef);
+      const x = (x1 > 0 && x1 <= remainingHeight) ? x1 : x2;
+      return x;
+    }
+
+    function goBack() {
+      // العودة إلى الصفحة الرئيسية
+      window.location.href = "index.html";
+    }
+
+    function increaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize + 1) + 'px';
+    }
+
+    function decreaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize - 1) + 'px';
+    }
+
+    // تحميل البيانات عند بدء التشغيل
+    calculateArea();
+
+    // Auto-resize inputs to fit content
+    function adjustInputSize() {
+      this.style.width = ((this.value.length || 1) + 1) + "ch";
+    }
+    
+    document.querySelectorAll("input").forEach(input => {
+      adjustInputSize.call(input);
+      input.addEventListener("input", adjustInputSize);
+    });
+
+    function saveResult() {
+        const initialArea = document.getElementById("initialArea").innerText;
+        const divisionsArea = document.getElementById("results").innerText;
+        
+        const result = {
+            type: "شبه منحرف",
+            date: new Date().toLocaleString('ar'),
+            result: initialArea,
+            details: divisionsArea
+        };
+
+        let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+        savedResults.push(result);
+        localStorage.setItem('calculationResults', JSON.stringify(savedResults));
+
+        alert('تم حفظ النتيجة بنجاح');
+    }
+
+    // Add loading animation
+    function showLoading() {
+      const loading = document.createElement('div');
+      loading.className = 'loading';
+      loading.innerHTML = '<div></div><div></div><div></div>';
+      document.body.appendChild(loading);
+      return loading;
+    }
+
+    function hideLoading(loading) {
+      loading.remove();
+    }
+
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+
+      <footer>
+        <p>حقوق النشر والملكية © 2025 يوسف الزغبي</p>
+    </footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حساب مساحة الرباعي الدائري</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3498db">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    h2 {
+      color: #444;
+    }
+    label {
+      display: block;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    input {
+      margin: 10px;
+      padding: 8px;
+      width: 150px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      text-align: right;
+      max-width: 500px;
+    }
+    .results p {
+      margin: 10px 0;
+    }
+    .results span {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .back-button {
+      margin-top: 20px;
+    }
+    .back-button button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-button button:hover {
+      background-color: #5a6268;
+    }
+
+    /* Hide native number spinners */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body>
+  <!-- Added font size controls -->
+  <div class="controls">
+    <button class="font-increase" onclick="increaseFontSize()">+</button>
+    <button class="font-decrease" onclick="decreaseFontSize()">–</button>
+  </div>
+  <h2>حساب مساحة الرباعي الدائري</h2>
+
+  <!-- Wrapped input fields in a grid container -->
+  <div class="input-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="a" step="any" required oninput="calculateArea()">
+      <label for="a">الأول (a):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="b" step="any" required oninput="calculateArea()">
+      <label for="b">الثاني (b):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="L1" step="any" required oninput="calculateArea()">
+      <label for="L1">الثالث (L1):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="L2" step="any" required oninput="calculateArea()">
+      <label for="L2">الرابع (L2):</label>
+    </div>
+  </div>
+
+  <div class="initial-area" id="initialArea"></div>
+
+  <!-- قسم اختيار طريقة التقسيم -->
+  <div id="divisionSection">
+    <label for="divisionType">اختر طريقة التقسيم:</label>
+    <select id="divisionType">
+      <option value="manual">يدوياً</option>
+      <option value="auto">تلقائياً بالتساوي</option>
+    </select>
+    <br>
+
+    <!-- حقول إدخال إضافية بناءً على طريقة التقسيم -->
+    <div id="divisionInputs">
+      <label for="manualAreas">مساحة كل قسم (مفصولة بفاصلة):</label>
+      <input type="text" id="manualAreas">
+      <br>
+      <label for="parts">عدد الأقسام:</label>
+      <input type="number" id="parts" step="1">
+      <br>
+    </div>
+
+    <button onclick="calculate()">حساب الأقسام</button>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <!-- Add save button -->
+  <button onclick="saveResult()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;">
+    حفظ النتيجة
+  </button>
+
+  <div class="back-button">
+    <button onclick="goBack()">العودة إلى الصفحة الرئيسية</button>
+  </div>
+    <script src="mini-calculator.js"></script>
+    <script>
+        function calculateArea() {
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const L1 = parseFloat(document.getElementById("L1").value);
+      const L2 = parseFloat(document.getElementById("L2").value);
+
+      if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2)) return;
+
+      // حساب المساحة باستخدام صيغة براهماغوبتا
+      const s = (a + b + L1 + L2) / 2;
+      const area = Math.sqrt((s - a) * (s - b) * (s - L1) * (s - L2));
+
+      const areaConverted = convertToFeddans(area);
+      const diagonals = calculateDiagonals(a, b, L1, L2);
+
+      const initialAreaDiv = document.getElementById("initialArea");
+      initialAreaDiv.innerHTML = `<h3>المساحة الأولية:</h3>
+        <p>المساحة الكلية: <span>${area.toFixed(2)}</span> متر² (${areaConverted.feddan} فدان، ${areaConverted.qirat} قيراط، ${areaConverted.sahm} سهم)</p>
+        <p>القطر الأول: <span>${diagonals.diagonal1.toFixed(2)}</span> متر</p>
+        <p>القطر الثاني: <span>${diagonals.diagonal2.toFixed(2)}</span> متر</p>`;
+    }
+
+    function calculateDiagonals(a, b, L1, L2) {
+      // حساب الأقطار باستخدام صيغة براهماغوبتا
+      const diagonal1 = Math.sqrt(((a * L1 + b * L2) * (a * L2 + b * L1)) / (a * b + L1 * L2));
+      const diagonal2 = Math.sqrt(((a * L1 + b * L2) * (a * b + L1 * L2)) / (a * L2 + b * L1));
+      return { diagonal1, diagonal2 };
+    }
+
+    function calculate() {
+      const divisionType = document.getElementById("divisionType").value;
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const L1 = parseFloat(document.getElementById("L1").value);
+      const L2 = parseFloat(document.getElementById("L2").value);
+
+      if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2)) return;
+
+      const s = (a + b + L1 + L2) / 2;
+      const totalArea = Math.sqrt((s - a) * (s - b) * (s - L1) * (s - L2));
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = `<h3>النتائج:</h3>
+        <p>المساحة الكلية: <span>${totalArea.toFixed(2)}</span> متر²</p>
+        <hr>
+        <h4>تفاصيل الأقسام:</h4>`;
+
+      if (divisionType === "manual") {
+        const manualAreas = document.getElementById("manualAreas").value.split(',').map(Number);
+        const sumAreas = manualAreas.reduce((sum, area) => sum + area, 0);
+
+        if (sumAreas > totalArea) {
+          alert("مجموع مساحات الأقسام أكبر من المساحة الكلية!");
+          return;
+        }
+
+        let remainingArea = totalArea;
+
+        for (let i = 0; i < manualAreas.length; i++) {
+          const area = manualAreas[i];
+          if (area > remainingArea) {
+            resultsDiv.innerHTML += `<p>لا يمكن حساب القسم رقم ${i + 1} بشكل صحيح.</p>`;
+            break;
+          }
+
+          const sectionAreaConverted = convertToFeddans(area);
+          resultsDiv.innerHTML += `
+            <p>القسم ${i + 1}:</p>
+            <ul>
+              <li>المساحة: <span>${area.toFixed(2)}</span> متر² (${sectionAreaConverted.feddan} فدان، ${sectionAreaConverted.qirat} قيراط، ${sectionAreaConverted.sahm} سهم)</li>
+            </ul>
+          `;
+
+          remainingArea -= area;
+        }
+      } else if (divisionType === "auto") {
+        const parts = parseInt(document.getElementById("parts").value);
+        if (isNaN(parts) || parts <= 0) {
+          alert("يرجى إدخال عدد صحيح للأقسام.");
+          return;
+        }
+
+        const partArea = totalArea / parts;
+        const partAreaConverted = convertToFeddans(partArea);
+
+        resultsDiv.innerHTML += `
+          <p>عدد الأقسام: <span>${parts}</span></p>
+          <p>مساحة كل قسم: <span>${partArea.toFixed(2)}</span> متر² (${partAreaConverted.feddan} فدان، ${partAreaConverted.qirat} قيراط، ${partAreaConverted.sahm} سهم)</p>
+        `;
+
+        for (let i = 0; i < parts; i++) {
+          resultsDiv.innerHTML += `
+            <p>القسم ${i + 1}:</p>
+            <ul>
+              <li>المساحة: <span>${partArea.toFixed(2)}</span> متر² (${partAreaConverted.feddan} فدان، ${partAreaConverted.qirat} قيراط، ${partAreaConverted.sahm} سهم)</li>
+            </ul>
+          `;
+        }
+      }
+    }
+
+    function convertToFeddans(m2) {
+      const feddan = 4200; // 1 فدان = 4200 متر مربع
+      const qirat = 175;   // 1 قيراط = 175 متر مربع
+      const sahm = 7.2917; // 1 سهم = 7.2917 متر مربع
+
+      let remaining = m2;
+      let f = Math.floor(remaining / feddan);
+      remaining -= f * feddan;
+      let q = Math.floor(remaining / qirat);
+      remaining -= q * qirat;
+      let s = remaining / sahm;
+
+      return { feddan: f, qirat: q, sahm: s.toFixed(2) };
+    }
+
+    function goBack() {
+      // العودة إلى الصفحة الرئيسية
+      window.location.href = "index.html";
+    }
+
+    // تحميل البيانات عند بدء التشغيل
+    calculateArea();
+
+    function increaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize + 1) + 'px';
+    }
+    function decreaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize - 1) + 'px';
+    }
+
+    // Add auto-resize functionality for all input elements
+    function adjustInputSize() {
+      this.style.width = ((this.value.length || 1) + 1) + "ch";
+    }
+    
+    document.querySelectorAll("input").forEach(input => {
+      adjustInputSize.call(input);
+      input.addEventListener("input", adjustInputSize);
+    });
+
+    function saveResult() {
+        const initialArea = document.getElementById("initialArea").innerText;
+        const divisionsArea = document.getElementById("results").innerText;
+        
+        const result = {
+            type: "رباعي دائري",
+            date: new Date().toLocaleString('ar'),
+            result: initialArea,
+            details: divisionsArea
+        };
+
+        let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+        savedResults.push(result);
+        localStorage.setItem('calculationResults', JSON.stringify(savedResults));
+
+        alert('تم حفظ النتيجة بنجاح');
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>

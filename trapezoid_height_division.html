@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقسيم مساحة شبه المنحرف بناءً على الارتفاعات</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3498db">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    h2 {
+      color: #444;
+    }
+    label {
+      display: block;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    input {
+      margin: 10px;
+      padding: 8px;
+      width: 150px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .results {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      text-align: right;
+      max-width: 500px;
+    }
+    .results p {
+      margin: 10px 0;
+    }
+    .results span {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .back-button {
+      margin-top: 20px;
+    }
+    .back-button button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-button button:hover {
+      background-color: #5a6268;
+    }
+    .hidden {
+      display: none;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .controls button {
+      padding: 5px 10px;
+      font-size: 16px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    
+    /* Hide the number spinner controls */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body>
+  <!-- Added font size controls -->
+  <div class="controls">
+    <button class="font-increase" onclick="increaseFontSize()">+</button>
+    <button class="font-decrease" onclick="decreaseFontSize()">–</button>
+  </div>
+  <h2>تقسيم مساحة شبه المنحرف بناءً على الارتفاعات</h2>
+
+  <!-- New container for the first four inputs -->
+  <div class="first-four" style="display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="a" step="any" required oninput="calculate()">
+      <label for="a">الصغرى (a):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="b" step="any" required oninput="calculate()">
+      <label for="b">الكبرى (b):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="L1" step="any" required oninput="calculate()">
+      <label for="L1">المائل الأول (L1):</label>
+    </div>
+    <div style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <input type="number" id="L2" step="any" required oninput="calculate()">
+      <label for="L2">المائل الثاني (L2):</label>
+    </div>
+  </div>
+  <!-- The remaining input for heights remains unchanged -->
+  <div class="input-group">
+    <label for="heights">الارتفاعات (مفصولة بفاصلة):</label>
+    <input type="text" id="heights" required oninput="calculate()">
+  </div>
+
+  <div class="results hidden" id="results"></div>
+
+  <!-- Add save button -->
+  <button onclick="saveResult()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;">
+    حفظ النتيجة
+  </button>
+
+  <div class="back-button">
+    <button onclick="goBack()">العودة إلى الصفحة الرئيسية</button>
+  </div>
+
+  <script>
+    function calculate() {
+      const a = parseFloat(document.getElementById("a").value);
+      const b = parseFloat(document.getElementById("b").value);
+      const L1 = parseFloat(document.getElementById("L1").value);
+      const L2 = parseFloat(document.getElementById("L2").value);
+      const heights = document.getElementById("heights").value.split(',').map(Number);
+
+      if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2) || heights.some(isNaN)) {
+        document.getElementById("results").classList.add("hidden");
+        return;
+      }
+
+      const baseDifference = (b - a) / 2;
+      const h1 = Math.sqrt(L1 * L1 - baseDifference * baseDifference);
+      const h2 = Math.sqrt(L2 * L2 - baseDifference * baseDifference);
+      const totalHeight = (h1 + h2) / 2;
+
+      const totalArea = ((a + b) / 2) * totalHeight;
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.classList.remove("hidden");
+      resultsDiv.innerHTML = `<h3>النتائج:</h3>
+        <p>المساحة الكلية: <span>${totalArea.toFixed(2)}</span> متر²</p>
+        <hr>
+        <h4>تفاصيل الأقسام:</h4>`;
+
+      let currentTopBase = a;
+      let currentBottomBase = b;
+      let remainingHeight = totalHeight;
+      let totalUsedArea = 0;
+
+      for (let i = 0; i < heights.length; i++) {
+        const height = heights[i];
+
+        if (height > remainingHeight) {
+          resultsDiv.innerHTML += `<p>لا يمكن حساب القسم رقم ${i + 1} بشكل صحيح.</p>`;
+          break;
+        }
+
+        const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * height;
+        const area = ((currentTopBase + newBase) / 2) * height;
+        const sectionAreaConverted = convertToFeddans(area);
+
+        resultsDiv.innerHTML += `
+          <p>القسم ${i + 1}:</p>
+          <ul>
+            <li>المساحة: <span>${area.toFixed(2)}</span> متر² (${sectionAreaConverted.feddan} فدان، ${sectionAreaConverted.qirat} قيراط، ${sectionAreaConverted.sahm} سهم)</li>
+            <li>الارتفاع: <span>${height.toFixed(2)}</span> متر</li>
+            <li>القاعدة العلوية الجديدة: <span>${currentTopBase.toFixed(2)}</span> متر</li>
+            <li>القاعدة السفلية الجديدة: <span>${newBase.toFixed(2)}</span> متر</li>
+          </ul>
+        `;
+
+        currentTopBase = newBase;
+        remainingHeight -= height;
+        totalUsedArea += area;
+      }
+
+      if (remainingHeight > 0) {
+        const remainingArea = totalArea - totalUsedArea;
+        const remainingAreaConverted = convertToFeddans(remainingArea);
+        resultsDiv.innerHTML += `
+          <h4>المساحة والارتفاع المتبقي:</h4>
+          <p>المساحة المتبقية: <span>${remainingArea.toFixed(2)}</span> متر² (${remainingAreaConverted.feddan} فدان، ${remainingAreaConverted.qirat} قيراط، ${remainingAreaConverted.sahm} سهم)</p>
+          <p>الارتفاع المتبقي: <span>${remainingHeight.toFixed(2)}</span> متر</p>
+        `;
+      }
+    }
+
+    function convertToFeddans(m2) {
+      const feddan = 4200; // 1 فدان = 4200 متر مربع
+      const qirat = 175;   // 1 قيراط = 175 متر مربع
+      const sahm = 7.2917; // 1 سهم = 7.2917 متر مربع
+
+      let remaining = m2;
+      let f = Math.floor(remaining / feddan);
+      remaining -= f * feddan;
+      let q = Math.floor(remaining / qirat);
+      remaining -= q * qirat;
+      let s = remaining / sahm;
+
+      return { feddan: f, qirat: q, sahm: s.toFixed(2) };
+    }
+
+    function goBack() {
+      // العودة إلى الصفحة الرئيسية
+      window.location.href = "index.html";
+    }
+
+    function increaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize + 1) + 'px';
+    }
+
+    function decreaseFontSize() {
+      const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+      document.body.style.fontSize = (currentSize - 1) + 'px';
+    }
+    
+    // Make input fields adapt to their content
+    function adjustInputSize() {
+      this.style.width = ((this.value.length || 1) + 1) + "ch";
+    }
+    
+    document.querySelectorAll("input").forEach(input => {
+      adjustInputSize.call(input);
+      input.addEventListener("input", adjustInputSize);
+    });
+
+    function saveResult() {
+        const resultsDiv = document.getElementById("results");
+        const result = {
+            type: "تقسيم شبه منحرف بالارتفاع",
+            date: new Date().toLocaleString('ar'),
+            result: resultsDiv.innerText
+        };
+
+        let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+        savedResults.push(result);
+        localStorage.setItem('calculationResults', JSON.stringify(savedResults));
+
+        alert('تم حفظ النتيجة بنجاح');
+    }
+  </script>
+      <footer>
+        <p>حقوق النشر والملكية © 2025 يوسف الزغبي</p>
+    </footer>
+
+  <script src="mini-calculator.js"></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>
