@@ -1,160 +1,95 @@
-// Smart cache strategy without version numbers
-const CACHE_NAME = 'area-calc-dynamic';
-const STATIC_CACHE_NAME = 'area-calc-static';
+// بص يا سيدي، ده الـ Service Worker اللي هيخلي التطبيق يشتغل أوفلاين زي الفل
+const CACHE_NAME = 'area-calc-v3';
 
-// Static assets that rarely change
-const STATIC_ASSETS = [
-  'manifest.json',
-  'icon.png',
-  'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap'
-];
-
-// Dynamic assets that may change frequently
-const DYNAMIC_ASSETS = [
+// دي قايمة بكل الملفات اللي محتاجينها عشان التطبيق يشتغل من غير نت
+const ASSETS_TO_CACHE = [
   './',
   'index.html',
+  'manifest.json',
+  'icon.png',
+  'calculator.html',
   'cyclicQuadrilateral.html',
   'divide_area.html',
   'irregular_quadrilateral.html',
+  'login.html',
+  'main_screen.html',
+  'profile.html',
   'saved_results.html',
   'trapezoid.html',
   'trapezoid_height_division.html',
   'triangle.html',
-  'calculator.html',
   'mini-calculator.js',
   'reset-button.js',
-  'main_screen.html',
-  'login.html',
-  'profile.html',
   'firebase-config.js',
-  'firebase-logic.js'
+  'firebase-logic.js',
+  // الروابط الخارجية المهمة
+  'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js',
+  'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
 ];
 
-// Install event - cache static assets
+// أول ما الـ Service Worker يتثبت، هنسيف كل الملفات دي في الكاش
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE_NAME).then((cache) => {
-      console.log('Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('يا مسهل.. بنسيف الملفات في الكاش');
+      // بنستخدم map عشان لو ملف واحد فشل، الباقي يكمل عادي
+      return Promise.all(
+        ASSETS_TO_CACHE.map(url => {
+          return cache.add(url).catch(err => console.warn('فشل تحميل ملف في الكاش:', url, err));
+        })
+      );
     })
   );
-  // Skip waiting to activate immediately
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// تنظيف الكاش القديم
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames
-          .filter((cacheName) => {
-            return cacheName !== STATIC_CACHE_NAME && cacheName !== CACHE_NAME;
-          })
-          .map((cacheName) => {
-            console.log('Deleting old cache:', cacheName);
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('بنمسح الكاش القديم:', cacheName);
             return caches.delete(cacheName);
-          })
+          }
+        })
       );
     })
   );
-  // Claim clients immediately
   self.clients.claim();
 });
 
-// Fetch event - Network First with cache update
+// استراتيجية الـ Fetch: نحاول نجيب من النت الأول، لو فشل نرجع للكاش
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
+  // بنتجاهل الطلبات اللي مش GET
+  if (event.request.method !== 'GET') return;
 
-  // Skip non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
-
-  // Handle dynamic assets (HTML, JS, CSS)
-  if (DYNAMIC_ASSETS.some(asset => request.url.includes(asset))) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone the response immediately
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // لو الرد تمام، نحدث الكاش بالنسخة الجديدة
+        if (response && response.status === 200) {
           const responseToCache = response.clone();
-          
-          // Update cache with fresh version
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseToCache);
+            cache.put(event.request, responseToCache);
           });
-          
-          return response;
-        })
-        .catch(() => {
-          // If network fails, try cache
-          return caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            // If not in cache, try static cache
-            return caches.match(request, { cacheName: STATIC_CACHE_NAME });
-          });
-        })
-    );
-  } else {
-    // For other assets, use cache first
-    event.respondWith(
-      caches.match(request).then((cachedResponse) => {
-        if (cachedResponse) {
-          // Update cache in background for next time
-          fetch(request).then((response) => {
-            if (response.ok) {
-              const responseToCache = response.clone();
-              caches.open(STATIC_CACHE_NAME).then((cache) => {
-                cache.put(request, responseToCache);
-              });
-            }
-          }).catch(() => {}); // Ignore network errors for background updates
-          
-          return cachedResponse;
         }
-        
-        // If not in cache, fetch from network
-        return fetch(request).then((response) => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+        return response;
+      })
+      .catch(() => {
+        // لو النت فصل، ندور في الكاش
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          
+          // لو صفحة ومش موجودة، نرجع index.html كحل أخير
+          if (event.request.mode === 'navigate') {
+            return caches.match('index.html');
           }
-          
-          const responseToCache = response.clone();
-          // Cache the response
-          caches.open(STATIC_CACHE_NAME).then((cache) => {
-            cache.put(request, responseToCache);
-          });
-          
-          return response;
-        }).catch(() => {
-            // Handle offline case for non-cached assets
-            return new Response('Offline content not available', {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: new Headers({ 'Content-Type': 'text/plain' })
-            });
         });
       })
-    );
-  }
-});
-
-// Message event to handle manual cache clearing
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => caches.delete(cacheName))
-      );
-    }).then(() => {
-      event.ports[0].postMessage({ success: true });
-    });
-  }
+  );
 });

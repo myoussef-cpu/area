@@ -273,21 +273,6 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- كاش باستر - Cache Buster -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                } 
-            });
-            caches.keys().then(function(names) {
-                for (let name of names)
-                    caches.delete(name);
-            });
-        }
-    </script>
-
     <header class="app-bar">
         <button class="nav-btn" id="menu-toggle">
             <i class="fas fa-bars"></i>
