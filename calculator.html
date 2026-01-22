@@ -1,238 +1,136 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الآلة الحاسبة الاحترافية</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Roboto+Mono&display=swap');
-        
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e67e22;
-            --success-color: #2ecc71;
-            --danger-color: #e74c3c;
-            --bg-gradient: linear-gradient(135deg, #77898f 0%, #95a5a6 100%);
-            --calc-bg: rgba(255, 255, 255, 0.95);
-        }
+<title>الآلة الحاسبة</title>
 
-        body {
-            font-family: 'Tajawal', Arial, sans-serif;
-            background: var(--bg-gradient);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .calc-wrapper {
-            width: 100%;
-            max-width: 450px;
-            perspective: 1000px;
-        }
-
-        .calculator {
-            background: var(--calc-bg);
-            backdrop-filter: blur(15px);
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            transform-style: preserve-3d;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotateX(0); }
-            50% { transform: translateY(-10px) rotateX(2deg); }
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--secondary-color);
-        }
-
-        .display-container {
-            background: #2c3e50;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
-            text-align: left;
-            direction: ltr;
-        }
-
-        .history {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            min-height: 1.2rem;
-            margin-bottom: 5px;
-            font-family: 'Roboto Mono', monospace;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .current-input {
-            color: #fff;
-            font-size: 2.5rem;
-            font-family: 'Roboto Mono', monospace;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        button {
-            border: none;
-            border-radius: 18px;
-            padding: 20px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Tajawal', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-        }
-
-        button:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 rgba(0,0,0,0.1);
-        }
-
-        .num-btn { background: #fff; color: var(--secondary-color); }
-        .num-btn:hover { background: #f8f9fa; }
-
-        .op-btn { background: #eef2f3; color: var(--primary-color); }
-        .op-btn:hover { background: var(--primary-color); color: #fff; }
-
-        .action-btn { background: #fdebd0; color: var(--accent-color); }
-        .action-btn:hover { background: var(--accent-color); color: #fff; }
-
-        .equal-btn { 
-            background: var(--success-color); 
-            color: #fff; 
-            grid-column: span 2;
-        }
-        .equal-btn:hover { filter: brightness(1.1); }
-
-        .clear-btn { 
-            background: var(--danger-color); 
-            color: #fff; 
-            grid-column: span 2;
-        }
-        .clear-btn:hover { filter: brightness(1.1); }
-
-        .back-home {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .back-link {
-            text-decoration: none;
-            color: var(--secondary-color);
-            font-weight: 700;
-            font-size: 1rem;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .back-link:hover { opacity: 1; }
-
-        /* Tablet & Mobile Responsiveness */
-        @media (max-width: 480px) {
-            .calculator {
-                padding: 20px;
-                border-radius: 20px;
-            }
-            .buttons-grid {
-                gap: 10px;
-            }
-            button {
-                padding: 15px;
-                font-size: 1.1rem;
-                border-radius: 14px;
-            }
-            .current-input {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-height: 700px) {
-            body { padding: 10px; }
-            .calculator { padding: 15px; }
-            .display-container { padding: 15px; margin-bottom: 15px; }
-            .buttons-grid { gap: 8px; }
-            button { padding: 12px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="calc-wrapper">
-        <div class="calculator">
-            <div class="header">
-                <h1>الآلة الحاسبة</h1>
-                <div style="font-size: 1.5rem;">🔢</div>
-            </div>
-            
-            <div class="display-container">
-                <div class="history" id="history"></div>
-                <div class="current-input" id="display">0</div>
-            </div>
-            
-            <div class="buttons-grid">
-                <button class="clear-btn" onclick="clearDisplay()">مسح</button>
-                <button class="action-btn" onclick="deleteLast()">⌫</button>
-                <button class="op-btn" onclick="appendOperator('/')">÷</button>
-                
-                <button class="num-btn" onclick="appendNumber('7')">7</button>
-                <button class="num-btn" onclick="appendNumber('8')">8</button>
-                <button class="num-btn" onclick="appendNumber('9')">9</button>
-                <button class="op-btn" onclick="appendOperator('*')">×</button>
-                
-                <button class="num-btn" onclick="appendNumber('4')">4</button>
-                <button class="num-btn" onclick="appendNumber('5')">5</button>
-                <button class="num-btn" onclick="appendNumber('6')">6</button>
-                <button class="op-btn" onclick="appendOperator('-')">−</button>
-                
-                <button class="num-btn" onclick="appendNumber('1')">1</button>
-                <button class="num-btn" onclick="appendNumber('2')">2</button>
-                <button class="num-btn" onclick="appendNumber('3')">3</button>
-                <button class="op-btn" onclick="appendOperator('+')">+</button>
-                
-                <button class="num-btn" onclick="appendNumber('0')">0</button>
-                <button class="num-btn" onclick="appendNumber('.')">.</button>
-                <button class="equal-btn" onclick="calculate()">=</button>
-            </div>
+<div class="calc-wrapper">
+    <div class="calculator">
+        <div class="display-container">
+            <div class="history" id="history"></div>
+            <div class="current-input" id="display">0</div>
         </div>
         
-        <div class="back-home">
-            <a href="index.html" class="back-link">← العودة للرئيسية</a>
+        <div class="buttons-grid">
+            <button class="clear-btn" onclick="clearDisplay()">مسح</button>
+            <button class="action-btn" onclick="deleteLast()">⌫</button>
+            <button class="op-btn" onclick="appendOperator('/')">÷</button>
+            
+            <button class="num-btn" onclick="appendNumber('7')">7</button>
+            <button class="num-btn" onclick="appendNumber('8')">8</button>
+            <button class="num-btn" onclick="appendNumber('9')">9</button>
+            <button class="op-btn" onclick="appendOperator('*')">×</button>
+            
+            <button class="num-btn" onclick="appendNumber('4')">4</button>
+            <button class="num-btn" onclick="appendNumber('5')">5</button>
+            <button class="num-btn" onclick="appendNumber('6')">6</button>
+            <button class="op-btn" onclick="appendOperator('-')">−</button>
+            
+            <button class="num-btn" onclick="appendNumber('1')">1</button>
+            <button class="num-btn" onclick="appendNumber('2')">2</button>
+            <button class="num-btn" onclick="appendNumber('3')">3</button>
+            <button class="op-btn" onclick="appendOperator('+')">+</button>
+            
+            <button class="num-btn" onclick="appendNumber('0')">0</button>
+            <button class="num-btn" onclick="appendNumber('.')">.</button>
+            <button class="equal-btn" onclick="calculate()">=</button>
         </div>
     </div>
+</div>
 
-    <script>
+<style>
+    .calc-wrapper {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .calculator {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark-mode .calculator {
+        background: var(--card-dark);
+    }
+
+    .display-container {
+        background: #2c3e50;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 20px;
+        text-align: left;
+        direction: ltr;
+        box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .history {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+        min-height: 1.2rem;
+        margin-bottom: 5px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .current-input {
+        color: #fff;
+        font-size: 2.2rem;
+        font-family: 'Courier New', Courier, monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .buttons-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .buttons-grid button {
+        border: none;
+        border-radius: 16px;
+        padding: 18px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .num-btn { background: #f8f9fa; color: #333; }
+    .dark-mode .num-btn { background: #3a3a3c; color: #fff; }
+
+    .op-btn { background: #eef2f3; color: var(--primary); }
+    .dark-mode .op-btn { background: #2c2c2e; color: var(--primary); }
+
+    .action-btn { background: #fdebd0; color: #e67e22; }
+    
+    .equal-btn { 
+        background: var(--primary); 
+        color: #fff; 
+        grid-column: span 2;
+    }
+
+    .clear-btn { 
+        background: #f8d7da; 
+        color: #721c24; 
+        grid-column: span 2;
+    }
+    
+    .dark-mode .clear-btn { background: #442727; color: #ff8a8a; }
+
+    button:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+</style>
+
+<script>
+    if (typeof currentInput === 'undefined') {
         let currentInput = '0';
         let history = '';
+        
         const displayElement = document.getElementById('display');
         const historyElement = document.getElementById('history');
 
@@ -241,7 +139,7 @@
             historyElement.textContent = history;
         }
 
-        function appendNumber(num) {
+        window.appendNumber = function(num) {
             if (currentInput === '0' && num !== '.') {
                 currentInput = num;
             } else {
@@ -249,9 +147,9 @@
                 currentInput += num;
             }
             updateDisplay();
-        }
+        };
 
-        function appendOperator(op) {
+        window.appendOperator = function(op) {
             const lastChar = currentInput.slice(-1);
             if (['+', '-', '*', '/'].includes(lastChar)) {
                 currentInput = currentInput.slice(0, -1) + op;
@@ -263,24 +161,24 @@
                 }
             }
             updateDisplay();
-        }
+        };
 
-        function clearDisplay() {
+        window.clearDisplay = function() {
             currentInput = '0';
             history = '';
             updateDisplay();
-        }
+        };
 
-        function deleteLast() {
+        window.deleteLast = function() {
             if (currentInput.length > 1) {
                 currentInput = currentInput.slice(0, -1);
             } else {
                 currentInput = '0';
             }
             updateDisplay();
-        }
+        };
 
-        function calculate() {
+        window.calculate = function() {
             try {
                 history = currentInput + ' =';
                 let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
@@ -292,20 +190,6 @@
                 updateDisplay();
                 setTimeout(clearDisplay, 1500);
             }
-        }
-
-        // Keyboard Support
-        document.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
-            if (e.key === '.') appendNumber('.');
-            if (e.key === '+') appendOperator('+');
-            if (e.key === '-') appendOperator('-');
-            if (e.key === '*') appendOperator('*');
-            if (e.key === '/') appendOperator('/');
-            if (e.key === 'Enter' || e.key === '=') calculate();
-            if (e.key === 'Escape') clearDisplay();
-            if (e.key === 'Backspace') deleteLast();
-        });
-    </script>
-</body>
-</html>
+        };
+    }
+</script>

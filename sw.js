@@ -5,6 +5,7 @@ const STATIC_CACHE_NAME = 'area-calc-static';
 // Static assets that rarely change
 const STATIC_ASSETS = [
   'manifest.json',
+  'icon.png',
   'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap'
 ];
 
@@ -20,7 +21,13 @@ const DYNAMIC_ASSETS = [
   'trapezoid_height_division.html',
   'triangle.html',
   'calculator.html',
-  'mini-calculator.js'
+  'mini-calculator.js',
+  'reset-button.js',
+  'main_screen.html',
+  'login.html',
+  'profile.html',
+  'firebase-config.js',
+  'firebase-logic.js'
 ];
 
 // Install event - cache static assets
@@ -70,12 +77,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Clone the response
-          const responseClone = response.clone();
+          // Clone the response immediately
+          const responseToCache = response.clone();
           
           // Update cache with fresh version
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
+            cache.put(request, responseToCache);
           });
           
           return response;
@@ -98,9 +105,12 @@ self.addEventListener('fetch', (event) => {
         if (cachedResponse) {
           // Update cache in background for next time
           fetch(request).then((response) => {
-            caches.open(STATIC_CACHE_NAME).then((cache) => {
-              cache.put(request, response.clone());
-            });
+            if (response.ok) {
+              const responseToCache = response.clone();
+              caches.open(STATIC_CACHE_NAME).then((cache) => {
+                cache.put(request, responseToCache);
+              });
+            }
           }).catch(() => {}); // Ignore network errors for background updates
           
           return cachedResponse;
@@ -108,12 +118,24 @@ self.addEventListener('fetch', (event) => {
         
         // If not in cache, fetch from network
         return fetch(request).then((response) => {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          const responseToCache = response.clone();
           // Cache the response
           caches.open(STATIC_CACHE_NAME).then((cache) => {
-            cache.put(request, response.clone());
+            cache.put(request, responseToCache);
           });
           
           return response;
+        }).catch(() => {
+            // Handle offline case for non-cached assets
+            return new Response('Offline content not available', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: new Headers({ 'Content-Type': 'text/plain' })
+            });
         });
       })
     );

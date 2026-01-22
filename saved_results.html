@@ -5,291 +5,331 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>النتائج المحفوظة</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
     <meta name="theme-color" content="#3498db">
     <link rel="stylesheet" href="css/common-styles.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%);
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .dark-mode body {
+            background-color: #1c1c1e;
+            color: #ffffff;
         }
 
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .result-card {
-            position: relative;
-            overflow: hidden;
-            border: none;
-            background: white;
-            padding: 20px;
-            margin: 15px 0;
+            background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s, background-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #eee;
+            text-align: right;
         }
 
-        .result-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary-color);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+        .dark-mode .result-card {
+            background: #2c2c2e;
+            border-color: #3a3a3c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        .result-card:hover::before {
-            transform: scaleY(1);
+        .result-card:active {
+            transform: scale(0.98);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-summary {
+        .result-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            margin-bottom: 8px;
         }
+
+        .result-type {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #007aff;
+        }
+
+        .result-date {
+            font-size: 0.8rem;
+            color: #8e8e93;
+        }
+
+        .result-summary-text {
+            font-size: 1rem;
+            margin: 8px 0;
+            color: #333;
+        }
+
+        .dark-mode .result-summary-text {
+            color: #ebebf5;
+        }
+
         .result-details {
-            position: relative;
-            padding: 20px;
-            margin-top: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            transform-origin: top;
-            transition: all 0.3s ease;
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #666;
+            white-space: pre-line;
         }
+
+        .dark-mode .result-details {
+            border-top-color: #3a3a3c;
+            color: #aeaeb2;
+        }
+
         .result-details.show {
-            animation: expandDetails 0.3s ease-out forwards;
+            display: block;
         }
 
-        @keyframes expandDetails {
-            from { transform: scaleY(0); opacity: 0; }
-            to { transform: scaleY(1); opacity: 1; }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 10px;
         }
 
-        .expand-icon {
-            position: relative;
-            width: 24px;
-            height: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .expand-icon::before,
-        .expand-icon::after {
-            content: '';
-            position: absolute;
-            background: var(--primary-color);
-            transition: all 0.3s ease;
-        }
-
-        .summary-text {
-            flex: 1;
-            margin-right: 10px;
-        }
         .delete-btn {
-            background: linear-gradient(145deg, #ff4b4b, #dc3545);
+            background: #ff3b30;
             color: white;
             border: none;
             padding: 8px 15px;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
-            float: left;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .delete-btn:hover {
             opacity: 0.8;
         }
-        .delete-btn:hover {
-            opacity: 1;
-            transform: scale(1.1);
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .back-button {
-            margin: 20px;
-            padding: 10px 20px;
-            background: linear-gradient(145deg, #6c757d, #495057);
+
+        .reload-btn {
+            background: #3498db;
             color: white;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
-        }
-        h1 {
-            color: #2c3e50;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            animation: slideDown 0.5s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .result-details {
-            white-space: pre-line; /* Changed from pre-wrap to pre-line */
-            text-align: right;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-
-        /* Loading Animation */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .reload-btn:active i {
+            transform: rotate(360deg);
+            transition: transform 0.5s;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        .sync-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .sync-true { background: #e1f5fe; color: #0288d1; }
+        .sync-false { background: #fff3e0; color: #f57c00; }
+
+        .dark-mode .sync-true { background: #01579b; color: #e1f5fe; }
+        .dark-mode .sync-false { background: #e65100; color: #fff3e0; }   animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .delete-btn {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8e8e93;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* اخفاء الهيدر والباك بوتون لان index.html بيقوم بالواجب */
+        .page-header {
+            display: none;
         }
     </style>
 </head>
-<body>
-    <!-- Add loading overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-
+<body class="mobile-view">
     <div class="container">
-        <h1>النتائج المحفوظة</h1>
-        <div id="savedResults"></div>
-        <button class="back-button" onclick="window.location.href='index.html'">العودة للصفحة الرئيسية</button>
+        <div class="header-actions">
+            <h2 style="margin:0;">النتائج المحفوظة</h2>
+            <button class="reload-btn" onclick="loadSavedResults()" title="إعادة تحميل">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+        
+        <div id="sync-status" style="font-size: 0.8rem; margin-bottom: 15px; color: #7f8c8d; text-align: left;">
+            <i class="fas fa-cloud"></i> متصل بالسحابة
+        </div>
+        <div id="savedResults">
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: #3498db;"></i>
+            </div>
+        </div>
     </div>
 
-    <script src="mini-calculator.js"></script>
-    <script>
-        // Add loading animation
-        window.addEventListener('load', function() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 300);
-            }, 500);
-        });
+    <script type="module">
+        import { fetchResults } from './firebase-logic.js';
+        
+        // اول حاجة نشوف لو المود غامق ولا فاتح
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark-mode');
+        }
 
-        function loadSavedResults() {
+        async function loadSavedResults() {
             const resultsContainer = document.getElementById('savedResults');
-            const savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
+            const syncStatus = document.getElementById('sync-status');
+            const reloadIcon = document.querySelector('.reload-btn i');
             
-            if (savedResults.length === 0) {
-                resultsContainer.innerHTML = '<p>لا توجد نتائج محفوظة</p>';
+            if (reloadIcon) reloadIcon.classList.add('spinning');
+
+            // التأكد من وجود العنصر قبل التعديل عليه
+            if (!resultsContainer) {
+                console.error("❌ Element 'savedResults' not found!");
                 return;
             }
 
-            resultsContainer.innerHTML = savedResults.map((result, index) => {
-                const mainArea = extractMainArea(result.result);
-                return `
-                    <div class="result-card" onclick="toggleDetails(${index})">
-                        <div class="result-summary">
-                            <div class="summary-text">
-                                <strong>${result.type}</strong> - ${result.date}<br>
+            try {
+                // استخدام النسخة الموجودة في window لو الـ import فشل
+                const fetchFn = window.firebaseLogic?.fetchResults || fetchResults;
+                const savedResults = await fetchFn();
+                
+                if (syncStatus) {
+                    syncStatus.innerHTML = '<i class="fas fa-check-circle" style="color: green;"></i> تم التحديث';
+                }
+                
+                if (!savedResults || savedResults.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <p>يا ريس مفيش أي نتائج محفوظة لسه!</p>
+                            <p style="font-size: 0.8rem;">ابتدأ احسب مساحاتك وهتلاقيها هنا</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                resultsContainer.innerHTML = savedResults.map((result, index) => {
+                    // معالجة البيانات عشان لو جاية من Firestore
+                    const mainArea = result.result || "نتيجة غير معروفة"; 
+                    const timestamp = result.timestamp ? new Date(result.timestamp).toLocaleDateString('ar-EG') : 'غير محدد';
+                    const cloudId = result.id || null;
+                    const isSynced = result.fromCloud || result.synced;
+                    const syncLabel = isSynced ? 'متزامن' : 'محلي فقط';
+                    const syncClass = isSynced ? 'sync-true' : 'sync-false';
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header" onclick="this.parentElement.querySelector('.result-details').classList.toggle('show')">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span class="result-type">${result.type || 'حساب مساحة'}</span>
+                                    <span class="sync-badge ${syncClass}">${syncLabel}</span>
+                                </div>
+                                <span class="result-date">${timestamp}</span>
+                            </div>
+                            <div class="result-summary-text" onclick="this.parentElement.querySelector('.result-details').classList.toggle('show')">
                                 ${mainArea}
                             </div>
-                            <button class="delete-btn" onclick="deleteResult(${index}); event.stopPropagation();">حذف</button>
-                            <span class="expand-icon" id="icon-${index}">▼</span>
+                            <div class="result-details">
+                                ${result.details || ''}
+                                <div class="actions">
+                                    <button class="delete-btn" onclick="confirmDelete('${result.timestamp}', '${cloudId}')">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="result-details" id="details-${index}">
-                            ${formatResult(result.result)}
-                            ${result.details ? `<hr>${formatResult(result.details)}` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join(''); 
+            } catch (e) {
+                console.error(e);
+                resultsContainer.innerHTML = '<p style="color:red; text-align:center;">حصل خطأ في تحميل البيانات. اتأكد من النت.</p>';
+            } finally {
+                if (reloadIcon) reloadIcon.classList.remove('spinning');
+            }
         }
 
-        function toggleDetails(index) {
-            const detailsDiv = document.getElementById(`details-${index}`);
-            const icon = document.getElementById(`icon-${index}`);
-            detailsDiv.classList.toggle('show');
-            icon.classList.toggle('rotate');
-        }
+        window.confirmDelete = async function(timestamp, cloudId) {
+            if (confirm('هل أنت متأكد من حذف هذه النتيجة؟')) {
+                try {
+                    const deleteFn = window.firebaseLogic?.deleteResult || deleteResult;
+                    await deleteFn(timestamp, cloudId);
+                    loadSavedResults(); // إعادة تحميل القائمة
+                } catch (e) {
+                    alert('حصل مشكلة أثناء الحذف');
+                }
+            }
+        };
 
-        function extractMainArea(text) {
-            // استخراج المساحة الرئيسية فقط
-            const areaMatch = text.match(/المساحة الكلية:([^(]+)/);
-            return areaMatch ? areaMatch[1].trim() : text;
-        }
-
-        function formatResult(text) {
-            if (!text) return '';
-            return text
-                .replace(/\n/g, '<br>')
-                .replace(/:/g, ':<br>')
-                .replace(/،/g, '،<br>')
-                .replace(/\s*\|\s*/g, ' | ')
-                .trim();
-        }
-
-        function deleteResult(index) {
-            let savedResults = JSON.parse(localStorage.getItem('calculationResults') || '[]');
-            savedResults.splice(index, 1);
-            localStorage.setItem('calculationResults', JSON.stringify(savedResults));
-            loadSavedResults();
-        }
-
-        // Load results when page loads
-        loadSavedResults();
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed', err));
-            });
-        }
+        // تشغيل التحميل
+        window.loadSavedResults = loadSavedResults;
+        setTimeout(loadSavedResults, 100);
     </script>
 </body>
 </html>

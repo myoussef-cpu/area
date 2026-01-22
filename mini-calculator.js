@@ -1,12 +1,12 @@
 (function() {
-    // Check if style already exists
+    // يعني يا باشا لو الاستايلات موجودة خلاص مش هنحطها تاني
     if (document.getElementById('mini-calc-styles')) return;
 
-    // Create Styles
+    // هنا بقى بنعمل الاستايلات اللي هتخلي الآلة الحاسبة شكلها "برنس"
     const style = document.createElement('style');
     style.id = 'mini-calc-styles';
     style.textContent = `
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Roboto+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap');
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
         #mini-calc-container {
@@ -19,48 +19,52 @@
             touch-action: none;
         }
 
+        /* الزرار اللي بيفتح الآلة الحاسبة، عاملينه عايم وشيك */
         #mini-calc-toggle {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1abc9c, #16a085);
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             border: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
             cursor: move;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             touch-action: none;
         }
 
         #mini-calc-toggle:hover {
-            transform: scale(1.1) rotate(10deg);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(52, 152, 219, 0.5);
         }
 
         #mini-calc-toggle:active {
             transform: scale(0.9);
         }
 
+        /* الصندوق بتاع الآلة الحاسبة نفسه */
         #mini-calc-box {
             position: absolute;
-            bottom: 75px;
+            bottom: 85px;
             right: 0;
-            width: 240px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            padding: 15px;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            padding: 18px;
             display: none;
             flex-direction: column;
-            gap: 10px;
-            border: 1px solid rgba(0,0,0,0.05);
-            animation: slideUp 0.3s ease-out;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: calcReveal 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             transform-origin: bottom right;
         }
 
@@ -68,103 +72,137 @@
             display: flex;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: scale(0.8) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes calcReveal {
+            from { 
+                opacity: 0; 
+                transform: scale(0.5) translateY(40px);
+                filter: blur(10px);
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1) translateY(0);
+                filter: blur(0);
+            }
         }
 
+        /* الشاشة اللي بتعرض الأرقام */
         .mini-display-wrapper {
-            background: #2c3e50;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: left;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 18px;
+            text-align: right;
             direction: ltr;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         #mini-history {
             color: rgba(255, 255, 255, 0.4);
-            font-size: 10px;
+            font-size: 11px;
             font-family: 'Roboto Mono', monospace;
-            min-height: 12px;
+            min-height: 14px;
+            margin-bottom: 4px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         #mini-display {
-            color: white;
-            font-size: 18px;
+            color: #2ecc71;
+            font-size: 24px;
             font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            margin-top: 2px;
         }
 
+        /* تقسيمة الزراير */
         .mini-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .mini-grid button {
-            padding: 12px 5px;
-            font-size: 16px;
-            font-weight: bold;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             cursor: pointer;
-            background: #f8f9fa;
+            background: #ffffff;
             color: #2c3e50;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Tajawal', sans-serif;
-            box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             -webkit-tap-highlight-color: transparent;
         }
 
         .mini-grid button:hover {
-            background: #eef2f3;
+            background: #f0f3f5;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
 
         .mini-grid button:active {
-            transform: translateY(1px);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: #e8ecef;
         }
 
+        /* زراير العمليات الحسابية */
         .mini-grid .op {
-            background: #eef2f3;
+            background: #f8f9fa;
             color: #3498db;
         }
 
+        /* زرار التساوي الأخضر */
         .mini-grid .eq {
             background: #2ecc71;
             color: white;
             grid-column: span 2;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .mini-grid .eq:hover {
+            background: #27ae60;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
         }
 
+        /* زرار المسح الأحمر */
         .mini-grid .clr {
-            background: #e74c3c;
+            background: #ff7675;
             color: white;
             grid-column: span 2;
+            box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3);
         }
 
-        /* Mobile specific adjustments */
+        .mini-grid .clr:hover {
+            background: #d63031;
+            box-shadow: 0 6px 20px rgba(255, 118, 117, 0.4);
+        }
+
+        /* شوية تظبيط للموبايل */
         @media (max-width: 480px) {
             #mini-calc-box {
-                width: 220px;
-                bottom: 70px;
+                width: 240px;
+                bottom: 80px;
+                right: -10px;
             }
             #mini-calc-toggle {
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
             }
         }
     `;
     document.head.appendChild(style);
 
-    // Create HTML
+    // بنبني الـ HTML بتاعنا هنا يا ريس
     const container = document.createElement('div');
     container.id = 'mini-calc-container';
     container.innerHTML = `
@@ -174,19 +212,19 @@
                 <div id="mini-display">0</div>
             </div>
             <div class="mini-grid">
-                <button class="clr" id="mini-clr"><i class="fas fa-trash-alt"></i></button>
-                <button class="op" data-val="/"><i class="fas fa-divide"></i></button>
-                <button class="op" data-val="*"><i class="fas fa-times"></i></button>
+                <button class="clr" id="mini-clr" title="مسح الكل"><i class="fas fa-trash-alt"></i></button>
+                <button class="op" data-val="/" title="قسمة"><i class="fas fa-divide"></i></button>
+                <button class="op" data-val="*" title="ضرب"><i class="fas fa-times"></i></button>
                 
                 <button data-val="7">7</button>
                 <button data-val="8">8</button>
                 <button data-val="9">9</button>
-                <button class="op" data-val="-"><i class="fas fa-minus"></i></button>
+                <button class="op" data-val="-" title="طرح"><i class="fas fa-minus"></i></button>
                 
                 <button data-val="4">4</button>
                 <button data-val="5">5</button>
                 <button data-val="6">6</button>
-                <button class="op" data-val="+"><i class="fas fa-plus"></i></button>
+                <button class="op" data-val="+" title="جمع"><i class="fas fa-plus"></i></button>
                 
                 <button data-val="1">1</button>
                 <button data-val="2">2</button>
@@ -194,16 +232,16 @@
                 <button data-val=".">.</button>
                 
                 <button data-val="0">0</button>
-                <button class="eq" id="mini-eq"><i class="fas fa-equals"></i></button>
+                <button class="eq" id="mini-eq" title="يساوي"><i class="fas fa-equals"></i></button>
             </div>
         </div>
         <div id="mini-calc-toggle" title="سحب للتحريك، ضغطة للفتح">
-            <i class="fas fa-calculator" style="font-size: 28px;"></i>
+            <i class="fas fa-calculator"></i>
         </div>
     `;
     document.body.appendChild(container);
 
-    // Logic
+    // شوية الـ Logic اللي بيشغلوا المكنة
     const box = document.getElementById('mini-calc-box');
     const toggle = document.getElementById('mini-calc-toggle');
     const display = document.getElementById('mini-display');
@@ -217,33 +255,45 @@
         historyDisp.textContent = history;
     }
 
-    // Calculator Logic
+    // هنا بنهندل كليكات الزراير
     const handleButtonClick = (e) => {
-        const btn = e.target;
+        let btn = e.target;
+        // لو داس على الأيقونة اللي جوه الزرار، نطلع للزرار نفسه
+        if (btn.tagName === 'I') btn = btn.parentElement;
         if (btn.tagName !== 'BUTTON') return;
         
         e.preventDefault();
         e.stopPropagation();
 
+        // لو داس مسح
         if (btn.id === 'mini-clr') {
             currentInput = '0';
             history = '';
-        } else if (btn.id === 'mini-eq') {
+        } 
+        // لو داس يساوي
+        else if (btn.id === 'mini-eq') {
             try {
+                if (currentInput === '0' || !currentInput) return;
                 history = currentInput + ' =';
                 let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
-                let result = eval(expression);
+                // بنستخدم Function بدل eval عشان الأمان والحلاوة
+                let result = new Function('return ' + expression)();
                 currentInput = String(Number(result.toFixed(8)));
             } catch {
                 currentInput = 'Error';
                 setTimeout(() => { currentInput = '0'; updateMiniDisplay(); }, 1000);
             }
-        } else {
+        } 
+        // لو داس رقم أو عملية
+        else {
             const val = btn.getAttribute('data-val');
             if (!val) return;
+            
             if (currentInput === '0' && !isNaN(val)) {
                 currentInput = val;
             } else {
+                // نمنع تكرار العلامات العشرية
+                if (val === '.' && currentInput.includes('.')) return;
                 currentInput += val;
             }
         }
@@ -252,20 +302,26 @@
 
     box.addEventListener('click', handleButtonClick);
 
-    // Simple toggle function
+    // دالة الفتح والقفل
     function toggleBox() {
         box.classList.toggle('active');
+        if (box.classList.contains('active')) {
+            // انيميشن بسيط للزرار لما يفتح
+            toggle.style.transform = 'rotate(90deg) scale(0.8)';
+            toggle.innerHTML = '<i class="fas fa-times"></i>';
+        } else {
+            toggle.style.transform = '';
+            toggle.innerHTML = '<i class="fas fa-calculator"></i>';
+        }
     }
 
-    // Drag Logic - completely separate from toggle
+    // لوجيك السحب (Drag) عشان اليوزر يحطها في الحتة اللي تريحه
     let isDragging = false;
     let dragMoved = false;
     let startX, startY, initialX, initialY;
-    let startTime;
-    const dragThreshold = 25; // Very high threshold
+    const dragThreshold = 10; // حساسية السحب
 
     const handleStart = (e) => {
-        // Only allow left click or touch/pointer
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         
         startX = e.clientX;
@@ -274,7 +330,6 @@
         initialY = container.offsetTop;
         dragMoved = false;
         isDragging = true;
-        startTime = Date.now();
 
         toggle.setPointerCapture(e.pointerId);
     };
@@ -294,7 +349,7 @@
             let newX = initialX + dx;
             let newY = initialY + dy;
             
-            // Boundary checks
+            // عشان متخرجش بره الشاشة
             newX = Math.max(0, Math.min(window.innerWidth - toggle.offsetWidth, newX));
             newY = Math.max(0, Math.min(window.innerHeight - toggle.offsetHeight, newY));
             
@@ -307,21 +362,18 @@
 
     const handleEnd = (e) => {
         if (!isDragging) return;
-        
         isDragging = false;
         toggle.releasePointerCapture(e.pointerId);
-        // No toggle logic here - only drag
     };
 
-    // Simple click handler - completely separate from drag
+    // لما يدوس كليك عادية
     toggle.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Only toggle if not dragging
         if (!dragMoved) {
             toggleBox();
         }
-        dragMoved = false; // Reset after click
+        dragMoved = false;
     });
 
     toggle.addEventListener('pointerdown', handleStart);
@@ -329,10 +381,7 @@
     toggle.addEventListener('pointerup', handleEnd);
     toggle.addEventListener('pointercancel', handleEnd);
     
-    // Disable default behaviors that might interfere
     toggle.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    // Prevent closing when clicking inside the box
     box.addEventListener('pointerdown', (e) => e.stopPropagation());
     box.addEventListener('click', (e) => e.stopPropagation());
 

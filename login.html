@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - تطبيق المساحات</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-container i {
+            font-size: 50px;
+            color: #3498db;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .google-btn {
+            background: white;
+            color: #444;
+            border: 1px solid #ddd;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .google-btn:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            background: #f8f9fa;
+        }
+
+        .google-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        #error-msg {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <i class="fas fa-shapes"></i>
+        </div>
+        <h1>أهلاً بيك يا هندسة 👋</h1>
+        <p>سجل دخول عشان تحفظ حساباتك وتوصلها من أي جهاز وفي أي وقت</p>
+        
+        <button id="login-btn" class="google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+            تسجيل الدخول باستخدام جوجل
+        </button>
+        
+        <div id="error-msg"></div>
+
+        <a href="index.html" class="back-link">الرجوع للرئيسية</a>
+    </div>
+
+    <script type="module">
+        import { loginWithGoogle } from './firebase-logic.js';
+
+        const loginBtn = document.getElementById('login-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        loginBtn.addEventListener('click', async () => {
+            loginBtn.style.opacity = '0.7';
+            loginBtn.innerText = 'جاري التحميل...';
+            
+            try {
+                await loginWithGoogle();
+                // لو نجح، وديه على البروفايل أو الرئيسية
+                window.location.href = 'profile.html';
+            } catch (error) {
+                console.error(error);
+                loginBtn.style.opacity = '1';
+                loginBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo"> تسجيل الدخول باستخدام جوجل';
+                errorMsg.textContent = 'حصل مشكلة في التسجيل. اتأكد من النت او إعدادات Firebase.';
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+
+</body>
+</html>

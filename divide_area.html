@@ -5,160 +5,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحويل الوحدات - الأطوال والمساحات</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
     <meta name="theme-color" content="#3498db">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
             direction: rtl;
-        }
-        h1 {
-            color: #333;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            text-align: center;
-            max-width: 90%;
-        }
-        .converter {
-            margin: 20px 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            justify-items: center;
-        }
-        label {
-            font-size: 18px;
-            font-weight: bold;
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input, select {
-            width: 150px;
-            padding: 5px;
-            font-size: 16px;
-            text-align: center;
-            margin: 5px;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #007bff;
-        }
-        .home-button {
-            display: inline-block;
-            margin: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            color: white;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .home-button:hover {
-            background-color: #0056b3;
-        }
-        .controls {
-            margin-bottom: 20px;
-        }
-        .font-increase, .font-decrease {
-            font-size: 20px;
-            padding: 5px 10px;
-            margin: 0 5px;
-            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Remove spinners from number inputs */
-        input[type=number]::-webkit-outer-spin-button,
-        input[type=number]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        .dark-mode body {
+            background-color: #1c1c1e;
+            color: #ffffff;
         }
-        input[type=number] {
-            appearance: textfield;
-            -moz-appearance: textfield;
+
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dark-mode .card {
+            background: #2c2c2e;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: #007aff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #8e8e93;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input, select {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            background: #f8f9fa;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .dark-mode input, .dark-mode select {
+            background: #1c1c1e;
+            border-color: #3a3a3c;
+            color: white;
+        }
+
+        input:focus, select:focus {
+            border-color: #007aff;
+            outline: none;
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 14px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 8px;
+        }
+
+        .convert-btn:active {
+            opacity: 0.8;
+        }
+
+        .result-box {
+            margin-top: 16px;
+            padding: 16px;
+            background: #eef7ff;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #007aff;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-mode .result-box {
+            background: #1c3d5a;
+            color: #4dabff;
+        }
+
+        .hidden-web {
+            display: none;
         }
     </style>
 </head>
-<body>
-
-    <!-- Added font size controls -->
-    <div class="controls">
-        <button class="font-increase" onclick="increaseFontSize()">+</button>
-        <button class="font-decrease" onclick="decreaseFontSize()">–</button>
-    </div>
-
-    <!-- زر العودة إلى الصفحة الرئيسية -->
-    <a href="index.html" class="home-button">العودة إلى الصفحة الرئيسية</a>
-
-    <h1>تحويل الوحدات - الأطوال والمساحات</h1>
+<body class="mobile-view">
     <div class="container">
         <!-- تحويل الأطوال -->
-        <div class="converter">
-            <h2>تحويل الأطوال</h2>
-            <label for="lengthValue">القيمة:</label>
-            <input type="number" id="lengthValue" placeholder="أدخل القيمة">
-            <label for="lengthFrom">من:</label>
-            <select id="lengthFrom">
-                <option value="m">متر (m)</option>
-                <option value="cm">سنتيمتر (cm)</option>
-                <option value="ft">قدم (ft)</option>
-                <option value="in">بوصة (in)</option>
-                <option value="km">كيلومتر (km)</option>
-                <option value="mi">ميل (mi)</option>
-            </select>
-            <label for="lengthTo">إلى:</label>
-            <select id="lengthTo">
-                <option value="m">متر (m)</option>
-                <option value="cm">سنتيمتر (cm)</option>
-                <option value="ft">قدم (ft)</option>
-                <option value="in">بوصة (in)</option>
-                <option value="km">كيلومتر (km)</option>
-                <option value="mi">ميل (mi)</option>
-            </select>
-            <button onclick="convertLength()">تحويل</button>
-            <p class="result" id="lengthResult">النتيجة: --</p>
+        <div class="card">
+            <h2><i class="fas fa-ruler-horizontal"></i> تحويل الأطوال</h2>
+            
+            <div class="input-group">
+                <label>القيمة:</label>
+                <input type="number" id="lengthValue" placeholder="أدخل الرقم هنا..." oninput="convertLength()">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group" style="flex: 1;">
+                    <label>من:</label>
+                    <select id="lengthFrom" onchange="convertLength()">
+                        <option value="m">متر (m)</option>
+                        <option value="cm">سنتيمتر (cm)</option>
+                        <option value="ft">قدم (ft)</option>
+                        <option value="in">بوصة (in)</option>
+                        <option value="km">كيلومتر (km)</option>
+                        <option value="mi">ميل (mi)</option>
+                    </select>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>إلى:</label>
+                    <select id="lengthTo" onchange="convertLength()">
+                        <option value="m">متر (m)</option>
+                        <option value="cm">سنتيمتر (cm)</option>
+                        <option value="ft">قدم (ft)</option>
+                        <option value="in">بوصة (in)</option>
+                        <option value="km">كيلومتر (km)</option>
+                        <option value="mi">ميل (mi)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="result-box" id="lengthResult">
+                النتيجة تظهر هنا...
+            </div>
         </div>
 
         <!-- تحويل المساحات -->
-        <div class="converter">
-            <h2>تحويل المساحات</h2>
-            <label for="areaValue">القيمة:</label>
-            <input type="number" id="areaValue" placeholder="أدخل القيمة">
-            <label for="areaFrom">من:</label>
-            <select id="areaFrom">
-                <option value="m2">متر مربع (m²)</option>
-                <option value="feddan">فدان</option>
-                <option value="qirat">قيراط</option>
-                <option value="sahm">سهم</option>
-                <option value="ha">هكتار (ha)</option>
-                <option value="km2">كيلومتر مربع (km²)</option>
-            </select>
-            <label for="areaTo">إلى:</label>
-            <select id="areaTo">
-                <option value="m2">متر مربع (m²)</option>
-                <option value="feddan">فدان</option>
-                <option value="qirat">قيراط</option>
-                <option value="sahm">سهم</option>
-                <option value="ha">هكتار (ha)</option>
-                <option value="km2">كيلومتر مربع (km²)</option>
-            </select>
-            <button onclick="convertArea()">تحويل</button>
-            <p class="result" id="areaResult">النتيجة: --</p>
+        <div class="card">
+            <h2><i class="fas fa-vector-square"></i> تحويل المساحات</h2>
+            
+            <div class="input-group">
+                <label>القيمة:</label>
+                <input type="number" id="areaValue" placeholder="أدخل الرقم هنا..." oninput="convertArea()">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group" style="flex: 1;">
+                    <label>من:</label>
+                    <select id="areaFrom" onchange="convertArea()">
+                        <option value="m2">متر مربع (m²)</option>
+                        <option value="feddan">فدان</option>
+                        <option value="qirat">قيراط</option>
+                        <option value="sahm">سهم</option>
+                        <option value="ha">هكتار (ha)</option>
+                        <option value="km2">كيلومتر مربع (km²)</option>
+                    </select>
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>إلى:</label>
+                    <select id="areaTo" onchange="convertArea()">
+                        <option value="m2">متر مربع (m²)</option>
+                        <option value="feddan">فدان</option>
+                        <option value="qirat">قيراط</option>
+                        <option value="sahm">سهم</option>
+                        <option value="ha">هكتار (ha)</option>
+                        <option value="km2">كيلومتر مربع (km²)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="result-box" id="areaResult">
+                النتيجة تظهر هنا...
+            </div>
         </div>
     </div>
 
-    <script src="mini-calculator.js"></script>
     <script>
+        // اول حاجة نشوف لو المود غامق ولا فاتح
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark-mode');
+        }
+
         // عوامل تحويل الأطوال
         const lengthFactors = {
             m: 1,
@@ -167,6 +230,10 @@
             in: 0.0254,
             km: 1000,
             mi: 1609.34
+        };
+
+        const lengthNames = {
+            m: 'متر', cm: 'سم', ft: 'قدم', in: 'بوصة', km: 'كم', mi: 'ميل'
         };
 
         // عوامل تحويل المساحات
@@ -179,19 +246,24 @@
             km2: 1000000
         };
 
+        const areaNames = {
+            m2: 'متر²', feddan: 'فدان', qirat: 'قيراط', sahm: 'سهم', ha: 'هكتار', km2: 'كم²'
+        };
+
         // تحويل الأطوال
         function convertLength() {
             let value = parseFloat(document.getElementById("lengthValue").value);
             let from = document.getElementById("lengthFrom").value;
             let to = document.getElementById("lengthTo").value;
+            let resDiv = document.getElementById("lengthResult");
 
             if (isNaN(value)) {
-                document.getElementById("lengthResult").innerText = "النتيجة: أدخل قيمة صحيحة";
+                resDiv.innerText = "أدخل قيمة يا ريس";
                 return;
             }
 
             let result = value * lengthFactors[from] / lengthFactors[to];
-            document.getElementById("lengthResult").innerText = `النتيجة: ${result.toFixed(4)} ${to}`;
+            resDiv.innerHTML = `${result.toLocaleString(undefined, {maximumFractionDigits: 4})} <span style="font-size: 0.8rem; margin-right: 5px;">${lengthNames[to]}</span>`;
         }
 
         // تحويل المساحات
@@ -199,46 +271,15 @@
             let value = parseFloat(document.getElementById("areaValue").value);
             let from = document.getElementById("areaFrom").value;
             let to = document.getElementById("areaTo").value;
+            let resDiv = document.getElementById("areaResult");
 
             if (isNaN(value)) {
-                document.getElementById("areaResult").innerText = "النتيجة: أدخل قيمة صحيحة";
+                resDiv.innerText = "أدخل قيمة يا ريس";
                 return;
             }
 
             let result = value * areaFactors[from] / areaFactors[to];
-            document.getElementById("areaResult").innerText = `النتيجة: ${result.toFixed(4)} ${to}`;
-        }
-
-        // زيادة حجم الخط
-        function increaseFontSize() {
-            const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
-            document.body.style.fontSize = (currentSize + 1) + 'px';
-        }
-
-        // تقليل حجم الخط
-        function decreaseFontSize() {
-            const currentSize = parseFloat(window.getComputedStyle(document.body).fontSize);
-            document.body.style.fontSize = (currentSize - 1) + 'px';
-        }
-
-        // Auto-resize inputs to adapt their width to the content length
-        function adjustInputSize() {
-            this.style.width = ((this.value.length || 1) + 1) + "ch";
-        }
-        
-        document.querySelectorAll("input").forEach(input => {
-            adjustInputSize.call(input);
-            input.addEventListener("input", adjustInputSize);
-        });
-    </script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed', err));
-            });
+            resDiv.innerHTML = `${result.toLocaleString(undefined, {maximumFractionDigits: 4})} <span style="font-size: 0.8rem; margin-right: 5px;">${areaNames[to]}</span>`;
         }
     </script>
 </body>

@@ -1,0 +1,266 @@
+<title>الرئيسية</title>
+<div class="main-dashboard">
+    <!-- سكشن الترحيب -->
+    <div class="welcome-header">
+        <div class="welcome-text">
+            <h2>أهلاً بيك يا هندسة 👋</h2>
+            <p>جاهز نحسب مساحات النهاردة؟</p>
+        </div>
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </div>
+
+    <!-- شبكة الأدوات -->
+    <div class="section-title">الأدوات الهندسية</div>
+    <div class="tools-list">
+        <div class="tool-item" onclick="navigateTo('trapezoid')">
+            <div class="tool-icon-box" style="--bg: #e3f2fd; --color: #1e88e5;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <div class="tool-details">
+                <h3>ارتفاع شبه المنحرف</h3>
+                <p>تقسيم بالارتفاع</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('trapezoid_height_division')">
+            <div class="tool-icon-box" style="--bg: #f1f8e9; --color: #7cb342;">
+                <i class="fas fa-ruler-combined"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مساحة شبه المنحرف</h3>
+                <p>تقسيم بالمساحة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('cyclicQuadrilateral')">
+            <div class="tool-icon-box" style="--bg: #fff3e0; --color: #fb8c00;">
+                <i class="fas fa-circle-notch"></i>
+            </div>
+            <div class="tool-details">
+                <h3>رباعي دائري</h3>
+                <p>حساب المساحة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('irregular_quadrilateral')">
+            <div class="tool-icon-box" style="--bg: #f3e5f5; --color: #8e24aa;">
+                <i class="fas fa-vector-square"></i>
+            </div>
+            <div class="tool-details">
+                <h3>رباعي غير منتظم</h3>
+                <p>أشكال حرة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('triangle')">
+            <div class="tool-icon-box" style="--bg: #e8f5e9; --color: #43a047;">
+                <i class="fas fa-triangle"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مساحة مثلث</h3>
+                <p>قاعدة هيرون</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('divide_area')">
+            <div class="tool-icon-box" style="--bg: #efebe9; --color: #6d4c41;">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="tool-details">
+                <h3>تحويل وحدات</h3>
+                <p>فدان، قيراط، سهم</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- سكشن الوصول السريع -->
+    <div class="section-title">وصول سريع</div>
+    <div class="quick-access">
+        <div class="access-card" onclick="navigateTo('saved_results')">
+            <div class="access-icon"><i class="fas fa-history"></i></div>
+            <span>المحفوظات</span>
+        </div>
+        <div class="access-card" onclick="navigateTo('calculator')">
+            <div class="access-icon"><i class="fas fa-calculator"></i></div>
+            <span>الآلة الحاسبة</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .main-dashboard {
+        padding-top: 10px;
+    }
+
+    .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding: 0 5px;
+    }
+
+    .welcome-text h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: var(--text-light);
+        font-weight: 700;
+    }
+
+    .dark-mode .welcome-text h2 {
+        color: var(--text-dark);
+    }
+
+    .welcome-text p {
+        margin: 5px 0 0;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .user-avatar {
+        font-size: 2.5rem;
+        color: var(--primary);
+        opacity: 0.8;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 20px 5px 15px;
+        color: #34495e;
+        text-align: right;
+    }
+
+    .dark-mode .section-title {
+        color: #bdc3c7;
+    }
+
+    .tools-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .tool-item {
+        background: white;
+        padding: 12px 15px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .dark-mode .tool-item {
+        background: var(--card-dark);
+    }
+
+    .tool-item:active {
+        transform: scale(0.97);
+    }
+
+    .tool-icon-box {
+        width: 48px;
+        height: 48px;
+        background: var(--bg);
+        color: var(--color);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    .dark-mode .tool-icon-box {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .tool-details {
+        flex: 1;
+        text-align: right;
+    }
+
+    .tool-details h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .dark-mode .tool-details h3 {
+        color: var(--text-dark);
+    }
+
+    .tool-details p {
+        margin: 3px 0 0;
+        font-size: 0.8rem;
+        color: #95a5a6;
+    }
+
+    .tool-arrow {
+        color: #bdc3c7;
+        font-size: 0.8rem;
+    }
+
+    .quick-access {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .access-card {
+        background: white;
+        padding: 15px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        cursor: pointer;
+    }
+
+    .dark-mode .access-card {
+        background: var(--card-dark);
+    }
+
+    .access-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(52, 152, 219, 0.1);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .access-card span {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+</style>
