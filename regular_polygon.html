@@ -1,0 +1,84 @@
+<title>المضلعات المنتظمة</title>
+
+<div class="calc-container">
+    <div class="card">
+        <h2><i class="fas fa-draw-polygon"></i> حساب المضلعات المنتظمة</h2>
+        <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">(خماسي، سداسي، مسبع، إلخ...)</p>
+        
+        <div class="input-group">
+            <label><i class="fas fa-hashtag"></i> عدد الأضلاع (n)</label>
+            <input type="number" id="numSides" placeholder="مثلاً 5 للخماسي" min="3" step="1" oninput="calculatePolygon()">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-arrows-alt-h"></i> طول الضلع (ل)</label>
+            <input type="number" id="sideLength" placeholder="بالمتر" step="any" oninput="calculatePolygon()">
+        </div>
+    </div>
+
+    <div id="resultCard" class="result-card hidden">
+        <!-- النتائج هنا -->
+    </div>
+
+    <button class="btn-main" onclick="savePolygonResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<script>
+    function calculatePolygon() {
+        const n = parseInt(document.getElementById('numSides').value);
+        const s = parseFloat(document.getElementById('sideLength').value);
+        const resultCard = document.getElementById('resultCard');
+        const saveBtn = document.getElementById('saveBtn');
+
+        if (n >= 3 && s > 0) {
+            // Area = (n * s^2) / (4 * tan(PI/n))
+            const area = (n * Math.pow(s, 2)) / (4 * Math.tan(Math.PI / n));
+            const perimeter = n * s;
+            const conv = window.convertToFeddans(area);
+            
+            let shapeName = n === 3 ? "مثلث متساوي الأضلاع" : 
+                           n === 4 ? "مربع" : 
+                           n === 5 ? "خماسي منتظم" : 
+                           n === 6 ? "سداسي منتظم" : 
+                           `مضلع منتظم (${n} ضلع)`;
+
+            resultCard.innerHTML = `
+                <h3>${shapeName}</h3>
+                <p>المساحة الكلية: <span>${area.toFixed(2)}</span> متر²</p>
+                <p>المحيط: <span>${perimeter.toFixed(2)}</span> متر</p>
+                <p>بالوحدات: <span>${conv.feddan}</span> فدان، <span>${conv.qirat}</span> قيراط، <span>${conv.sahm}</span> سهم</p>
+            `;
+            resultCard.classList.remove('hidden');
+            saveBtn.style.display = 'block';
+            window.lastCalc = { title: shapeName, area, type: 'polygon' };
+        } else {
+            resultCard.classList.add('hidden');
+            saveBtn.style.display = 'none';
+        }
+    }
+
+    function savePolygonResult() {
+        if (!window.lastCalc) return;
+        
+        const data = {
+            type: "مضلعات منتظمة",
+            name: window.lastCalc.title,
+            area: window.lastCalc.area,
+            result: document.getElementById("resultCard").innerText,
+            timestamp: new Date().toISOString()
+        };
+
+        if (window.firebaseLogic && window.firebaseLogic.saveResult) {
+            window.firebaseLogic.saveResult(data)
+                .then(() => alert('تم حفظ النتيجة بنجاح يا ريس ✅'))
+                .catch(() => alert('حصل مشكلة في السحابة، بس حفظناها محلياً'));
+        } else {
+            let savedResults = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            savedResults.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(savedResults));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

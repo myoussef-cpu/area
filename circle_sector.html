@@ -1,0 +1,159 @@
+<title>حساب الدائرة والقطاعات</title>
+
+<div class="calc-container">
+    <div class="card">
+        <h2><i class="fas fa-circle"></i> حساب الدائرة والقطع الناقص</h2>
+        
+        <div class="input-group">
+            <label>نوع الشكل</label>
+            <select id="shapeType" class="custom-select" onchange="toggleInputs()">
+                <option value="circle">دائرة كاملة</option>
+                <option value="sector">قطاع دائري (جزء من دائرة)</option>
+                <option value="ellipse">قطع ناقص (بيضاوي)</option>
+            </select>
+        </div>
+
+        <!-- مدخلات الدائرة -->
+        <div id="circle-inputs">
+            <div class="input-group">
+                <label><i class="fas fa-radius"></i> نصف القطر (نق)</label>
+                <input type="number" id="radius" placeholder="أدخل نصف القطر بالمتر" step="any" oninput="calculateCircle()">
+            </div>
+        </div>
+
+        <!-- مدخلات القطاع -->
+        <div id="sector-inputs" class="hidden">
+            <div class="input-group">
+                <label><i class="fas fa-angle-double-right"></i> الزاوية المركزية (بالدرجات)</label>
+                <input type="number" id="angle" placeholder="مثلاً 90" step="any" oninput="calculateCircle()">
+            </div>
+        </div>
+
+        <!-- مدخلات القطع الناقص -->
+        <div id="ellipse-inputs" class="hidden">
+            <div class="input-group">
+                <label><i class="fas fa-arrows-alt-h"></i> نصف المحور الأكبر (أ)</label>
+                <input type="number" id="axisA" placeholder="بالمتر" step="any" oninput="calculateCircle()">
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-arrows-alt-v"></i> نصف المحور الأصغر (ب)</label>
+                <input type="number" id="axisB" placeholder="بالمتر" step="any" oninput="calculateCircle()">
+            </div>
+        </div>
+    </div>
+
+    <div id="resultCard" class="result-card hidden">
+        <!-- النتائج هنا -->
+    </div>
+
+    <button class="btn-main" onclick="saveCircleResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<style>
+    .calc-container { display: flex; flex-direction: column; gap: 15px; }
+    .hidden { display: none; }
+    .custom-select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        background: var(--card-light);
+        color: var(--text-light);
+        font-family: 'Tajawal', sans-serif;
+        font-weight: 600;
+        outline: none;
+    }
+    .dark-mode .custom-select {
+        background: var(--card-dark);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+</style>
+
+<script>
+    function toggleInputs() {
+        const type = document.getElementById('shapeType').value;
+        document.getElementById('circle-inputs').classList.toggle('hidden', type === 'ellipse');
+        document.getElementById('sector-inputs').classList.toggle('hidden', type !== 'sector');
+        document.getElementById('ellipse-inputs').classList.toggle('hidden', type !== 'ellipse');
+        calculateCircle();
+    }
+
+    function calculateCircle() {
+        const type = document.getElementById('shapeType').value;
+        const resultCard = document.getElementById('resultCard');
+        const saveBtn = document.getElementById('saveBtn');
+        
+        let area = 0;
+        let perimeter = 0;
+        let title = "";
+
+        if (type === 'circle') {
+            const r = parseFloat(document.getElementById('radius').value);
+            if (r > 0) {
+                area = Math.PI * r * r;
+                perimeter = 2 * Math.PI * r;
+                title = "دائرة كاملة";
+            }
+        } else if (type === 'sector') {
+            const r = parseFloat(document.getElementById('radius').value);
+            const a = parseFloat(document.getElementById('angle').value);
+            if (r > 0 && a > 0) {
+                area = (a / 360) * Math.PI * r * r;
+                perimeter = (a / 360) * (2 * Math.PI * r) + (2 * r);
+                title = `قطاع دائري (${a}°)`;
+            }
+        } else if (type === 'ellipse') {
+            const a = parseFloat(document.getElementById('axisA').value);
+            const b = parseFloat(document.getElementById('axisB').value);
+            if (a > 0 && b > 0) {
+                area = Math.PI * a * b;
+                // Ramanujan approximation for perimeter
+                const h = Math.pow(a - b, 2) / Math.pow(a + b, 2);
+                perimeter = Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+                title = "قطع ناقص (بيضاوي)";
+            }
+        }
+
+        if (area > 0) {
+            const conv = window.convertToFeddans(area);
+            resultCard.innerHTML = `
+                <h3>${title}</h3>
+                <p>المساحة: <span>${area.toFixed(2)}</span> متر²</p>
+                <p>المحيط: <span>${perimeter.toFixed(2)}</span> متر طولي</p>
+                <p>بالوحدات: <span>${conv.feddan}</span> فدان، <span>${conv.qirat}</span> قيراط، <span>${conv.sahm}</span> سهم</p>
+            `;
+            resultCard.classList.remove('hidden');
+            saveBtn.style.display = 'block';
+            window.lastCalc = { title, area, type: 'geometry' };
+        } else {
+            resultCard.classList.add('hidden');
+            saveBtn.style.display = 'none';
+        }
+    }
+
+    function saveCircleResult() {
+        if (!window.lastCalc) return;
+        
+        const data = {
+            type: "دائرة وقطاعات",
+            name: window.lastCalc.title,
+            area: window.lastCalc.area,
+            result: document.getElementById("resultCard").innerText,
+            timestamp: new Date().toISOString()
+        };
+
+        if (window.firebaseLogic && window.firebaseLogic.saveResult) {
+            window.firebaseLogic.saveResult(data)
+                .then(() => alert('تم حفظ النتيجة بنجاح يا ريس ✅'))
+                .catch(() => alert('حصل مشكلة في السحابة، بس حفظناها محلياً'));
+        } else {
+            let savedResults = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            savedResults.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(savedResults));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

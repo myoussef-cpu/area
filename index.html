@@ -368,8 +368,11 @@
         const loading = document.getElementById('loading');
         
         // فنكشن التنقل الرئيسية
-        window.navigateTo = async function(page) {
+        window.navigateTo = async function(page, params = null) {
             if (!loading || !mainContent) return;
+            
+            // تخزين المعاملات في window لسهولة الوصول إليها من الصفحات
+            window.currentPageParams = params;
             
             // لما نتنقل لصفحة جديدة، مسموح لزرار المحفوظات يرجع
             window.forceHideSaved = false;
@@ -451,7 +454,13 @@
             const items = document.querySelectorAll('.bottom-nav-item');
             const indicator = document.querySelector('.nav-indicator');
             
-            const toolPages = ['cyclicQuadrilateral', 'divide_area', 'irregular_quadrilateral', 'trapezoid', 'trapezoid_height_division', 'triangle', 'settings', 'profile'];
+            const toolPages = [
+                'cyclicQuadrilateral', 'divide_area', 'irregular_quadrilateral', 
+                'trapezoid', 'trapezoid_height_division', 'triangle', 
+                'circle_sector', 'regular_polygon', 'volumes_3d', 
+                'concrete_calc', 'land_leveling', 'all_tools', 'smart_tool',
+                'settings', 'profile'
+            ];
             let activeId = 'nav-main'; 
             
             if (page === 'calculator') activeId = 'nav-calc';

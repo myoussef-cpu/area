@@ -1,0 +1,56 @@
+<title>المعادلة التربيعية</title>
+<div class="calc-container">
+    <div class="card">
+        <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem;">ax² + bx + c = 0</p>
+        <div class="input-group">
+            <label>المعامل a</label>
+            <input type="number" id="coeffA" placeholder="1" step="any">
+        </div>
+        <div class="input-group">
+            <label>المعامل b</label>
+            <input type="number" id="coeffB" placeholder="0" step="any">
+        </div>
+        <div class="input-group">
+            <label>المعامل c</label>
+            <input type="number" id="coeffC" placeholder="0" step="any">
+        </div>
+        <button class="btn-main" onclick="solveQuadratic()">حل المعادلة</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    function solveQuadratic() {
+        const a = parseFloat(document.getElementById('coeffA').value);
+        const b = parseFloat(document.getElementById('coeffB').value);
+        const c = parseFloat(document.getElementById('coeffC').value);
+        const resCard = document.getElementById('resultCard');
+
+        if (isNaN(a) || a === 0) {
+            alert('يجب أن تكون قيمة a غير صفرية');
+            return;
+        }
+
+        const discriminant = b * b - 4 * a * c;
+        let resultHtml = '<h3>الجذور:</h3>';
+
+        if (discriminant > 0) {
+            const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+            resultHtml += `<p>x1 = <span>${x1.toFixed(4)}</span></p>`;
+            resultHtml += `<p>x2 = <span>${x2.toFixed(4)}</span></p>`;
+        } else if (discriminant === 0) {
+            const x = -b / (2 * a);
+            resultHtml += `<p>جذر مكرر: x = <span>${x.toFixed(4)}</span></p>`;
+        } else {
+            const realPart = (-b / (2 * a)).toFixed(4);
+            const imagPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(4);
+            resultHtml += `<p>x1 = <span>${realPart} + ${imagPart}i</span></p>`;
+            resultHtml += `<p>x2 = <span>${realPart} - ${imagPart}i</span></p>`;
+        }
+
+        resCard.innerHTML = resultHtml;
+        resCard.classList.remove('hidden');
+    }
+</script>

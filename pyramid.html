@@ -1,0 +1,56 @@
+<title>حساب الهرم</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>مساحة القاعدة (م²)</label>
+            <input type="number" id="baseArea" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>الارتفاع القائم (متر)</label>
+            <input type="number" id="height" placeholder="0.00" step="any">
+        </div>
+        <button class="btn-main" onclick="calculatePyramid()">احسب الحجم</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+    <button class="btn-main" onclick="savePyramidResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<script>
+    function calculatePyramid() {
+        const baseArea = parseFloat(document.getElementById('baseArea').value);
+        const height = parseFloat(document.getElementById('height').value);
+        if (baseArea > 0 && height > 0) {
+            const volume = (baseArea * height) / 3;
+            const resCard = document.getElementById('resultCard');
+            
+            resCard.innerHTML = `
+                <h3>النتيجة:</h3>
+                <p>الحجم: <span>${volume.toFixed(2)}</span> م³</p>
+            `;
+            resCard.classList.remove('hidden');
+            document.getElementById('saveBtn').style.display = 'block';
+            window.lastCalc = { title: "الهرم", result: resCard.innerText };
+        }
+    }
+
+    function savePyramidResult() {
+        if (!window.lastCalc) return;
+        const data = {
+            type: "أحجام",
+            name: window.lastCalc.title,
+            result: window.lastCalc.result,
+            timestamp: new Date().toISOString()
+        };
+        if (window.firebaseLogic?.saveResult) {
+            window.firebaseLogic.saveResult(data).then(() => alert('تم الحفظ ✅')).catch(() => alert('تم الحفظ محلياً ✅'));
+        } else {
+            let s = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            s.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(s));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

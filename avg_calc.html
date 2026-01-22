@@ -1,0 +1,46 @@
+<title>المتوسط الحسابي والإحصاء</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>أدخل الأرقام (مفصولة بمسافة أو فاصلة)</label>
+            <textarea id="numbers" placeholder="10 20 30 40..." rows="4" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 10px;"></textarea>
+        </div>
+        <button class="btn-main" onclick="calculateStats()">احسب الإحصائيات</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    function calculateStats() {
+        const input = document.getElementById('numbers').value;
+        const nums = input.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+        const resCard = document.getElementById('resultCard');
+
+        if (nums.length > 0) {
+            const sum = nums.reduce((a, b) => a + b, 0);
+            const avg = sum / nums.length;
+            
+            const sorted = [...nums].sort((a, b) => a - b);
+            const median = nums.length % 2 === 0 
+                ? (sorted[nums.length/2 - 1] + sorted[nums.length/2]) / 2 
+                : sorted[Math.floor(nums.length/2)];
+
+            const variance = nums.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / nums.length;
+            const stdDev = Math.sqrt(variance);
+
+            resCard.innerHTML = `
+                <h3>النتائج (${nums.length} أرقام):</h3>
+                <p>المجموع: <span>${sum.toLocaleString()}</span></p>
+                <p>المتوسط الحسابي: <span>${avg.toFixed(2)}</span></p>
+                <p>الوسيط: <span>${median.toFixed(2)}</span></p>
+                <p>أصغر قيمة: <span>${sorted[0]}</span></p>
+                <p>أكبر قيمة: <span>${sorted[sorted.length-1]}</span></p>
+                <p>الانحراف المعياري: <span>${stdDev.toFixed(4)}</span></p>
+            `;
+            resCard.classList.remove('hidden');
+        } else {
+            alert('يرجى إدخال أرقام صحيحة');
+        }
+    }
+</script>

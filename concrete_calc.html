@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب كميات الخرسانة - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success-color: #34C759;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .unit {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب كميات الخرسانة</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>نوع العنصر الإنشائي</label>
+                <select id="concreteType">
+                    <option value="slab">بلاطة سقف (Slab)</option>
+                    <option value="column">عمود (Column)</option>
+                    <option value="footing">قاعدة (Footing)</option>
+                    <option value="wall">حائط ساند (Wall)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>الطول (متر)</label>
+                <input type="number" id="length" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>العرض (متر)</label>
+                <input type="number" id="width" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label id="heightLabel">السمك / الارتفاع (متر)</label>
+                <input type="number" id="height" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>العدد المتكرر</label>
+                <input type="number" id="count" value="1" min="1">
+            </div>
+
+            <button class="btn-calc" onclick="calculateConcrete()">حساب الكميات</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-grid">
+                <div class="result-item" style="grid-column: span 2;">
+                    <span class="result-label">إجمالي حجم الخرسانة</span>
+                    <div>
+                        <span class="result-value" id="totalVolume">0</span>
+                        <span class="unit">متر مكعب</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">الأسمنت (350 كجم/م³)</span>
+                    <div>
+                        <span class="result-value" id="cement">0</span>
+                        <span class="unit">شكارة</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">الرمل (0.4 م³/م³)</span>
+                    <div>
+                        <span class="result-value" id="sand">0</span>
+                        <span class="unit">متر مكعب</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">الزلط/السن (0.8 م³/م³)</span>
+                    <div>
+                        <span class="result-value" id="gravel">0</span>
+                        <span class="unit">متر مكعب</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">الماء (175 لتر/م³)</span>
+                    <div>
+                        <span class="result-value" id="water">0</span>
+                        <span class="unit">لتر</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('concreteType').addEventListener('change', function(e) {
+            const label = document.getElementById('heightLabel');
+            if (e.target.value === 'slab') {
+                label.innerText = 'سمك البلاطة (متر)';
+            } else {
+                label.innerText = 'الارتفاع (متر)';
+            }
+        });
+
+        function calculateConcrete() {
+            const l = parseFloat(document.getElementById('length').value);
+            const w = parseFloat(document.getElementById('width').value);
+            const h = parseFloat(document.getElementById('height').value);
+            const count = parseInt(document.getElementById('count').value) || 1;
+
+            if (isNaN(l) || isNaN(w) || isNaN(h) || l <= 0 || w <= 0 || h <= 0) {
+                alert('يرجى إدخال قيم صحيحة لجميع الأبعاد');
+                return;
+            }
+
+            const volumePerOne = l * w * h;
+            const totalVolume = volumePerOne * count;
+
+            // Standard mix (M25/M20 approx: 1:2:4 or 1:1.5:3)
+            // Common estimate: 7 bags cement per m3, 0.4 m3 sand, 0.8 m3 gravel
+            const cementBags = Math.ceil(totalVolume * 7);
+            const sandVolume = totalVolume * 0.4;
+            const gravelVolume = totalVolume * 0.8;
+            const waterLiters = totalVolume * 175;
+
+            document.getElementById('totalVolume').innerText = totalVolume.toFixed(3);
+            document.getElementById('cement').innerText = cementBags;
+            document.getElementById('sand').innerText = sandVolume.toFixed(2);
+            document.getElementById('gravel').innerText = gravelVolume.toFixed(2);
+            document.getElementById('water').innerText = Math.round(waterLiters);
+
+            document.getElementById('resultCard').style.display = 'block';
+            
+            window.lastCalc = {
+                toolId: 'concrete_calc',
+                name: 'حساب كميات الخرسانة',
+                type: document.getElementById('concreteType').value,
+                dimensions: `${l}x${w}x${h}`,
+                count: count,
+                totalVolume: totalVolume.toFixed(3),
+                cement: cementBags,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ التقدير بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

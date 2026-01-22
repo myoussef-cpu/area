@@ -9,92 +9,87 @@
     <meta name="theme-color" content="#3498db">
     <link rel="stylesheet" href="css/common-styles.css">
     <style>
+    :root {
+        --primary-color: #007AFF;
+        --secondary-color: #5856D6;
+        --bg-dark: #000000;
+        --card-bg: rgba(28, 28, 30, 0.8);
+        --text-main: #FFFFFF;
+        --text-dim: #8E8E93;
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
     body {
-        font-family: 'Tajawal', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
         margin: 0;
         padding: 0;
-        background-color: var(--bg-light);
-        color: var(--text-light);
-        transition: background-color 0.3s, color 0.3s;
+        min-height: 100vh;
     }
 
     .container {
-        padding: 15px;
+        padding: 20px;
         max-width: 600px;
         margin: 0 auto;
+        padding-top: env(safe-area-inset-top);
     }
 
     .result-card {
-        background: var(--card-light);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid var(--border-light);
-        border-radius: 22px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 20px;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         position: relative;
         text-align: right;
     }
 
-    .dark-mode .result-card {
-        background: var(--card-dark);
-        border: 1px solid var(--border-dark);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
-
     .result-card:active {
         transform: scale(0.98);
-        background: rgba(0,0,0,0.02);
+        background: rgba(255, 255, 255, 0.05);
     }
 
     .result-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
 
     .result-type {
         font-weight: 700;
-        font-size: 1.15rem;
-        color: var(--primary);
+        font-size: 1.1rem;
+        color: var(--primary-color);
     }
 
     .result-date {
         font-size: 0.85rem;
-        color: #8e8e93;
+        color: var(--text-dim);
         font-weight: 500;
     }
 
     .result-summary-text {
-        font-size: 1rem;
+        font-size: 1.1rem;
         margin: 10px 0;
-        color: var(--text-light);
+        color: var(--text-main);
         line-height: 1.5;
-    }
-
-    .dark-mode .result-summary-text {
-        color: var(--text-dark);
+        font-weight: 600;
     }
 
     .result-details {
         display: none;
         margin-top: 15px;
         padding-top: 15px;
-        border-top: 1px solid var(--border-light);
+        border-top: 1px solid var(--glass-border);
         font-size: 0.95rem;
         line-height: 1.7;
-        color: var(--text-light);
-        opacity: 0.9;
+        color: var(--text-dim);
         white-space: pre-line;
-    }
-
-    .dark-mode .result-details {
-        border-top-color: var(--border-dark);
-        color: var(--text-dark);
     }
 
     .result-details.show {
@@ -112,25 +107,20 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
-        padding: 0 5px;
     }
 
     .header-actions h2 {
         font-weight: 700;
-        font-size: 1.4rem;
-        color: var(--text-light);
-    }
-
-    .dark-mode .header-actions h2 {
-        color: var(--text-dark);
+        font-size: 1.5rem;
+        color: var(--text-main);
     }
 
     .reload-btn {
-        background: var(--glass-light);
+        background: var(--card-bg);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        color: var(--primary);
-        border: 1px solid var(--border-light);
+        color: var(--text-main);
+        border: 1px solid var(--glass-border);
         width: 44px;
         height: 44px;
         border-radius: 14px;
@@ -138,17 +128,12 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         transition: all 0.2s;
-    }
-
-    .dark-mode .reload-btn {
-        background: var(--glass-dark);
-        border-color: var(--border-dark);
     }
 
     .reload-btn:active {
         transform: scale(0.9);
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .sync-badge {
@@ -157,21 +142,32 @@
         border-radius: 8px;
         font-weight: 600;
         margin-right: 8px;
+        display: inline-block;
+        margin-top: 5px;
     }
 
     .sync-true { background: rgba(52, 199, 89, 0.1); color: #34c759; }
     .sync-false { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
 
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+
     .delete-btn {
         background: rgba(255, 59, 48, 0.1);
         color: #ff3b30;
-        border: none;
-        padding: 8px 16px;
+        border: 1px solid rgba(255, 59, 48, 0.2);
+        padding: 10px 20px;
         border-radius: 12px;
         font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .delete-btn:active {
@@ -182,7 +178,7 @@
     .empty-state {
         text-align: center;
         padding: 60px 20px;
-        color: #8e8e93;
+        color: var(--text-dim);
     }
 
     .empty-state i {
@@ -191,7 +187,24 @@
         display: block;
         opacity: 0.5;
     }
-</style>
+
+    #sync-status {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(-360deg); }
+    }
+    </style>
 </head>
 <body class="mobile-view">
     <div class="container">

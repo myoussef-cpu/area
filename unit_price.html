@@ -1,0 +1,61 @@
+<title>مقارنة سعر الوحدة</title>
+<div class="calc-container">
+    <div class="card">
+        <h3 style="margin-bottom: 1rem;">المنتج الأول</h3>
+        <div class="input-group">
+            <label>السعر</label>
+            <input type="number" id="p1" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>الكمية (الوزن، الحجم، العدد...)</label>
+            <input type="number" id="q1" placeholder="1.00" step="any">
+        </div>
+        <hr style="opacity: 0.2; margin: 1.5rem 0;">
+        <h3 style="margin-bottom: 1rem;">المنتج الثاني</h3>
+        <div class="input-group">
+            <label>السعر</label>
+            <input type="number" id="p2" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>الكمية</label>
+            <input type="number" id="q2" placeholder="1.00" step="any">
+        </div>
+        <button class="btn-main" onclick="comparePrice()">قارن الأسعار</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    function comparePrice() {
+        const p1 = parseFloat(document.getElementById('p1').value);
+        const q1 = parseFloat(document.getElementById('q1').value);
+        const p2 = parseFloat(document.getElementById('p2').value);
+        const q2 = parseFloat(document.getElementById('q2').value);
+        const resCard = document.getElementById('resultCard');
+
+        if (p1 > 0 && q1 > 0 && p2 > 0 && q2 > 0) {
+            const up1 = p1 / q1;
+            const up2 = p2 / q2;
+            
+            let resultHtml = `<h3>النتائج:</h3>`;
+            resultHtml += `<p>سعر الوحدة للمنتج 1: <span>${up1.toFixed(3)}</span></p>`;
+            resultHtml += `<p>سعر الوحدة للمنتج 2: <span>${up2.toFixed(3)}</span></p>`;
+            
+            if (up1 < up2) {
+                const diff = ((up2 - up1) / up2) * 100;
+                resultHtml += `<p style="color: #44ff44; margin-top: 1rem;">✅ المنتج الأول أوفر بنسبة <span>${diff.toFixed(1)}%</span></p>`;
+            } else if (up2 < up1) {
+                const diff = ((up1 - up2) / up1) * 100;
+                resultHtml += `<p style="color: #44ff44; margin-top: 1rem;">✅ المنتج الثاني أوفر بنسبة <span>${diff.toFixed(1)}%</span></p>`;
+            } else {
+                resultHtml += `<p style="margin-top: 1rem;">المنتجان لهما نفس السعر تماماً</p>`;
+            }
+
+            resCard.innerHTML = resultHtml;
+            resCard.classList.remove('hidden');
+        } else {
+            alert('يرجى إدخال قيم صحيحة للأسعار والكميات');
+        }
+    }
+</script>

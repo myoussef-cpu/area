@@ -1,0 +1,61 @@
+<title>حساب المستطيل</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>الطول (متر)</label>
+            <input type="number" id="length" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>العرض (متر)</label>
+            <input type="number" id="width" placeholder="0.00" step="any">
+        </div>
+        <button class="btn-main" onclick="calculateRectangle()">احسب المساحة</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+    <button class="btn-main" onclick="saveRectangleResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<script>
+    function calculateRectangle() {
+        const length = parseFloat(document.getElementById('length').value);
+        const width = parseFloat(document.getElementById('width').value);
+        if (length > 0 && width > 0) {
+            const area = length * width;
+            const perimeter = 2 * (length + width);
+            const resCard = document.getElementById('resultCard');
+            const conv = window.convertToFeddans ? window.convertToFeddans(area) : null;
+            
+            resCard.innerHTML = `
+                <h3>النتيجة:</h3>
+                <p>المساحة: <span>${area.toFixed(2)}</span> م²</p>
+                <p>المحيط: <span>${perimeter.toFixed(2)}</span> م</p>
+                ${conv ? `<p>بالوحدات: ${conv.feddan} فدان، ${conv.qirat} قيراط، ${conv.sahm} سهم</p>` : ''}
+            `;
+            resCard.classList.remove('hidden');
+            document.getElementById('saveBtn').style.display = 'block';
+            window.lastCalc = { title: "المستطيل", area: area, result: resCard.innerText };
+        }
+    }
+
+    function saveRectangleResult() {
+        if (!window.lastCalc) return;
+        const data = {
+            type: "مساحات",
+            name: window.lastCalc.title,
+            area: window.lastCalc.area,
+            result: window.lastCalc.result,
+            timestamp: new Date().toISOString()
+        };
+        if (window.firebaseLogic?.saveResult) {
+            window.firebaseLogic.saveResult(data).then(() => alert('تم الحفظ ✅')).catch(() => alert('تم الحفظ محلياً ✅'));
+        } else {
+            let s = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            s.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(s));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

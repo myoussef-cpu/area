@@ -19,8 +19,8 @@
                 <i class="fas fa-draw-polygon"></i>
             </div>
             <div class="tool-details">
-                <h3>ارتفاع شبه المنحرف</h3>
-                <p>تقسيم بالارتفاع</p>
+                <h3>مساحة شبه المنحرف</h3>
+                <p>حساب المساحة الأساسية</p>
             </div>
             <div class="tool-arrow">
                 <i class="fas fa-chevron-left"></i>
@@ -32,8 +32,8 @@
                 <i class="fas fa-ruler-combined"></i>
             </div>
             <div class="tool-details">
-                <h3>مساحة شبه المنحرف</h3>
-                <p>تقسيم بالمساحة</p>
+                <h3>تقسيم شبه المنحرف</h3>
+                <p>التقسيم بناءً على الارتفاع</p>
             </div>
             <div class="tool-arrow">
                 <i class="fas fa-chevron-left"></i>
@@ -79,6 +79,71 @@
             </div>
         </div>
 
+        <div class="tool-item" onclick="navigateTo('circle_sector')">
+            <div class="tool-icon-box" style="--bg: #e0f7fa; --color: #00acc1;">
+                <i class="fas fa-circle"></i>
+            </div>
+            <div class="tool-details">
+                <h3>الدائرة والقطاعات</h3>
+                <p>دائرة، بيضاوي، قطاع</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('regular_polygon')">
+            <div class="tool-icon-box" style="--bg: #fce4ec; --color: #d81b60;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مضلعات منتظمة</h3>
+                <p>خماسي، سداسي، إلخ</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('volumes_3d')">
+            <div class="tool-icon-box" style="--bg: #fffde7; --color: #fbc02d;">
+                <i class="fas fa-cube"></i>
+            </div>
+            <div class="tool-details">
+                <h3>حساب الأحجام</h3>
+                <p>أسطوانة، كرة، مخروط</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('concrete_calc')">
+            <div class="tool-icon-box" style="--bg: #efebe9; --color: #5d4037;">
+                <i class="fas fa-hard-hat"></i>
+            </div>
+            <div class="tool-details">
+                <h3>كميات الخرسانة</h3>
+                <p>بلاطات، أعمدة، قواعد</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('land_leveling')">
+            <div class="tool-icon-box" style="--bg: #f1f8e9; --color: #33691e;">
+                <i class="fas fa-mountain"></i>
+            </div>
+            <div class="tool-details">
+                <h3>تسوية وميول</h3>
+                <p>حساب الميل والتسوية</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
         <div class="tool-item" onclick="navigateTo('divide_area')">
             <div class="tool-icon-box" style="--bg: #efebe9; --color: #6d4c41;">
                 <i class="fas fa-exchange-alt"></i>
@@ -103,6 +168,18 @@
         <div class="access-card" onclick="navigateTo('calculator')">
             <div class="access-icon"><i class="fas fa-calculator"></i></div>
             <span>الآلة الحاسبة</span>
+        </div>
+        <div class="tool-item more-tools-btn" onclick="navigateTo('all_tools')" style="border: 2px dashed var(--primary); background: rgba(0, 122, 255, 0.05); margin: 15px 10px 0;">
+            <div class="tool-icon-box" style="--bg: var(--primary); --color: #fff;">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="tool-details">
+                <h3 style="color: var(--primary);">المزيد من الأدوات</h3>
+                <p>تصفح أكثر من 50 أداة متخصصة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-search" style="color: var(--primary);"></i>
+            </div>
         </div>
     </div>
 </div>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب الطوب - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .unit {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .note {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب عدد الطوب</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>طول الحائط (متر)</label>
+                <input type="number" id="length" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>ارتفاع الحائط (متر)</label>
+                <input type="number" id="height" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>سمك الحائط</label>
+                <select id="thickness">
+                    <option value="12">12 سم (نصف طوبة)</option>
+                    <option value="25">25 سم (طوبة كاملة)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>مقاس الطوبة (سم)</label>
+                <select id="brickSize">
+                    <option value="25x12x6">25 × 12 × 6 (قياسي)</option>
+                    <option value="20x10x6">20 × 10 × 6</option>
+                    <option value="24x11x6">24 × 11 × 6</option>
+                </select>
+            </div>
+
+            <button class="btn-calc" onclick="calculateBricks()">حساب عدد الطوب</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-grid">
+                <div class="result-item" style="grid-column: span 2;">
+                    <span class="result-label">إجمالي عدد الطوب المطلوب</span>
+                    <div>
+                        <span class="result-value" id="totalBricks">0</span>
+                        <span class="unit">طوبة</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">مساحة الحائط</span>
+                    <div>
+                        <span class="result-value" id="wallArea">0</span>
+                        <span class="unit">م²</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">كمية الأسمنت</span>
+                    <div>
+                        <span class="result-value" id="cement">0</span>
+                        <span class="unit">شكارة</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">كمية الرمل</span>
+                    <div>
+                        <span class="result-value" id="sand">0</span>
+                        <span class="unit">م³</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">نسبة الهالك (5%)</span>
+                    <div>
+                        <span class="result-value" id="waste">0</span>
+                        <span class="unit">طوبة</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note">
+                * الحسابات تشمل المونة الأسمنتية (1 سم) ونسبة هالك تقديرية 5%.
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateBricks() {
+            const L = parseFloat(document.getElementById('length').value);
+            const H = parseFloat(document.getElementById('height').value);
+            const thickness = parseInt(document.getElementById('thickness').value);
+            const brickSize = document.getElementById('brickSize').value;
+
+            if (isNaN(L) || isNaN(H) || L <= 0 || H <= 0) {
+                alert('يرجى إدخال قيم صحيحة للطول والارتفاع');
+                return;
+            }
+
+            const area = L * H;
+            let bricksPerMeter = 0;
+
+            // الحسابات بناءً على مقاس الطوبة + 1 سم مونة
+            if (brickSize === '25x12x6') {
+                // (25+1) * (6+1) = 26 * 7 = 182 cm2 per brick in elevation
+                // 10000 / 182 = 54.9 bricks per m2 for 12cm wall
+                bricksPerMeter = (thickness === 12) ? 55 : 110;
+            } else if (brickSize === '20x10x6') {
+                // (20+1) * (6+1) = 21 * 7 = 147 cm2
+                // 10000 / 147 = 68 bricks
+                bricksPerMeter = (thickness === 12) ? 68 : 136;
+            } else {
+                // 24x11x6 -> (24+1) * (6+1) = 25 * 7 = 175 cm2
+                // 10000 / 175 = 57 bricks
+                bricksPerMeter = (thickness === 12) ? 57 : 114;
+            }
+
+            const baseCount = area * bricksPerMeter;
+            const wasteCount = Math.ceil(baseCount * 0.05);
+            const totalBricks = Math.ceil(baseCount + wasteCount);
+
+            // المونة: حوالي 0.025 م3 رمل لكل م2 حائط 12سم
+            const sandNeeded = (thickness === 12) ? (area * 0.025) : (area * 0.05);
+            const cementNeeded = Math.ceil(sandNeeded * 300 / 50); // 300kg per m3 sand, 50kg per bag
+
+            document.getElementById('totalBricks').innerText = totalBricks.toLocaleString();
+            document.getElementById('wallArea').innerText = area.toFixed(2);
+            document.getElementById('cement').innerText = cementNeeded;
+            document.getElementById('sand').innerText = sandNeeded.toFixed(2);
+            document.getElementById('waste').innerText = wasteCount;
+
+            document.getElementById('resultCard').style.display = 'block';
+
+            window.lastCalc = {
+                toolId: 'bricks_calc',
+                name: 'حساب الطوب',
+                length: L,
+                height: H,
+                thickness: thickness,
+                totalBricks: totalBricks,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            alert('تم حفظ النتيجة بنجاح');
+        }
+    </script>
+</body>
+</html>

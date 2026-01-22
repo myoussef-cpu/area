@@ -1,0 +1,59 @@
+<title>حساب المعين</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>طول القطر الأول (متر)</label>
+            <input type="number" id="diag1" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>طول القطر الثاني (متر)</label>
+            <input type="number" id="diag2" placeholder="0.00" step="any">
+        </div>
+        <button class="btn-main" onclick="calculateRhombus()">احسب المساحة</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+    <button class="btn-main" onclick="saveRhombusResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<script>
+    function calculateRhombus() {
+        const d1 = parseFloat(document.getElementById('diag1').value);
+        const d2 = parseFloat(document.getElementById('diag2').value);
+        if (d1 > 0 && d2 > 0) {
+            const area = (d1 * d2) / 2;
+            const resCard = document.getElementById('resultCard');
+            const conv = window.convertToFeddans ? window.convertToFeddans(area) : null;
+            
+            resCard.innerHTML = `
+                <h3>النتيجة:</h3>
+                <p>المساحة: <span>${area.toFixed(2)}</span> م²</p>
+                ${conv ? `<p>بالوحدات: ${conv.feddan} فدان، ${conv.qirat} قيراط، ${conv.sahm} سهم</p>` : ''}
+            `;
+            resCard.classList.remove('hidden');
+            document.getElementById('saveBtn').style.display = 'block';
+            window.lastCalc = { title: "المعين", area: area, result: resCard.innerText };
+        }
+    }
+
+    function saveRhombusResult() {
+        if (!window.lastCalc) return;
+        const data = {
+            type: "مساحات",
+            name: window.lastCalc.title,
+            area: window.lastCalc.area,
+            result: window.lastCalc.result,
+            timestamp: new Date().toISOString()
+        };
+        if (window.firebaseLogic?.saveResult) {
+            window.firebaseLogic.saveResult(data).then(() => alert('تم الحفظ ✅')).catch(() => alert('تم الحفظ محلياً ✅'));
+        } else {
+            let s = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            s.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(s));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

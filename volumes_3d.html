@@ -1,0 +1,160 @@
+<title>حساب الأحجام (3D)</title>
+
+<div class="calc-container">
+    <div class="card">
+        <h2><i class="fas fa-cube"></i> حساب الأحجام والمساحات السطحية</h2>
+        
+        <div class="input-group">
+            <label>اختر المجسم</label>
+            <select id="volType" class="custom-select" onchange="toggleVolInputs()">
+                <option value="box">صندوق / متوازي مستطيلات</option>
+                <option value="cylinder">أسطوانة</option>
+                <option value="sphere">كرة</option>
+                <option value="cone">مخروط</option>
+            </select>
+        </div>
+
+        <div id="box-inputs">
+            <div class="input-group">
+                <label>الطول (ل)</label>
+                <input type="number" id="len" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+            <div class="input-group">
+                <label>العرض (ع)</label>
+                <input type="number" id="width" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+            <div class="input-group">
+                <label>الارتفاع (ح)</label>
+                <input type="number" id="height" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+        </div>
+
+        <div id="cyl-inputs" class="hidden">
+            <div class="input-group">
+                <label>نصف القطر (نق)</label>
+                <input type="number" id="vRadius" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+            <div class="input-group">
+                <label>الارتفاع (ع)</label>
+                <input type="number" id="vHeight" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+        </div>
+
+        <div id="sphere-inputs" class="hidden">
+            <div class="input-group">
+                <label>نصف القطر (نق)</label>
+                <input type="number" id="sRadius" placeholder="بالمتر" step="any" oninput="calculateVolume()">
+            </div>
+        </div>
+    </div>
+
+    <div id="resultCard" class="result-card hidden">
+        <!-- النتائج هنا -->
+    </div>
+
+    <button class="btn-main" onclick="saveVolumeResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<style>
+    .calc-container { display: flex; flex-direction: column; gap: 15px; }
+    .hidden { display: none; }
+    .custom-select {
+        width: 100%; padding: 12px; border-radius: 12px;
+        border: 1px solid var(--border-light); background: var(--card-light);
+        color: var(--text-light); font-family: 'Tajawal', sans-serif;
+    }
+    .dark-mode .custom-select { background: var(--card-dark); border-color: var(--border-dark); color: var(--text-dark); }
+</style>
+
+<script>
+    function toggleVolInputs() {
+        const t = document.getElementById('volType').value;
+        document.getElementById('box-inputs').classList.toggle('hidden', t !== 'box' && t !== 'cone');
+        document.getElementById('cyl-inputs').classList.toggle('hidden', t !== 'cylinder');
+        document.getElementById('sphere-inputs').classList.toggle('hidden', t !== 'sphere');
+        
+        // Adjust labels for cone if needed
+        if (t === 'cone') {
+            document.getElementById('box-inputs').classList.remove('hidden');
+        }
+        calculateVolume();
+    }
+
+    function calculateVolume() {
+        const t = document.getElementById('volType').value;
+        const res = document.getElementById('resultCard');
+        const saveBtn = document.getElementById('saveBtn');
+        let vol = 0;
+        let area = 0;
+        let name = "";
+
+        if (t === 'box') {
+            const l = parseFloat(document.getElementById('len').value);
+            const w = parseFloat(document.getElementById('width').value);
+            const h = parseFloat(document.getElementById('height').value);
+            if (l>0 && w>0 && h>0) {
+                vol = l * w * h;
+                area = 2 * (l*w + l*h + w*h);
+                name = "متوازي مستطيلات";
+            }
+        } else if (t === 'cylinder') {
+            const r = parseFloat(document.getElementById('vRadius').value);
+            const h = parseFloat(document.getElementById('vHeight').value);
+            if (r>0 && h>0) {
+                vol = Math.PI * r * r * h;
+                area = 2 * Math.PI * r * (r + h);
+                name = "أسطوانة";
+            }
+        } else if (t === 'sphere') {
+            const r = parseFloat(document.getElementById('sRadius').value);
+            if (r>0) {
+                vol = (4/3) * Math.PI * Math.pow(r, 3);
+                area = 4 * Math.PI * r * r;
+                name = "كرة";
+            }
+        } else if (t === 'cone') {
+            const r = parseFloat(document.getElementById('len').value);
+            const h = parseFloat(document.getElementById('height').value);
+            if (r>0 && h>0) {
+                vol = (1/3) * Math.PI * r * r * h;
+                const s = Math.sqrt(r*r + h*h);
+                area = Math.PI * r * (r + s);
+                name = "مخروط";
+            }
+        }
+
+        if (vol > 0) {
+            res.innerHTML = `
+                <h3>${name}</h3>
+                <p>الحجم: <span>${vol.toFixed(3)}</span> م³</p>
+                <p>المساحة السطحية: <span>${area.toFixed(2)}</span> متر²</p>
+            `;
+            res.classList.remove('hidden');
+            saveBtn.style.display = 'block';
+            window.lastCalc = { title: name, vol, area };
+        } else {
+            res.classList.add('hidden');
+            saveBtn.style.display = 'none';
+        }
+    }
+
+    function saveVolumeResult() {
+        if (!window.lastCalc) return;
+        const data = {
+            type: "أحجام 3D",
+            name: window.lastCalc.title,
+            result: document.getElementById("resultCard").innerText,
+            timestamp: new Date().toISOString()
+        };
+        if (window.firebaseLogic && window.firebaseLogic.saveResult) {
+            window.firebaseLogic.saveResult(data).then(() => alert('تم الحفظ ✅')).catch(() => alert('تم الحفظ محلياً ✅'));
+        } else {
+            let s = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            s.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(s));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

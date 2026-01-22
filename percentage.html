@@ -1,0 +1,85 @@
+<title>حساب النسبة المئوية</title>
+<div class="calc-container">
+    <div class="card">
+        <h3>1. ما هي (X) % من (Y)؟</h3>
+        <div class="input-group">
+            <input type="number" id="perc1" placeholder="النسبة %" style="width: 45%;">
+            <input type="number" id="val1" placeholder="من القيمة" style="width: 45%;">
+        </div>
+        <button class="btn-main" onclick="calcPerc1()">احسب</button>
+        <div id="res1" class="result-inline hidden"></div>
+    </div>
+
+    <div class="card">
+        <h3>2. القيمة (X) تمثل كم % من (Y)؟</h3>
+        <div class="input-group">
+            <input type="number" id="val2a" placeholder="القيمة X" style="width: 45%;">
+            <input type="number" id="val2b" placeholder="من الإجمالي Y" style="width: 45%;">
+        </div>
+        <button class="btn-main" onclick="calcPerc2()">احسب</button>
+        <div id="res2" class="result-inline hidden"></div>
+    </div>
+
+    <div class="card">
+        <h3>3. زيادة/نقصان القيمة بنسبة %</h3>
+        <div class="input-group">
+            <input type="number" id="val3" placeholder="القيمة" style="width: 30%;">
+            <select id="op3" style="width: 30%;">
+                <option value="plus">زيادة (+)</option>
+                <option value="minus">نقصان (-)</option>
+            </select>
+            <input type="number" id="perc3" placeholder="%" style="width: 30%;">
+        </div>
+        <button class="btn-main" onclick="calcPerc3()">احسب</button>
+        <div id="res3" class="result-inline hidden"></div>
+    </div>
+</div>
+
+<style>
+    .result-inline {
+        margin-top: 1rem;
+        padding: 0.8rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .result-inline span { color: var(--accent-color); font-size: 1.2rem; }
+</style>
+
+<script>
+    function calcPerc1() {
+        const p = parseFloat(document.getElementById('perc1').value);
+        const v = parseFloat(document.getElementById('val1').value);
+        if (!isNaN(p) && !isNaN(v)) {
+            const res = (p / 100) * v;
+            const div = document.getElementById('res1');
+            div.innerHTML = `النتيجة: <span>${res.toLocaleString()}</span>`;
+            div.classList.remove('hidden');
+        }
+    }
+
+    function calcPerc2() {
+        const x = parseFloat(document.getElementById('val2a').value);
+        const y = parseFloat(document.getElementById('val2b').value);
+        if (!isNaN(x) && !isNaN(y) && y !== 0) {
+            const res = (x / y) * 100;
+            const div = document.getElementById('res2');
+            div.innerHTML = `النسبة: <span>${res.toFixed(2)} %</span>`;
+            div.classList.remove('hidden');
+        }
+    }
+
+    function calcPerc3() {
+        const v = parseFloat(document.getElementById('val3').value);
+        const op = document.getElementById('op3').value;
+        const p = parseFloat(document.getElementById('perc3').value);
+        if (!isNaN(v) && !isNaN(p)) {
+            const diff = (p / 100) * v;
+            const res = op === 'plus' ? v + diff : v - diff;
+            const div = document.getElementById('res3');
+            div.innerHTML = `النتيجة النهائية: <span>${res.toLocaleString()}</span>`;
+            div.classList.remove('hidden');
+        }
+    }
+</script>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حجم الخزانات الكبسولية - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007aff;
+            --bg-color: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-color: #ffffff;
+            --input-bg: rgba(44, 44, 46, 0.8);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #8e8e93;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .btn-calc {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .result-card {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: none;
+        }
+
+        .result-card.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .save-btn {
+            background: #34c759;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            align-self: flex-start;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <a href="#" onclick="window.navigateTo('all_tools')" class="back-btn">
+        <i class="fas fa-arrow-right"></i>
+        العودة للأدوات
+    </a>
+
+    <div class="calc-container">
+        <div class="header">
+            <i class="fas fa-capsules"></i>
+            <h2>حجم الخزان الكبسولي</h2>
+        </div>
+
+        <div class="input-group">
+            <label>نصف قطر النهاية الكروية (r)</label>
+            <input type="number" id="radius" placeholder="أدخل نصف القطر" step="any">
+        </div>
+
+        <div class="input-group">
+            <label>طول الجزء الأسطواني (L)</label>
+            <input type="number" id="length" placeholder="أدخل الطول" step="any">
+        </div>
+
+        <button class="btn-calc" onclick="calculateCapsule()">حساب الحجم</button>
+
+        <div id="resultCard" class="result-card">
+            <h3>النتائج:</h3>
+            <div id="resultsList"></div>
+            <button class="btn-calc save-btn" onclick="saveCapsuleResult()">حفظ النتيجة</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateCapsule() {
+            const r = parseFloat(document.getElementById('radius').value);
+            const L = parseFloat(document.getElementById('length').value);
+            
+            if (r > 0 && L >= 0) {
+                // Volume of capsule = Volume of cylinder + Volume of sphere
+                const cylinderVol = Math.PI * Math.pow(r, 2) * L;
+                const sphereVol = (4/3) * Math.PI * Math.pow(r, 3);
+                const totalVol = cylinderVol + sphereVol;
+                
+                const resultsList = document.getElementById('resultsList');
+                resultsList.innerHTML = `
+                    <div class="result-item">
+                        <span>الحجم الكلي:</span>
+                        <span>${totalVol.toFixed(2)} وحدة مكعبة</span>
+                    </div>
+                    <div class="result-item">
+                        <span>حجم الجزء الأسطواني:</span>
+                        <span>${cylinderVol.toFixed(2)} وحدة مكعبة</span>
+                    </div>
+                    <div class="result-item">
+                        <span>حجم الأطراف الكروية:</span>
+                        <span>${sphereVol.toFixed(2)} وحدة مكعبة</span>
+                    </div>
+                `;
+                
+                document.getElementById('resultCard').classList.add('show');
+                
+                window.lastCalc = {
+                    title: "حجم الخزان الكبسولي",
+                    result: `الحجم: ${totalVol.toFixed(2)}`,
+                    date: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة');
+            }
+        }
+
+        function saveCapsuleResult() {
+            if (window.firebaseLogic && window.firebaseLogic.saveCalculation) {
+                window.firebaseLogic.saveCalculation(window.lastCalc);
+            } else {
+                const saved = JSON.parse(localStorage.getItem('saved_calculations') || '[]');
+                saved.push(window.lastCalc);
+                localStorage.setItem('saved_calculations', JSON.stringify(saved));
+                alert('تم حفظ النتيجة محلياً');
+            }
+        }
+    </script>
+</body>
+</html>
