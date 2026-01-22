@@ -136,6 +136,18 @@
         .hidden {
             display: none;
         }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 100%;
+        }
+        /* يعني عشان الرسمة تبان حلوة في الـ Dark Mode */
+        .dark-mode canvas {
+            background: #2c2c2e;
+        }
     </style>
 </head>
 <body class="mobile-view">
@@ -169,6 +181,9 @@
 
             <div id="results" class="hidden"></div>
             
+            <!-- هنا يا سيدي هنرسم المنحرف بالتقسيمات بتاعته -->
+            <canvas id="trapezoidCanvas"></canvas>
+            
             <button id="saveBtn" class="save-btn hidden" onclick="saveResult()">
                 <i class="fas fa-save"></i> حفظ النتائج
             </button>
@@ -178,6 +193,111 @@
     <script>
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark-mode');
+        }
+
+        function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
+            const canvas = document.getElementById('trapezoidCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // تظبيط مقاس الكانفاس
+            canvas.width = 500;
+            canvas.height = 400;
+            const padding = 50;
+            const drawW = canvas.width - padding * 2;
+            const drawH = canvas.height - padding * 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // لو الداتا مش كاملة نخرج
+            if (!a || !b || !L1 || !L2 || h <= 0) return;
+
+            // حساب مكان القاعدة الصغرى بالنسبة للكبرى
+            const x1 = (b * b + L1 * L1 - L2 * L2 - a * a) / (2 * (b - a));
+            const x_offset = x1; 
+
+            // تظبيط الـ Scale عشان الرسمة تملى الكانفاس
+            const scale = Math.min(drawW / Math.max(a, b), drawH / h);
+            
+            const startX = (canvas.width - b * scale) / 2;
+            const startY = canvas.height - padding;
+
+            // إحداثيات النقط
+            const p1 = { x: startX, y: startY }; // شمال تحت
+            const p2 = { x: startX + b * scale, y: startY }; // يمين تحت
+            const p3 = { x: startX + (x_offset + a) * scale, y: startY - h * scale }; // يمين فوق
+            const p4 = { x: startX + x_offset * scale, y: startY - h * scale }; // شمال فوق
+
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#e0e0e0' : '#333';
+            const strokeColor = isDarkMode ? '#4dabf7' : '#1971c2';
+            const divisionColor = isDarkMode ? '#ff922b' : '#e67e22';
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineJoin = 'round';
+
+            // رسم المنحرف الكبير
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            // رسم خطوط التقسيم
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = divisionColor;
+            ctx.lineWidth = 2;
+            ctx.font = '12px Arial';
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+
+            divisionHeights.forEach(dh => {
+                if (dh > 0 && dh < h) {
+                    const ratio = dh / h;
+                    // النقط على الضلعين المائلين
+                    const dL = {
+                        x: p1.x + (p4.x - p1.x) * ratio,
+                        y: p1.y + (p4.y - p1.y) * ratio
+                    };
+                    const dR = {
+                        x: p2.x + (p3.x - p2.x) * ratio,
+                        y: p2.y + (p3.y - p2.y) * ratio
+                    };
+
+                    ctx.beginPath();
+                    ctx.moveTo(dL.x, dL.y);
+                    ctx.lineTo(dR.x, dR.y);
+                    ctx.stroke();
+
+                    // نكتب الارتفاع عند الخط
+                    ctx.fillText(`h=${dh.toFixed(2)}`, (dL.x + dR.x) / 2, dL.y - 5);
+                }
+            });
+
+            ctx.setLineDash([]); // نرجع الخط العادي
+
+            // كتابة أطوال الأضلاع الأساسية
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 14px Arial';
+            
+            // القاعدة الكبرى
+            ctx.fillText(b.toFixed(2), (p1.x + p2.x) / 2, p1.y + 20);
+            // القاعدة الصغرى
+            ctx.fillText(a.toFixed(2), (p3.x + p4.x) / 2, p3.y - 10);
+            // الأضلاع المائلة
+            ctx.save();
+            ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
+            ctx.rotate(Math.atan2(p4.y - p1.y, p4.x - p1.x));
+            ctx.fillText(L1.toFixed(2), 0, -10);
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
+            ctx.rotate(Math.atan2(p3.y - p2.y, p3.x - p2.x));
+            ctx.fillText(L2.toFixed(2), 0, -10);
+            ctx.restore();
         }
 
         function calculate() {
@@ -260,6 +380,8 @@
             }
 
             resultsDiv.innerHTML = html;
+            // يا معلم، نرسم المنحرف بالتقسيمات
+            drawTrapezoidDivision(a, b, L1, L2, totalHeight, heights);
         }
 
         function convertToFeddans(m2) {

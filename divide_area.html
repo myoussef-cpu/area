@@ -130,6 +130,19 @@
             color: #4dabff;
         }
 
+        /* ستايل الرسمة التوضيحية */
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 100%;
+        }
+        .dark-mode canvas {
+            background: #2c2c2e;
+        }
+
         .hidden-web {
             display: none;
         }
@@ -174,6 +187,8 @@
             <div class="result-box" id="lengthResult">
                 النتيجة تظهر هنا...
             </div>
+            <!-- رسمة الطول -->
+            <canvas id="lengthCanvas" height="100"></canvas>
         </div>
 
         <!-- تحويل المساحات -->
@@ -213,13 +228,93 @@
             <div class="result-box" id="areaResult">
                 النتيجة تظهر هنا...
             </div>
+            <!-- رسمة المساحة -->
+            <canvas id="areaCanvas" height="200"></canvas>
         </div>
     </div>
 
     <script>
         // اول حاجة نشوف لو المود غامق ولا فاتح
+        function isDark() {
+            return document.documentElement.classList.contains('dark-mode');
+        }
+
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark-mode');
+        }
+
+        // رسم توضيحي للطول
+        function drawLengthVis(val, unit) {
+            const canvas = document.getElementById('lengthCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (isNaN(val) || val <= 0) return;
+
+            const textColor = isDark() ? '#e0e0e0' : '#333';
+            const strokeColor = isDark() ? '#4dabf7' : '#1971c2';
+
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+
+            // رسم خط
+            const startX = 50;
+            const endX = canvas.width - 50;
+            const y = canvas.height / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(endX, y);
+            ctx.stroke();
+
+            // رسم شرطتين في الآخر
+            ctx.beginPath();
+            ctx.moveTo(startX, y - 10); ctx.lineTo(startX, y + 10);
+            ctx.moveTo(endX, y - 10); ctx.lineTo(endX, y + 10);
+            ctx.stroke();
+
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${val} ${unit}`, canvas.width / 2, y - 15);
+        }
+
+        // رسم توضيحي للمساحة
+        function drawAreaVis(val, unit) {
+            const canvas = document.getElementById('areaCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (isNaN(val) || val <= 0) return;
+
+            const textColor = isDark() ? '#e0e0e0' : '#333';
+            const strokeColor = isDark() ? '#4dabf7' : '#1971c2';
+
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3;
+            ctx.fillStyle = isDark() ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.1)';
+
+            const size = Math.min(canvas.width, canvas.height) - 60;
+            const x = (canvas.width - size) / 2;
+            const y = (canvas.height - size) / 2;
+
+            // رسم مربع يمثل المساحة
+            ctx.beginPath();
+            ctx.rect(x, y, size, size);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${val} ${unit}`, canvas.width / 2, y + size / 2 + 5);
+            
+            // إضافة رمز المساحة
+            ctx.font = '12px Arial';
+            ctx.fillText('مساحة الأرض', canvas.width / 2, y + 20);
         }
 
         // عوامل تحويل الأطوال
@@ -264,6 +359,9 @@
 
             let result = value * lengthFactors[from] / lengthFactors[to];
             resDiv.innerHTML = `${result.toLocaleString(undefined, {maximumFractionDigits: 4})} <span style="font-size: 0.8rem; margin-right: 5px;">${lengthNames[to]}</span>`;
+            
+            // رسم توضيحي للطول الناتج
+            drawLengthVis(result.toFixed(2), lengthNames[to]);
         }
 
         // تحويل المساحات
@@ -280,6 +378,9 @@
 
             let result = value * areaFactors[from] / areaFactors[to];
             resDiv.innerHTML = `${result.toLocaleString(undefined, {maximumFractionDigits: 4})} <span style="font-size: 0.8rem; margin-right: 5px;">${areaNames[to]}</span>`;
+            
+            // رسم توضيحي للمساحة الناتجة
+            drawAreaVis(result.toFixed(2), areaNames[to]);
         }
     </script>
 </body>

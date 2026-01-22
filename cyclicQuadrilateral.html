@@ -20,6 +20,10 @@
         </div>
     </div>
 
+    <div id="drawing-container" class="card hidden">
+        <canvas id="shapeCanvas"></canvas>
+    </div>
+
     <div id="initialArea" class="result-card hidden">
         <!-- النتائج الأولية هتظهر هنا -->
     </div>
@@ -91,6 +95,22 @@
     }
 
     .hidden { display: none; }
+
+    #drawing-container {
+        text-align: center;
+        padding: 10px;
+        background: #fdfdfd;
+        overflow: hidden;
+    }
+
+    .dark-mode #drawing-container {
+        background: #252525;
+    }
+
+    #shapeCanvas {
+        max-width: 100%;
+        height: auto;
+    }
 </style>
 
 <script>
@@ -101,10 +121,12 @@
         const L2 = parseFloat(document.getElementById("L2").value);
 
         const initialAreaDiv = document.getElementById("initialArea");
+        const drawingContainer = document.getElementById("drawing-container");
         const saveBtn = document.getElementById("saveBtn");
 
         if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2) || a <= 0 || b <= 0 || L1 <= 0 || L2 <= 0) {
             initialAreaDiv.classList.add('hidden');
+            drawingContainer.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
         }
@@ -113,9 +135,10 @@
         const s = (a + b + L1 + L2) / 2;
         const area = Math.sqrt((s - a) * (s - b) * (s - L1) * (s - L2));
 
-        if (isNaN(area)) {
+        if (isNaN(area) || area <= 0) {
             initialAreaDiv.innerHTML = `<p style="color: #e74c3c;">الأضلاع دي متنفعش تعمل رباعي دائري يا هندسة!</p>`;
             initialAreaDiv.classList.remove('hidden');
+            drawingContainer.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
         }
@@ -131,7 +154,83 @@
             <p>القطر الثاني: <span>${diagonals.diagonal2.toFixed(2)}</span> متر</p>
         `;
         initialAreaDiv.classList.remove('hidden');
+        drawingContainer.classList.remove('hidden');
         saveBtn.style.display = 'block';
+
+        // رسم الرباعي الدائري
+        drawCyclic(a, b, L1, L2, diagonals.diagonal1);
+    }
+
+    function drawCyclic(a, b, c, d, diag) {
+        const canvas = document.getElementById('shapeCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 400;
+        canvas.height = 300;
+        const padding = 40;
+        const drawW = canvas.width - padding * 2;
+        const drawH = canvas.height - padding * 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // حساب الإحداثيات باستخدام القطر الأول
+        const cosAlpha = (a*a + diag*diag - b*b) / (2*a*diag);
+        const alpha = Math.acos(cosAlpha);
+        
+        const cosBeta = (d*d + diag*diag - c*c) / (2*d*diag);
+        const beta = Math.acos(cosBeta);
+
+        let pt1 = { x: 0, y: 0 };
+        let pt2 = { x: diag, y: 0 };
+        let pt3 = { x: a * Math.cos(alpha), y: a * Math.sin(alpha) };
+        let pt4 = { x: d * Math.cos(beta), y: -d * Math.sin(beta) };
+
+        const pts = [pt1, pt2, pt3, pt4];
+        const xs = pts.map(p => p.x);
+        const ys = pts.map(p => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+
+        const scale = Math.min(drawW / (maxX - minX), drawH / (maxY - minY));
+
+        const offsetX = padding + (drawW - (maxX - minX) * scale) / 2 - minX * scale;
+        const offsetY = padding + (drawH - (maxY - minY) * scale) / 2 - minY * scale;
+
+        const sPts = pts.map(p => ({
+            x: offsetX + p.x * scale,
+            y: canvas.height - (offsetY + p.y * scale)
+        }));
+
+        ctx.beginPath();
+        ctx.moveTo(sPts[0].x, sPts[0].y);
+        ctx.lineTo(sPts[2].x, sPts[2].y);
+        ctx.lineTo(sPts[1].x, sPts[1].y);
+        ctx.lineTo(sPts[3].x, sPts[3].y);
+        ctx.closePath();
+
+        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+        ctx.strokeStyle = isDarkMode ? '#4dabf7' : '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(52, 152, 219, 0.1)';
+        ctx.fill();
+
+        ctx.fillStyle = isDarkMode ? '#e0e0e0' : '#2c3e50';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+
+        function drawLabel(pA, pB, label) {
+            const midX = (pA.x + pB.x) / 2;
+            const midY = (pA.y + pB.y) / 2;
+            ctx.fillText(label + ' م', midX, midY - 5);
+        }
+
+        drawLabel(sPts[0], sPts[2], a.toFixed(1));
+        drawLabel(sPts[2], sPts[1], b.toFixed(1));
+        drawLabel(sPts[1], sPts[3], c.toFixed(1));
+        drawLabel(sPts[3], sPts[0], d.toFixed(1));
     }
 
     function calculateDiagonals(a, b, L1, L2) {

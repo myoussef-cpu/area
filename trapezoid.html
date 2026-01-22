@@ -20,6 +20,10 @@
         </div>
     </div>
 
+    <div id="drawing-container" class="card hidden">
+        <canvas id="shapeCanvas"></canvas>
+    </div>
+
     <div id="initialArea" class="result-card hidden">
         <!-- النتائج الأولية هتظهر هنا -->
     </div>
@@ -165,6 +169,22 @@
     }
 
     .hidden { display: none; }
+
+    #drawing-container {
+        text-align: center;
+        padding: 10px;
+        background: #fdfdfd;
+        overflow: hidden;
+    }
+
+    .dark-mode #drawing-container {
+        background: #252525;
+    }
+
+    #shapeCanvas {
+        max-width: 100%;
+        height: auto;
+    }
 </style>
 
 <script>
@@ -175,11 +195,13 @@
         const L2 = parseFloat(document.getElementById("L2").value);
 
         const initialAreaDiv = document.getElementById("initialArea");
+        const drawingContainer = document.getElementById("drawing-container");
         const divisionSection = document.getElementById("divisionSection");
         const saveBtn = document.getElementById("saveBtn");
 
         if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2) || a <= 0 || b <= 0 || L1 <= 0 || L2 <= 0) {
             initialAreaDiv.classList.add('hidden');
+            drawingContainer.classList.add('hidden');
             divisionSection.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
@@ -190,6 +212,7 @@
         if (L1 < baseDiff || L2 < baseDiff) {
             initialAreaDiv.innerHTML = `<p style="color: #e74c3c;">الأطوال دي مستحيل تعمل شبه منحرف يا هندسة!</p>`;
             initialAreaDiv.classList.remove('hidden');
+            drawingContainer.classList.add('hidden');
             divisionSection.classList.add('hidden');
             return;
         }
@@ -199,24 +222,82 @@
         const h = (h1 + h2) / 2;
         const area = ((a + b) / 2) * h;
 
-        if (isNaN(area)) {
-            initialAreaDiv.classList.add('hidden');
-            return;
-        }
-
         const areaConverted = convertToFeddans(area);
-        const diagonals = calculateDiagonals(a, b, h);
 
         initialAreaDiv.innerHTML = `
-            <h3>المساحة الأولية:</h3>
+            <h3>النتيجة الأولية:</h3>
             <p>المساحة الكلية: <span>${area.toFixed(2)}</span> متر²</p>
+            <p>الارتفاع التقريبي: <span>${h.toFixed(2)}</span> متر</p>
             <p>بالوحدات: <span>${areaConverted.feddan}</span> فدان، <span>${areaConverted.qirat}</span> قيراط، <span>${areaConverted.sahm}</span> سهم</p>
-            <p>القطر الأول: <span>${diagonals.diagonal1.toFixed(2)}</span> متر</p>
-            <p>القطر الثاني: <span>${diagonals.diagonal2.toFixed(2)}</span> متر</p>
         `;
         initialAreaDiv.classList.remove('hidden');
+        drawingContainer.classList.remove('hidden');
         divisionSection.classList.remove('hidden');
         saveBtn.style.display = 'block';
+
+        // رسم شبه المنحرف
+        drawTrapezoid(a, b, L1, L2, h);
+    }
+
+    function drawTrapezoid(a, b, L1, L2, h) {
+        const canvas = document.getElementById('shapeCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 400;
+        canvas.height = 300;
+        const padding = 40;
+        const drawW = canvas.width - padding * 2;
+        const drawH = canvas.height - padding * 2;
+
+        // حساب الإحداثيات (بافتراض أنه متساوي الساقين تقريباً للرسم فقط أو بناء على الفرق)
+        const diff = (b - a) / 2;
+        
+        let p1 = { x: 0, y: 0 };           // أسفل يسار
+        let p2 = { x: b, y: 0 };           // أسفل يمين
+        let p3 = { x: b - diff, y: h };    // أعلى يمين
+        let p4 = { x: diff, y: h };        // أعلى يسار
+
+        const scaleX = drawW / b;
+        const scaleY = drawH / h;
+        const scale = Math.min(scaleX, scaleY);
+
+        const offsetX = padding + (drawW - b * scale) / 2;
+        const offsetY = padding + (drawH - h * scale) / 2;
+
+        const pts = [p1, p2, p3, p4].map(p => ({
+            x: offsetX + p.x * scale,
+            y: canvas.height - (offsetY + p.y * scale)
+        }));
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
+        ctx.fill();
+
+        ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#e0e0e0' : '#2c3e50';
+        ctx.font = 'bold 12px Tajawal';
+        ctx.textAlign = 'center';
+
+        function drawLabel(pA, pB, label, isVertical = false) {
+            const midX = (pA.x + pB.x) / 2;
+            const midY = (pA.y + pB.y) / 2;
+            ctx.fillText(label + ' م', midX, isVertical ? midY : midY - 5);
+        }
+
+        drawLabel(pts[0], pts[1], b.toFixed(1)); // القاعدة الكبرى
+        drawLabel(pts[2], pts[3], a.toFixed(1)); // القاعدة الصغرى
+        drawLabel(pts[1], pts[2], L2.toFixed(1), true); // المائل يمين
+        drawLabel(pts[3], pts[0], L1.toFixed(1), true); // المائل يسار
     }
 
     function calculateDiagonals(a, b, h) {

@@ -182,27 +182,113 @@
     function drawQuadrilateral(a, b, c, d, d1, d2) {
         let canvas = document.getElementById("quadCanvas");
         let ctx = canvas.getContext("2d");
+        
+        canvas.width = 400;
+        canvas.height = 300;
+        const padding = 40;
+        const drawW = canvas.width - padding * 2;
+        const drawH = canvas.height - padding * 2;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // رسم تخيلي بسيط للتوضيح فقط لأن الإحداثيات الحقيقية محتاجة زوايا
-        let maxSide = Math.max(a, b, c, d, d1 || 0, d2 || 0);
-        let scale = 200 / maxSide; 
-        let cx = canvas.width / 2;
-        let cy = canvas.height / 2;
+        // هنستخدم القطر المتاح (d1 أو d2)
+        let diag = d1 || d2;
+        if (!diag) return;
 
-        ctx.beginPath();
-        ctx.moveTo(cx - 50, cy - 50);
-        ctx.lineTo(cx + 50, cy - 50);
-        ctx.lineTo(cx + 70, cy + 50);
-        ctx.lineTo(cx - 70, cy + 50);
-        ctx.closePath();
-        ctx.strokeStyle = "#007bff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        // حساب زوايا المثلثين باستخدام قانون جيب التمام
+        // المثلث الأول: أضلاع a, b والقطر diag
+        // الزاوية alpha هي الزاوية بين الضلع a والقطر diag
+        const cosAlpha = (a*a + diag*diag - b*b) / (2*a*diag);
         
-        ctx.fillStyle = "#333";
-        ctx.font = "12px Arial";
-        ctx.fillText("رسم توضيحي", cx - 30, cy);
+        // المثلث الثاني: أضلاع d, c والقطر diag
+        // الزاوية beta هي الزاوية بين الضلع d والقطر diag
+        const cosBeta = (d*d + diag*diag - c*c) / (2*d*diag);
+
+        // لو الحسابات مش منطقية (مفيش مثلث ينفع يترسم بالأبعاد دي)
+        if (Math.abs(cosAlpha) > 1 || Math.abs(cosBeta) > 1) {
+            ctx.fillStyle = "#e74c3c";
+            ctx.textAlign = "center";
+            ctx.fillText("الأبعاد دي متعملش شكل رباعي يا هندسة", canvas.width/2, canvas.height/2);
+            return;
+        }
+
+        const alpha = Math.acos(cosAlpha);
+        const beta = Math.acos(cosBeta);
+
+        // إحداثيات النقط
+        // pt1 و pt2 هما طرفي القطر
+        let pt1 = { x: 0, y: 0 };
+        let pt2 = { x: diag, y: 0 };
+        // pt3 فوق القطر (مثلث a, b, diag)
+        let pt3 = { x: a * Math.cos(alpha), y: a * Math.sin(alpha) };
+        // pt4 تحت القطر (مثلث d, c, diag)
+        let pt4 = { x: d * Math.cos(beta), y: -d * Math.sin(beta) };
+
+        // تظبيط المقاسات (Scaling)
+        const pts = [pt1, pt2, pt3, pt4];
+        const xs = pts.map(p => p.x);
+        const ys = pts.map(p => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+
+        const scaleX = drawW / (maxX - minX);
+        const scaleY = drawH / (maxY - minY);
+        const scale = Math.min(scaleX, scaleY);
+
+        const offsetX = padding + (drawW - (maxX - minX) * scale) / 2 - minX * scale;
+        const offsetY = padding + (drawH - (maxY - minY) * scale) / 2 - minY * scale;
+
+        const sPts = pts.map(p => ({
+            x: offsetX + p.x * scale,
+            y: canvas.height - (offsetY + p.y * scale)
+        }));
+
+        // رسم الشكل الرباعي (التوصيل بين النقط بالترتيب)
+        ctx.beginPath();
+        ctx.moveTo(sPts[0].x, sPts[0].y); // نقطة البداية (طرف القطر)
+        ctx.lineTo(sPts[2].x, sPts[2].y); // الضلع a
+        ctx.lineTo(sPts[1].x, sPts[1].y); // الضلع b
+        ctx.lineTo(sPts[3].x, sPts[3].y); // الضلع c
+        ctx.closePath(); // الضلع d
+
+        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+        
+        ctx.strokeStyle = isDarkMode ? '#4dabf7' : '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(52, 152, 219, 0.1)';
+        ctx.fill();
+
+        // رسم القطر كخط منقط
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(sPts[0].x, sPts[0].y);
+        ctx.lineTo(sPts[1].x, sPts[1].y);
+        ctx.strokeStyle = isDarkMode ? '#8e8e93' : '#95a5a6';
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // إضافة أطوال الأضلاع
+        ctx.fillStyle = isDarkMode ? '#e0e0e0' : '#2c3e50';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+
+        function drawLabel(pA, pB, label) {
+            const midX = (pA.x + pB.x) / 2;
+            const midY = (pA.y + pB.y) / 2;
+            ctx.fillText(label + ' م', midX, midY - 5);
+        }
+
+        drawLabel(sPts[0], sPts[2], a.toFixed(1)); // الضلع a
+        drawLabel(sPts[2], sPts[1], b.toFixed(1)); // الضلع b
+        drawLabel(sPts[1], sPts[3], c.toFixed(1)); // الضلع c
+        drawLabel(sPts[3], sPts[0], d.toFixed(1)); // الضلع d
+        
+        // القطر
+        ctx.font = '11px Arial';
+        ctx.fillText(`${diag.toFixed(1)} م (قطر)`, (sPts[0].x + sPts[1].x) / 2, (sPts[0].y + sPts[1].y) / 2 + 15);
     }
 
     function saveResult() {

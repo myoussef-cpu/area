@@ -1,5 +1,5 @@
 // بص يا سيدي، ده الـ Service Worker اللي هيخلي التطبيق يشتغل أوفلاين زي الفل
-const CACHE_NAME = 'area-calc-v3';
+const CACHE_NAME = 'area-calc-v4';
 
 // دي قايمة بكل الملفات اللي محتاجينها عشان التطبيق يشتغل من غير نت
 const ASSETS_TO_CACHE = [

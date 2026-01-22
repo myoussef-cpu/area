@@ -16,6 +16,10 @@
         </div>
     </div>
 
+    <div id="drawing-container" class="card hidden">
+        <canvas id="shapeCanvas"></canvas>
+    </div>
+
     <div id="initialArea" class="result-card hidden">
         <!-- النتائج هتظهر هنا -->
     </div>
@@ -85,6 +89,22 @@
     }
 
     .hidden { display: none; }
+
+    #drawing-container {
+        text-align: center;
+        padding: 10px;
+        background: #fdfdfd;
+        overflow: hidden;
+    }
+
+    .dark-mode #drawing-container {
+        background: #252525;
+    }
+
+    #shapeCanvas {
+        max-width: 100%;
+        height: auto;
+    }
 </style>
 
 <script>
@@ -94,10 +114,12 @@
         const side3 = parseFloat(document.getElementById("side3").value);
 
         const initialAreaDiv = document.getElementById("initialArea");
+        const drawingContainer = document.getElementById("drawing-container");
         const saveBtn = document.getElementById("saveBtn");
 
         if (isNaN(side1) || isNaN(side2) || isNaN(side3) || side1 <= 0 || side2 <= 0 || side3 <= 0) {
             initialAreaDiv.classList.add('hidden');
+            drawingContainer.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
         }
@@ -106,6 +128,7 @@
         if (side1 + side2 <= side3 || side1 + side3 <= side2 || side2 + side3 <= side1) {
             initialAreaDiv.innerHTML = `<p style="color: #e74c3c;">الأضلاع دي متنفعش تعمل مثلث يا هندسة!</p>`;
             initialAreaDiv.classList.remove('hidden');
+            drawingContainer.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
         }
@@ -116,6 +139,7 @@
 
         if (isNaN(area)) {
             initialAreaDiv.classList.add('hidden');
+            drawingContainer.classList.add('hidden');
             saveBtn.style.display = 'none';
             return;
         }
@@ -128,7 +152,84 @@
             <p>بالوحدات: <span>${areaConverted.feddan}</span> فدان، <span>${areaConverted.qirat}</span> قيراط، <span>${areaConverted.sahm}</span> سهم</p>
         `;
         initialAreaDiv.classList.remove('hidden');
+        drawingContainer.classList.remove('hidden');
         saveBtn.style.display = 'block';
+
+        // رسم المثلث
+        drawTriangle(side1, side2, side3);
+    }
+
+    function drawTriangle(a, b, c) {
+        const canvas = document.getElementById('shapeCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // تظبيط مقاس الكانفس
+        canvas.width = 400;
+        canvas.height = 300;
+        const padding = 40;
+        const drawW = canvas.width - padding * 2;
+        const drawH = canvas.height - padding * 2;
+
+        // حساب زوايا المثلث باستخدام قانون جيب التمام
+        const cosA = (b*b + c*c - a*a) / (2*b*c);
+        const angleA = Math.acos(cosA);
+
+        // إحداثيات النقط
+        let p1 = { x: 0, y: 0 };
+        let p2 = { x: c, y: 0 };
+        let p3 = { x: b * Math.cos(angleA), y: b * Math.sin(angleA) };
+
+        // مقياس الرسم (Scaling) عشان المثلث يملى الكانفس
+        const minX = Math.min(p1.x, p2.x, p3.x);
+        const maxX = Math.max(p1.x, p2.x, p3.x);
+        const minY = Math.min(p1.y, p2.y, p3.y);
+        const maxY = Math.max(p1.y, p2.y, p3.y);
+
+        const scaleX = drawW / (maxX - minX);
+        const scaleY = drawH / (maxY - minY);
+        const scale = Math.min(scaleX, scaleY);
+
+        // تحويل النقط لمقياس الرسم وتوسيطها
+        const offsetX = padding + (drawW - (maxX - minX) * scale) / 2 - minX * scale;
+        const offsetY = padding + (drawH - (maxY - minY) * scale) / 2 - minY * scale;
+
+        const pts = [p1, p2, p3].map(p => ({
+            x: offsetX + p.x * scale,
+            y: canvas.height - (offsetY + p.y * scale) // قلب محور Y عشان الرسم يبدأ من تحت
+        }));
+
+        // مسح الكانفس
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // رسم المثلث
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.closePath();
+
+        // ستايل الرسم
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
+        ctx.fill();
+
+        // إضافة أطوال الأضلاع
+        ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#e0e0e0' : '#2c3e50';
+        ctx.font = 'bold 14px Tajawal';
+        ctx.textAlign = 'center';
+
+        // فنكشن مساعدة لكتابة النص في نص الضلع
+        function drawLabel(pA, pB, label) {
+            const midX = (pA.x + pB.x) / 2;
+            const midY = (pA.y + pB.y) / 2;
+            ctx.fillText(label + ' م', midX, midY - 5);
+        }
+
+        drawLabel(pts[0], pts[1], c.toFixed(1)); // الضلع اللي تحت
+        drawLabel(pts[1], pts[2], a.toFixed(1)); // الضلع اليمين
+        drawLabel(pts[2], pts[0], b.toFixed(1)); // الضلع الشمال
     }
 
     function saveResult() {
