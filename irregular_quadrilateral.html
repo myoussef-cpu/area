@@ -37,8 +37,11 @@
         <p id="convertedUnits">الفدان: -- | القيراط: -- | السهم: --</p>
     </div>
 
-    <div id="canvasCard" class="card hidden" style="text-align: center; overflow: hidden;">
-        <canvas id="quadCanvas" width="300" height="300" style="max-width: 100%;"></canvas>
+    <div id="canvasCard" class="card hidden" style="text-align: center; padding: 10px;">
+        <h4 style="margin: 10px 0; color: var(--primary);">الرسم التوضيحي:</h4>
+        <div class="canvas-scroll-container" id="canvasScroll">
+            <canvas id="quadCanvas"></canvas>
+        </div>
     </div>
 
     <button class="btn-main" onclick="saveResult()" id="saveBtn" style="display: none; margin-top: 10px; background: #27ae60;">
@@ -54,17 +57,51 @@
         padding-bottom: 20px;
     }
 
+    /* حاوية الرسمة عشان تكون قابلة للتمرير */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 15px 0;
+        padding: 5px;
+        cursor: grab;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+    }
+
+    .canvas-scroll-container:active {
+        cursor: grabbing;
+    }
+
+    .dark-mode .canvas-scroll-container {
+        background: rgba(255,255,255,0.02);
+    }
+
+    #quadCanvas {
+        display: block;
+        margin: 0 auto;
+        background: var(--card-light);
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+    }
+
+    .dark-mode #quadCanvas {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+
     .input-group {
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         text-align: right;
     }
 
     .input-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: var(--text-light);
+        padding-right: 5px;
     }
 
     .dark-mode .input-group label {
@@ -73,36 +110,71 @@
 
     .input-group label i {
         color: var(--primary);
-        margin-left: 5px;
+        margin-left: 8px;
+        font-size: 1rem;
     }
 
     .result-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        border-right: 5px solid var(--primary);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
         text-align: right;
+        transition: all 0.3s ease;
     }
 
     .dark-mode .result-card {
         background: var(--card-dark);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid var(--border-dark);
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
     .result-card h3 {
-        margin: 0 0 10px;
-        font-size: 1.1rem;
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
         color: var(--primary);
     }
 
     .result-card p {
-        margin: 8px 0;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        margin: 10px 0;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .result-card span {
+        font-weight: 700;
+        color: var(--primary);
     }
 
     .hidden { display: none; }
+
+    #canvasCard {
+        text-align: center;
+        padding: 20px;
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .dark-mode #canvasCard {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+
+    #quadCanvas {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+    }
 </style>
 
 <script>
@@ -183,9 +255,10 @@
         let canvas = document.getElementById("quadCanvas");
         let ctx = canvas.getContext("2d");
         
-        canvas.width = 400;
-        canvas.height = 300;
-        const padding = 40;
+        // تظبيط مقاس الكانفاس عشان يبقى كبير وواضح
+        canvas.width = 800;
+        canvas.height = 500;
+        const padding = 60;
         const drawW = canvas.width - padding * 2;
         const drawH = canvas.height - padding * 2;
 
@@ -196,17 +269,13 @@
         if (!diag) return;
 
         // حساب زوايا المثلثين باستخدام قانون جيب التمام
-        // المثلث الأول: أضلاع a, b والقطر diag
-        // الزاوية alpha هي الزاوية بين الضلع a والقطر diag
         const cosAlpha = (a*a + diag*diag - b*b) / (2*a*diag);
-        
-        // المثلث الثاني: أضلاع d, c والقطر diag
-        // الزاوية beta هي الزاوية بين الضلع d والقطر diag
         const cosBeta = (d*d + diag*diag - c*c) / (2*d*diag);
 
-        // لو الحسابات مش منطقية (مفيش مثلث ينفع يترسم بالأبعاد دي)
+        // لو الحسابات مش منطقية
         if (Math.abs(cosAlpha) > 1 || Math.abs(cosBeta) > 1) {
             ctx.fillStyle = "#e74c3c";
+            ctx.font = "bold 18px Tajawal, Arial";
             ctx.textAlign = "center";
             ctx.fillText("الأبعاد دي متعملش شكل رباعي يا هندسة", canvas.width/2, canvas.height/2);
             return;
@@ -216,12 +285,9 @@
         const beta = Math.acos(cosBeta);
 
         // إحداثيات النقط
-        // pt1 و pt2 هما طرفي القطر
         let pt1 = { x: 0, y: 0 };
         let pt2 = { x: diag, y: 0 };
-        // pt3 فوق القطر (مثلث a, b, diag)
         let pt3 = { x: a * Math.cos(alpha), y: a * Math.sin(alpha) };
-        // pt4 تحت القطر (مثلث d, c, diag)
         let pt4 = { x: d * Math.cos(beta), y: -d * Math.sin(beta) };
 
         // تظبيط المقاسات (Scaling)
@@ -245,50 +311,93 @@
             y: canvas.height - (offsetY + p.y * scale)
         }));
 
-        // رسم الشكل الرباعي (التوصيل بين النقط بالترتيب)
+        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+        const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
+        const strokeColor = isDarkMode ? '#4dabf7' : '#1971c2';
+        const areaFillColor = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.05)';
+
+        // رسم الشكل الرباعي
         ctx.beginPath();
-        ctx.moveTo(sPts[0].x, sPts[0].y); // نقطة البداية (طرف القطر)
+        ctx.moveTo(sPts[0].x, sPts[0].y); 
         ctx.lineTo(sPts[2].x, sPts[2].y); // الضلع a
         ctx.lineTo(sPts[1].x, sPts[1].y); // الضلع b
         ctx.lineTo(sPts[3].x, sPts[3].y); // الضلع c
-        ctx.closePath(); // الضلع d
-
-        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+        ctx.closePath(); 
         
-        ctx.strokeStyle = isDarkMode ? '#4dabf7' : '#3498db';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(52, 152, 219, 0.1)';
+        ctx.fillStyle = areaFillColor;
         ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
 
         // رسم القطر كخط منقط
-        ctx.setLineDash([5, 5]);
+        ctx.setLineDash([8, 6]);
         ctx.beginPath();
         ctx.moveTo(sPts[0].x, sPts[0].y);
         ctx.lineTo(sPts[1].x, sPts[1].y);
-        ctx.strokeStyle = isDarkMode ? '#8e8e93' : '#95a5a6';
+        ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)';
         ctx.stroke();
         ctx.setLineDash([]);
 
         // إضافة أطوال الأضلاع
-        ctx.fillStyle = isDarkMode ? '#e0e0e0' : '#2c3e50';
-        ctx.font = 'bold 13px Arial';
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 15px Tajawal, Arial';
         ctx.textAlign = 'center';
 
-        function drawLabel(pA, pB, label) {
+        function drawLabel(pA, pB, label, isDiag = false) {
             const midX = (pA.x + pB.x) / 2;
             const midY = (pA.y + pB.y) / 2;
-            ctx.fillText(label + ' م', midX, midY - 5);
+            
+            ctx.save();
+            ctx.translate(midX, midY);
+            const angle = Math.atan2(pB.y - pA.y, pB.x - pA.x);
+            // لو الكلام مقلوب نعدله
+            let labelAngle = angle;
+            if (labelAngle > Math.PI/2 || labelAngle < -Math.PI/2) labelAngle += Math.PI;
+            
+            ctx.rotate(labelAngle);
+            ctx.fillText(label, 0, isDiag ? 20 : -10);
+            ctx.restore();
         }
 
-        drawLabel(sPts[0], sPts[2], a.toFixed(1)); // الضلع a
-        drawLabel(sPts[2], sPts[1], b.toFixed(1)); // الضلع b
-        drawLabel(sPts[1], sPts[3], c.toFixed(1)); // الضلع c
-        drawLabel(sPts[3], sPts[0], d.toFixed(1)); // الضلع d
+        drawLabel(sPts[0], sPts[2], `a = ${a.toFixed(2)}`);
+        drawLabel(sPts[2], sPts[1], `b = ${b.toFixed(2)}`);
+        drawLabel(sPts[1], sPts[3], `c = ${c.toFixed(2)}`);
+        drawLabel(sPts[3], sPts[0], `d = ${d.toFixed(2)}`);
         
         // القطر
-        ctx.font = '11px Arial';
-        ctx.fillText(`${diag.toFixed(1)} م (قطر)`, (sPts[0].x + sPts[1].x) / 2, (sPts[0].y + sPts[1].y) / 2 + 15);
+        ctx.font = '13px Tajawal, Arial';
+        ctx.fillStyle = isDarkMode ? '#adb5bd' : '#495057';
+        drawLabel(sPts[0], sPts[1], `القطر = ${diag.toFixed(2)}`, true);
+    }
+
+    // إضافة دعم السحب بالماوس للتمرير
+    const scrollContainer = document.getElementById('canvasScroll');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    if (scrollContainer) {
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; 
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
     }
 
     function saveResult() {

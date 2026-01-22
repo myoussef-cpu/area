@@ -116,15 +116,16 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
-        padding: 0 5px;
+        margin-bottom: 25px;
+        padding: 0 10px;
     }
 
     .welcome-text h2 {
         margin: 0;
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         color: var(--text-light);
-        font-weight: 700;
+        font-weight: 800;
+        letter-spacing: -0.5px;
     }
 
     .dark-mode .welcome-text h2 {
@@ -132,69 +133,106 @@
     }
 
     .welcome-text p {
-        margin: 5px 0 0;
-        color: #7f8c8d;
-        font-size: 0.9rem;
+        margin: 4px 0 0;
+        color: #8e8e93;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .user-avatar {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         color: var(--primary);
-        opacity: 0.8;
+        filter: drop-shadow(0 4px 10px rgba(0, 122, 255, 0.2));
     }
 
     .section-title {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 700;
-        margin: 20px 5px 15px;
-        color: #34495e;
+        margin: 25px 10px 15px;
+        color: var(--text-light);
         text-align: right;
+        opacity: 0.9;
     }
 
     .dark-mode .section-title {
-        color: #bdc3c7;
+        color: var(--text-dark);
     }
 
     .tools-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
     }
 
     .tool-item {
-        background: white;
-        padding: 12px 15px;
-        border-radius: 16px;
+        background: var(--card-light);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 16px;
+        border-radius: 22px;
         display: flex;
         align-items: center;
-        gap: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        gap: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* تأثير اللمعان "Liquid" */
+    .tool-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .tool-item:hover::before {
+        left: 100%;
     }
 
     .dark-mode .tool-item {
         background: var(--card-dark);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
 
     .tool-item:active {
-        transform: scale(0.97);
+        transform: scale(0.96) translateY(2px);
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .dark-mode .tool-item:active {
+        background: rgba(255, 255, 255, 0.05);
     }
 
     .tool-icon-box {
-        width: 48px;
-        height: 48px;
+        width: 52px;
+        height: 52px;
         background: var(--bg);
         color: var(--color);
-        border-radius: 14px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     .dark-mode .tool-icon-box {
-        background: rgba(255,255,255,0.05);
+        background: rgba(255,255,255,0.05) !important;
+        color: var(--color) !important;
     }
 
     .tool-details {
@@ -204,7 +242,7 @@
 
     .tool-details h3 {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: var(--text-light);
     }
@@ -214,53 +252,91 @@
     }
 
     .tool-details p {
-        margin: 3px 0 0;
-        font-size: 0.8rem;
-        color: #95a5a6;
+        margin: 4px 0 0;
+        font-size: 0.85rem;
+        color: #8e8e93;
+        font-weight: 500;
     }
 
     .tool-arrow {
-        color: #bdc3c7;
-        font-size: 0.8rem;
+        color: #c7c7cc;
+        font-size: 0.9rem;
     }
 
     .quick-access {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 15px;
+        margin-bottom: 30px;
     }
 
     .access-card {
-        background: white;
-        padding: 15px;
-        border-radius: 16px;
+        background: var(--card-light);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 20px;
+        border-radius: 24px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        gap: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
         cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .access-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.15),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .access-card:hover::before {
+        left: 100%;
     }
 
     .dark-mode .access-card {
         background: var(--card-dark);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .access-card:active {
+        transform: scale(0.95) translateY(2px);
     }
 
     .access-icon {
-        width: 40px;
-        height: 40px;
-        background: rgba(52, 152, 219, 0.1);
+        width: 48px;
+        height: 48px;
+        background: rgba(0, 122, 255, 0.1);
         color: var(--primary);
-        border-radius: 50%;
+        border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
 
     .access-card span {
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .dark-mode .access-card span {
+        color: var(--text-dark);
     }
 </style>

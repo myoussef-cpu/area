@@ -20,8 +20,11 @@
         </div>
     </div>
 
-    <div id="drawing-container" class="card hidden">
-        <canvas id="shapeCanvas"></canvas>
+    <div id="drawing-container" class="card hidden" style="padding: 10px;">
+        <h4 style="margin: 10px 0; color: var(--primary);">الرسم التوضيحي (براهماغوبتا):</h4>
+        <div class="canvas-scroll-container" id="canvasScroll">
+            <canvas id="shapeCanvas"></canvas>
+        </div>
     </div>
 
     <div id="initialArea" class="result-card hidden">
@@ -41,17 +44,51 @@
         padding-bottom: 20px;
     }
 
+    /* حاوية الرسمة عشان تكون قابلة للتمرير */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 15px 0;
+        padding: 5px;
+        cursor: grab;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+    }
+
+    .canvas-scroll-container:active {
+        cursor: grabbing;
+    }
+
+    .dark-mode .canvas-scroll-container {
+        background: rgba(255,255,255,0.02);
+    }
+
+    #shapeCanvas {
+        display: block;
+        margin: 0 auto;
+        background: var(--card-light);
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+    }
+
+    .dark-mode #shapeCanvas {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+
     .input-group {
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         text-align: right;
     }
 
     .input-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: var(--text-light);
+        padding-right: 5px;
     }
 
     .dark-mode .input-group label {
@@ -60,33 +97,41 @@
 
     .input-group label i {
         color: var(--primary);
-        margin-left: 5px;
+        margin-left: 8px;
+        font-size: 1rem;
     }
 
     .result-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        border-right: 5px solid var(--primary);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
         text-align: right;
+        transition: all 0.3s ease;
     }
 
     .dark-mode .result-card {
         background: var(--card-dark);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid var(--border-dark);
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
     .result-card h3 {
-        margin: 0 0 10px;
-        font-size: 1.1rem;
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
         color: var(--primary);
     }
 
     .result-card p {
-        margin: 8px 0;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        margin: 10px 0;
+        font-size: 1rem;
+        line-height: 1.6;
     }
 
     .result-card span {
@@ -98,18 +143,24 @@
 
     #drawing-container {
         text-align: center;
-        padding: 10px;
-        background: #fdfdfd;
+        padding: 20px;
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
         overflow: hidden;
     }
 
     .dark-mode #drawing-container {
-        background: #252525;
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
     }
 
     #shapeCanvas {
         max-width: 100%;
         height: auto;
+        border-radius: 12px;
     }
 </style>
 
@@ -165,9 +216,10 @@
         const canvas = document.getElementById('shapeCanvas');
         const ctx = canvas.getContext('2d');
         
-        canvas.width = 400;
-        canvas.height = 300;
-        const padding = 40;
+        // تظبيط مقاس الكانفاس
+        canvas.width = 800;
+        canvas.height = 500;
+        const padding = 60;
         const drawW = canvas.width - padding * 2;
         const drawH = canvas.height - padding * 2;
 
@@ -203,6 +255,11 @@
             y: canvas.height - (offsetY + p.y * scale)
         }));
 
+        const isDarkMode = document.documentElement.classList.contains('dark-mode');
+        const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
+        const strokeColor = isDarkMode ? '#4dabf7' : '#1971c2';
+        const areaFillColor = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.05)';
+
         ctx.beginPath();
         ctx.moveTo(sPts[0].x, sPts[0].y);
         ctx.lineTo(sPts[2].x, sPts[2].y);
@@ -210,33 +267,102 @@
         ctx.lineTo(sPts[3].x, sPts[3].y);
         ctx.closePath();
 
-        const isDarkMode = document.documentElement.classList.contains('dark-mode');
-        ctx.strokeStyle = isDarkMode ? '#4dabf7' : '#3498db';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(52, 152, 219, 0.1)';
+        ctx.fillStyle = areaFillColor;
         ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
 
-        ctx.fillStyle = isDarkMode ? '#e0e0e0' : '#2c3e50';
-        ctx.font = 'bold 13px Arial';
+        // رسم الدائرة المارة بالرؤوس (اختياري بس بيدي شكل حلو للرباعي الدائري)
+        // بنحسب مركز الدائرة المارة بمثلث واحد منهم (pt1, pt2, pt3)
+        // دي معادلة معقدة شوية بس بتطلع نتيجة روعة
+        const x1 = sPts[0].x, y1 = sPts[0].y;
+        const x2 = sPts[1].x, y2 = sPts[1].y;
+        const x3 = sPts[2].x, y3 = sPts[2].y;
+        const D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+        const centerX = ((x1*x1 + y1*y1) * (y2 - y3) + (x2*x2 + y2*y2) * (y3 - y1) + (x3*x3 + y3*y3) * (y1 - y2)) / D;
+        const centerY = ((x1*x1 + y1*y1) * (x3 - x2) + (x2*x2 + y2*y2) * (x1 - x3) + (x3*x3 + y3*y3) * (x2 - x1)) / D;
+        const radius = Math.sqrt((x1 - centerX)**2 + (y1 - centerY)**2);
+
+        ctx.setLineDash([10, 10]);
+        ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 15px Tajawal, Arial';
         ctx.textAlign = 'center';
 
         function drawLabel(pA, pB, label) {
             const midX = (pA.x + pB.x) / 2;
             const midY = (pA.y + pB.y) / 2;
-            ctx.fillText(label + ' م', midX, midY - 5);
+            
+            ctx.save();
+            ctx.translate(midX, midY);
+            const angle = Math.atan2(pB.y - pA.y, pB.x - pA.x);
+            let labelAngle = angle;
+            if (labelAngle > Math.PI/2 || labelAngle < -Math.PI/2) labelAngle += Math.PI;
+            ctx.rotate(labelAngle);
+            ctx.fillText(label, 0, -10);
+            ctx.restore();
         }
 
-        drawLabel(sPts[0], sPts[2], a.toFixed(1));
-        drawLabel(sPts[2], sPts[1], b.toFixed(1));
-        drawLabel(sPts[1], sPts[3], c.toFixed(1));
-        drawLabel(sPts[3], sPts[0], d.toFixed(1));
+        drawLabel(sPts[0], sPts[2], `a = ${a.toFixed(2)}`);
+        drawLabel(sPts[2], sPts[1], `b = ${b.toFixed(2)}`);
+        drawLabel(sPts[1], sPts[3], `c = ${c.toFixed(2)}`);
+        drawLabel(sPts[3], sPts[0], `d = ${d.toFixed(2)}`);
+    }
+
+    // إضافة دعم السحب بالماوس للتمرير
+    const scrollContainer = document.getElementById('canvasScroll');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    if (scrollContainer) {
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; 
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
     }
 
     function calculateDiagonals(a, b, L1, L2) {
         const diagonal1 = Math.sqrt(((a * L1 + b * L2) * (a * L2 + b * L1)) / (a * b + L1 * L2));
         const diagonal2 = Math.sqrt(((a * L1 + b * L2) * (a * b + L1 * L2)) / (a * L2 + b * L1));
         return { diagonal1, diagonal2 };
+    }
+
+    function convertToFeddans(m2) {
+        const feddan = 4200.83;
+        const qirat = 175.034;
+        const sahm = 7.293;
+
+        let remaining = m2;
+        let f = Math.floor(remaining / feddan);
+        remaining -= f * feddan;
+        let q = Math.floor(remaining / qirat);
+        remaining -= q * qirat;
+        let s = remaining / sahm;
+
+        return { feddan: f, qirat: q, sahm: s.toFixed(2) };
     }
 
     function saveResult() {

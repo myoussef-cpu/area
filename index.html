@@ -13,16 +13,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
         
         :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --bg-light: #f8f9fa;
-            --bg-dark: #121212;
-            --card-light: #ffffff;
-            --card-dark: #1e1e1e;
-            --text-light: #2c3e50;
-            --text-dark: #e0e0e0;
+            --primary: #007aff; /* iOS Blue */
+            --primary-dark: #0056b3;
+            --bg-light: #f2f2f7;
+            --bg-dark: #000000;
+            --glass-light: rgba(255, 255, 255, 0.8);
+            --glass-dark: rgba(28, 28, 30, 0.8);
+            --card-light: rgba(255, 255, 255, 0.7);
+            --card-dark: rgba(28, 28, 30, 0.7);
+            --text-light: #1c1c1e;
+            --text-dark: #ffffff;
+            --border-light: rgba(0, 0, 0, 0.1);
+            --border-dark: rgba(255, 255, 255, 0.1);
             --safe-area-inset-top: env(safe-area-inset-top, 0px);
-            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
         }
 
         * {
@@ -31,8 +35,11 @@
         }
 
         body {
-            font-family: 'Tajawal', Arial, sans-serif;
+            font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-light);
+            background-image: radial-gradient(circle at top right, #e3f2fd, transparent),
+                              radial-gradient(circle at bottom left, #fff9c4, transparent);
+            background-attachment: fixed;
             color: var(--text-light);
             margin: 0;
             padding: 0;
@@ -45,31 +52,34 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* هيدر زي الموبايل بالظبط */
+        /* هيدر بتأثير زجاجي راقي */
         .app-bar {
             height: calc(60px + var(--safe-area-inset-top));
-            background: var(--primary);
-            color: white;
+            background: var(--glass-light);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            color: var(--text-light);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: var(--safe-area-inset-top) 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border-light);
             z-index: 1000;
             flex-shrink: 0;
         }
 
         .user-profile-btn {
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 2px solid white;
+            border: 1px solid var(--border-light);
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .user-profile-btn img {
@@ -79,11 +89,12 @@
         }
 
         .app-bar h1 {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             margin: 0;
             font-weight: 700;
             flex: 1;
             text-align: center;
+            letter-spacing: -0.5px;
         }
 
         .nav-btn {
@@ -94,176 +105,221 @@
             justify-content: center;
             background: none;
             border: none;
-            color: white;
+            color: var(--primary);
             font-size: 1.2rem;
             cursor: pointer;
-            border-radius: 50%;
+            border-radius: 12px;
             transition: background 0.2s;
         }
 
         .nav-btn:active {
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.05);
         }
 
-        /* حاوية المحتوى اللي بتعمل سكرول */
+        /* حاوية المحتوى */
         #main-content {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 15px;
-            padding-bottom: calc(80px + var(--safe-area-inset-bottom));
-            transition: opacity 0.2s ease;
+            padding: 20px 15px;
+            padding-bottom: calc(100px + var(--safe-area-inset-bottom));
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* شريط التنقل السفلي - Bottom Navigation */
+        /* شريط التنقل السفلي - Liquid Glass Capsule Design */
         .bottom-nav {
-            height: calc(65px + var(--safe-area-inset-bottom));
-            background: white;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: var(--safe-area-inset-bottom);
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: calc(20px + var(--safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 32px;
+            display: flex;
+            padding: 0 8px;
             z-index: 1000;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .bottom-nav {
+            background: rgba(28, 28, 30, 0.6);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .nav-indicator {
+            position: absolute;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.33, 1);
+            z-index: 0;
+            opacity: 1; /* كبسولة صلبة عشان تبان */
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .dark-mode .nav-indicator {
+            background: var(--primary); /* تفضل زرقاء في الدارك مود برضه أشيك */
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.5);
         }
 
         .bottom-nav-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #95a5a6;
+            justify-content: center;
+            color: #8e8e93;
             text-decoration: none;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 700;
             border: none;
             background: none;
-            padding: 8px 0;
-            flex: 1;
+            cursor: pointer;
+            position: relative;
+            z-index: 1; /* فوق الكبسولة */
+            transition: all 0.3s ease;
         }
 
         .bottom-nav-item.active {
-            color: var(--primary);
+            color: #ffffff !important; /* أبيض عشان يبان فوق الكبسولة الزرقاء */
         }
 
         .bottom-nav-item i {
-            font-size: 1.4rem;
-            margin-bottom: 4px;
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .bottom-nav-item.active i {
+            transform: scale(1.1);
+        }
+
+        .bottom-nav-item span {
+            opacity: 0.8;
+            font-size: 0.65rem;
+        }
+
+        .bottom-nav-item.active span {
+            opacity: 1;
         }
 
         /* Dark Mode */
         body.dark-mode {
             background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top right, #1a237e, transparent),
+                              radial-gradient(circle at bottom left, #311b92, transparent);
             color: var(--text-dark);
         }
 
         .dark-mode .app-bar {
-            background: #1f1f1f;
-            border-bottom: 1px solid #333;
+            background: rgba(28, 28, 30, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
         }
 
-        .dark-mode .bottom-nav {
-            background: #1f1f1f;
-            border-top: 1px solid #333;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.2);
-        }
-
-        .dark-mode .bottom-nav-item {
-            color: #7f8c8d;
-        }
-
-        .dark-mode .bottom-nav-item.active {
+        .dark-mode .nav-btn {
             color: var(--primary);
         }
 
-        /* أنيميشن التنقل */
-        .page-enter {
-            animation: slideIn 0.3s ease-out;
+        .dark-mode .bottom-nav-item {
+            color: #8e8e93;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            display: none;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .dark-mode .bottom-nav-item.active {
+            color: #ffffff;
         }
 
         /* Common Page Elements Style */
         .card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: background 0.3s, box-shadow 0.3s;
+            background: var(--card-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-light);
+            border-radius: 22px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .dark-mode .card {
             background: var(--card-dark);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-dark);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
-        input, select, button.btn-main {
+        .card:active {
+            transform: scale(0.99);
+        }
+
+        input, select {
             width: 100%;
-            padding: 12px 15px;
-            margin: 8px 0;
-            border-radius: 12px;
-            border: 1px solid #ddd;
+            padding: 14px 18px;
+            margin: 10px 0;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.03);
             font-family: 'Tajawal', sans-serif;
             font-size: 1rem;
+            color: var(--text-light);
             outline: none;
+            transition: all 0.2s;
         }
 
         .dark-mode input, .dark-mode select {
-            background: #2c2c2c;
-            border-color: #444;
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
             color: white;
+        }
+
+        input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .dark-mode input:focus {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary);
         }
 
         button.btn-main {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            border-radius: 16px;
             background: var(--primary);
             color: white;
             border: none;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
         }
 
         button.btn-main:active {
-            transform: scale(0.98);
-            background: var(--primary-dark);
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        /* أنيميشن التنقل */
+        .page-enter {
+            animation: iosSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes iosSlideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
@@ -274,12 +330,12 @@
     </div>
 
     <header class="app-bar">
-        <button class="nav-btn" id="menu-toggle">
-            <i class="fas fa-bars"></i>
+        <button class="nav-btn" id="menu-toggle" onclick="toggleDarkMode()">
+            <i class="fas fa-moon"></i>
         </button>
         <h1 id="page-title">حساب المساحات</h1>
-        <div class="user-profile-btn" id="profile-btn">
-            <i class="fas fa-user"></i>
+        <div class="user-profile-btn" id="settings-btn" onclick="navigateTo('settings')">
+            <i class="fas fa-cog"></i>
         </div>
     </header>
 
@@ -288,6 +344,7 @@
     </main>
 
     <nav class="bottom-nav">
+        <div class="nav-indicator"></div>
         <button class="bottom-nav-item active" onclick="navigateTo('main')" id="nav-main">
             <i class="fas fa-th-large"></i>
             <span>الرئيسية</span>
@@ -308,26 +365,14 @@
         // تعريف العناصر الأساسية
         const mainContent = document.getElementById('main-content');
         const appTitle = document.getElementById('page-title');
-        const menuToggle = document.getElementById('menu-toggle');
         const loading = document.getElementById('loading');
-        const profileBtn = document.getElementById('profile-btn');
         
-        // ربط الزراير
-        profileBtn.addEventListener('click', () => {
-            window.location.href = 'profile.html';
-        });
-
-        onUserChange((user) => {
-            if (user && user.photoURL) {
-                profileBtn.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
-            } else {
-                profileBtn.innerHTML = `<i class="fas fa-user"></i>`;
-            }
-        });
-
         // فنكشن التنقل الرئيسية
         window.navigateTo = async function(page) {
             if (!loading || !mainContent) return;
+            
+            // لما نتنقل لصفحة جديدة، مسموح لزرار المحفوظات يرجع
+            window.forceHideSaved = false;
             
             loading.style.display = 'flex';
             mainContent.style.opacity = '0';
@@ -346,7 +391,13 @@
                 if (appTitle) appTitle.textContent = title ? title.textContent : 'تطبيق المساحات';
                 
                 // تحديث الـ UI بناء على الصفحة
-                updateUIState(page);
+                window.updateUIState(page);
+
+                // إظهار زر المحفوظات لو كان مخفي (عشان يرجع لما نتنقل)
+                const savedNavBtn = document.getElementById('nav-saved');
+                if (savedNavBtn && !window.forceHideSaved) {
+                    savedNavBtn.style.setProperty('display', 'flex', 'important');
+                }
 
                 // استخراج المحتوى
                 const bodyContent = doc.querySelector('body');
@@ -396,14 +447,47 @@
             }
         };
 
-        function updateUIState(page) {
-            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
-            if (page === 'main') {
-                document.getElementById('nav-main')?.classList.add('active');
-            } else if (page === 'calculator') {
-                document.getElementById('nav-calc')?.classList.add('active');
-            } else if (page === 'saved_results') {
-                document.getElementById('nav-saved')?.classList.add('active');
+        window.updateUIState = function(page) {
+            const items = document.querySelectorAll('.bottom-nav-item');
+            const indicator = document.querySelector('.nav-indicator');
+            
+            const toolPages = ['cyclicQuadrilateral', 'divide_area', 'irregular_quadrilateral', 'trapezoid', 'trapezoid_height_division', 'triangle', 'settings', 'profile'];
+            let activeId = 'nav-main'; 
+            
+            if (page === 'calculator') activeId = 'nav-calc';
+            else if (page === 'saved_results') activeId = 'nav-saved';
+            else if (toolPages.includes(page) || page === 'main') activeId = 'nav-main';
+
+            // محاولة أولى فورية
+            update();
+            // ومحاولة تانية بعد شوية عشان نضمن إن الـ Layout استقر
+            setTimeout(update, 50);
+            setTimeout(update, 150);
+
+            function update() {
+                items.forEach((item) => {
+                    item.classList.remove('active');
+                    const isVisible = item.offsetWidth > 0;
+                    
+                    if (item.id === activeId && isVisible) {
+                        item.classList.add('active');
+                        if (indicator) {
+                            indicator.style.opacity = '1';
+                            indicator.style.display = 'block';
+                            // حساب دقيق للمكان والمركز
+                            const rect = item.getBoundingClientRect();
+                            const navRect = item.parentElement.getBoundingClientRect();
+                            indicator.style.width = `${rect.width - 10}px`;
+                            indicator.style.left = `${rect.left - navRect.left + 5}px`;
+                        }
+                    }
+                });
+                
+                const activeBtn = document.getElementById(activeId);
+                if ((!activeBtn || activeBtn.offsetWidth === 0) && indicator) {
+                    indicator.style.opacity = '0';
+                    indicator.style.display = 'none';
+                }
             }
         }
 
@@ -412,12 +496,20 @@
         };
 
         window.toggleDarkMode = function() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            const icon = document.getElementById('dark-mode-icon');
+            const isDark = document.body.classList.toggle('dark-mode');
+            const icon = document.querySelector('#menu-toggle i');
             if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
             localStorage.setItem('darkMode', isDark);
+            
+            const currentPage = window.location.hash.replace('#', '') || 'main';
+            window.updateUIState(currentPage);
         };
+
+        // تحديث مكان المؤشر لو حجم الشاشة اتغير
+        window.addEventListener('resize', () => {
+            const currentPage = window.location.hash.replace('#', '') || 'main';
+            updateUIState(currentPage);
+        });
 
         // تحويل المساحات (فنكشن مشتركة)
         window.convertToFeddans = function(area) {
@@ -439,10 +531,11 @@
             window.navigateTo(page);
         };
 
-        window.onload = () => {
-            const hash = window.location.hash.replace('#', '');
-            window.navigateTo(hash || 'main');
-        };
+        // أول تشغيل
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialPage = window.location.hash.replace('#', '') || 'main';
+            navigateTo(initialPage);
+        });
     </script>
     <script src="mini-calculator.js?v=1.1"></script>
     <script src="reset-button.js?v=1.2"></script>

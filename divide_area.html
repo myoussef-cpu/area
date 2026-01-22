@@ -8,145 +8,110 @@
     <link rel="icon" type="image/png" href="icon.png">
     <meta name="theme-color" content="#3498db">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #1c1e21;
-            direction: rtl;
-            transition: background-color 0.3s, color 0.3s;
-        }
+    body {
+        font-family: 'Tajawal', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        direction: rtl;
+        transition: background-color 0.3s, color 0.3s;
+    }
 
-        .dark-mode body {
-            background-color: #1c1c1e;
-            color: #ffffff;
-        }
+    .container {
+        padding: 15px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-        .container {
-            padding: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .card {
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+    }
 
-        .card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    .dark-mode .card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
 
-        .dark-mode .card {
-            background: #2c2c2e;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+    h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 16px;
-            color: #007aff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .input-group {
+        margin-bottom: 18px;
+        text-align: right;
+    }
 
-        .input-group {
-            margin-bottom: 16px;
-            text-align: right;
-        }
+    .input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-light);
+        opacity: 0.8;
+    }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #8e8e93;
-        }
+    .dark-mode .input-group label {
+        color: var(--text-dark);
+    }
 
-        .input-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
+    .input-row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
 
-        input, select {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            background: #f8f9fa;
-            transition: border-color 0.3s, background-color 0.3s;
-        }
+    .result-box {
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(0, 122, 255, 0.1);
+        border-radius: 16px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--primary);
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(0, 122, 255, 0.1);
+    }
 
-        .dark-mode input, .dark-mode select {
-            background: #1c1c1e;
-            border-color: #3a3a3c;
-            color: white;
-        }
+    .dark-mode .result-box {
+        background: rgba(0, 122, 255, 0.15);
+        color: #4dabff;
+        border-color: rgba(0, 122, 255, 0.2);
+    }
 
-        input:focus, select:focus {
-            border-color: #007aff;
-            outline: none;
-        }
+    canvas {
+        display: block;
+        margin: 25px auto 10px;
+        background: var(--card-light);
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+        max-width: 100%;
+    }
 
-        .convert-btn {
-            width: 100%;
-            padding: 14px;
-            background: #007aff;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-top: 8px;
-        }
-
-        .convert-btn:active {
-            opacity: 0.8;
-        }
-
-        .result-box {
-            margin-top: 16px;
-            padding: 16px;
-            background: #eef7ff;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #007aff;
-            min-height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dark-mode .result-box {
-            background: #1c3d5a;
-            color: #4dabff;
-        }
-
-        /* ستايل الرسمة التوضيحية */
-        canvas {
-            display: block;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 100%;
-        }
-        .dark-mode canvas {
-            background: #2c2c2e;
-        }
-
-        .hidden-web {
-            display: none;
-        }
-    </style>
+    .dark-mode canvas {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+</style>
 </head>
 <body class="mobile-view">
     <div class="container">
@@ -188,7 +153,9 @@
                 النتيجة تظهر هنا...
             </div>
             <!-- رسمة الطول -->
-            <canvas id="lengthCanvas" height="100"></canvas>
+            <div class="canvas-scroll-container">
+                <canvas id="lengthCanvas" height="120"></canvas>
+            </div>
         </div>
 
         <!-- تحويل المساحات -->
@@ -229,9 +196,41 @@
                 النتيجة تظهر هنا...
             </div>
             <!-- رسمة المساحة -->
-            <canvas id="areaCanvas" height="200"></canvas>
+            <div class="canvas-scroll-container">
+                <canvas id="areaCanvas" height="250"></canvas>
+            </div>
         </div>
     </div>
+
+    <style>
+    /* حاوية الرسمة عشان تكون قابلة للتمرير */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 20px 0 10px;
+        padding: 5px;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+    }
+
+    .dark-mode .canvas-scroll-container {
+        background: rgba(255,255,255,0.02);
+    }
+
+    canvas {
+        display: block;
+        margin: 0 auto;
+        background: var(--card-light);
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+    }
+
+    .dark-mode canvas {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+    </style>
 
     <script>
         // اول حاجة نشوف لو المود غامق ولا فاتح
@@ -247,22 +246,25 @@
         function drawLengthVis(val, unit) {
             const canvas = document.getElementById('lengthCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
+            
+            // عرض ثابت عشان التمرير يشتغل لو الشاشة صغيرة
+            canvas.width = 600;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (isNaN(val) || val <= 0) return;
 
-            const textColor = isDark() ? '#e0e0e0' : '#333';
+            const textColor = isDark() ? '#ffffff' : '#1a1a1a';
             const strokeColor = isDark() ? '#4dabf7' : '#1971c2';
 
             ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 5;
             ctx.lineCap = 'round';
 
             // رسم خط
-            const startX = 50;
-            const endX = canvas.width - 50;
-            const y = canvas.height / 2;
+            const padding = 60;
+            const startX = padding;
+            const endX = canvas.width - padding;
+            const y = canvas.height / 2 + 10;
 
             ctx.beginPath();
             ctx.moveTo(startX, y);
@@ -270,51 +272,71 @@
             ctx.stroke();
 
             // رسم شرطتين في الآخر
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(startX, y - 10); ctx.lineTo(startX, y + 10);
-            ctx.moveTo(endX, y - 10); ctx.lineTo(endX, y + 10);
+            ctx.moveTo(startX, y - 15); ctx.lineTo(startX, y + 15);
+            ctx.moveTo(endX, y - 15); ctx.lineTo(endX, y + 15);
             ctx.stroke();
 
             ctx.fillStyle = textColor;
-            ctx.font = 'bold 16px Arial';
+            ctx.font = 'bold 18px Tajawal, Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`${val} ${unit}`, canvas.width / 2, y - 15);
+            ctx.fillText(`${val} ${unit}`, canvas.width / 2, y - 25);
+            
+            ctx.font = '14px Tajawal, Arial';
+            ctx.fillStyle = isDark() ? '#adb5bd' : '#6c757d';
+            ctx.fillText('المسافة الخطية', canvas.width / 2, y + 40);
         }
 
         // رسم توضيحي للمساحة
         function drawAreaVis(val, unit) {
             const canvas = document.getElementById('areaCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
+            
+            // عرض ثابت
+            canvas.width = 600;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (isNaN(val) || val <= 0) return;
 
-            const textColor = isDark() ? '#e0e0e0' : '#333';
+            const textColor = isDark() ? '#ffffff' : '#1a1a1a';
             const strokeColor = isDark() ? '#4dabf7' : '#1971c2';
+            const fillColor = isDark() ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.05)';
 
             ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 3;
-            ctx.fillStyle = isDark() ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.1)';
+            ctx.lineWidth = 4;
+            ctx.fillStyle = fillColor;
 
-            const size = Math.min(canvas.width, canvas.height) - 60;
+            const size = 180;
             const x = (canvas.width - size) / 2;
             const y = (canvas.height - size) / 2;
 
-            // رسم مربع يمثل المساحة
+            // رسم مربع يمثل المساحة بشكل شيك
             ctx.beginPath();
-            ctx.rect(x, y, size, size);
+            ctx.roundRect(x, y, size, size, 12);
             ctx.fill();
             ctx.stroke();
 
+            // رسم خطوط شبكة خفيفة جوه المربع
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = isDark() ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x + size/2, y); ctx.lineTo(x + size/2, y + size);
+            ctx.moveTo(x, y + size/2); ctx.lineTo(x + size, y + size/2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
             ctx.fillStyle = textColor;
-            ctx.font = 'bold 16px Arial';
+            ctx.font = 'bold 20px Tajawal, Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`${val} ${unit}`, canvas.width / 2, y + size / 2 + 5);
+            ctx.fillText(`${val}`, canvas.width / 2, y + size / 2 + 10);
+            ctx.font = '16px Tajawal, Arial';
+            ctx.fillText(`${unit}`, canvas.width / 2, y + size / 2 + 35);
             
-            // إضافة رمز المساحة
-            ctx.font = '12px Arial';
-            ctx.fillText('مساحة الأرض', canvas.width / 2, y + 20);
+            ctx.font = 'bold 15px Tajawal, Arial';
+            ctx.fillStyle = strokeColor;
+            ctx.fillText('مساحة السطح', canvas.width / 2, y - 20);
         }
 
         // عوامل تحويل الأطوال

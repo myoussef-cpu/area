@@ -21,7 +21,9 @@
     </div>
 
     <div id="drawing-container" class="card hidden">
-        <canvas id="shapeCanvas"></canvas>
+        <div class="canvas-scroll-container" id="canvasScroll">
+            <canvas id="shapeCanvas"></canvas>
+        </div>
     </div>
 
     <div id="initialArea" class="result-card hidden">
@@ -70,16 +72,17 @@
     }
 
     .input-group {
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         text-align: right;
     }
 
     .input-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: var(--text-light);
+        padding-right: 5px;
     }
 
     .dark-mode .input-group label {
@@ -88,61 +91,53 @@
 
     .input-group label i {
         color: var(--primary);
-        margin-left: 5px;
-    }
-
-    .input-group select {
-        width: 100%;
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #ddd;
-        background: #f9f9f9;
-        font-family: inherit;
+        margin-left: 8px;
         font-size: 1rem;
-        outline: none;
-    }
-
-    .dark-mode .input-group select {
-        background: #2c2c2e;
-        border-color: #444;
-        color: white;
     }
 
     .result-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        border-right: 5px solid var(--primary);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
         text-align: right;
+        transition: all 0.3s ease;
     }
 
     .dark-mode .result-card {
         background: var(--card-dark);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid var(--border-dark);
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
     .result-card h3 {
-        margin: 0 0 10px;
-        font-size: 1.1rem;
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
         color: var(--primary);
     }
 
     .result-card h4 {
-        margin: 15px 0 10px;
-        font-size: 1rem;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
+        margin: 20px 0 12px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 8px;
     }
 
     .dark-mode .result-card h4 {
-        border-bottom-color: #333;
+        border-bottom-color: var(--border-dark);
     }
 
     .result-card p {
-        margin: 8px 0;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        margin: 10px 0;
+        font-size: 1rem;
+        line-height: 1.6;
     }
 
     .result-card span {
@@ -157,33 +152,62 @@
     }
 
     .result-card li {
-        background: #f8f9fa;
-        margin-bottom: 8px;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 0.9rem;
+        background: rgba(0,0,0,0.03);
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        border: 1px solid rgba(0,0,0,0.02);
     }
 
     .dark-mode .result-card li {
-        background: #2c2c2e;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.05);
     }
 
     .hidden { display: none; }
 
     #drawing-container {
         text-align: center;
-        padding: 10px;
-        background: #fdfdfd;
+        padding: 20px;
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
         overflow: hidden;
     }
 
     .dark-mode #drawing-container {
-        background: #252525;
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+
+    /* حاوية الرسمة عشان تكون قابلة للتمرير يا ريس */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 20px 0 10px;
+        padding: 5px;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+        cursor: grab;
+    }
+
+    .canvas-scroll-container:active {
+        cursor: grabbing;
     }
 
     #shapeCanvas {
-        max-width: 100%;
-        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 12px;
+        background: var(--card-light);
+    }
+
+    .dark-mode #shapeCanvas {
+        background: var(--card-dark);
     }
 </style>
 
@@ -235,34 +259,38 @@
         divisionSection.classList.remove('hidden');
         saveBtn.style.display = 'block';
 
-        // رسم شبه المنحرف
-        drawTrapezoid(a, b, L1, L2, h);
+        // حساب الأقطار عشان نرسمها
+        const diags = calculateDiagonals(a, b, h);
+
+        // رسم شبه المنحرف مع الأقطار
+        drawTrapezoid(a, b, L1, L2, h, diags);
     }
 
-    function drawTrapezoid(a, b, L1, L2, h) {
+    function drawTrapezoid(a, b, L1, L2, h, diags = null, divisions = []) {
         const canvas = document.getElementById('shapeCanvas');
         const ctx = canvas.getContext('2d');
         
-        canvas.width = 400;
-        canvas.height = 300;
-        const padding = 40;
+        // بنكبر المقاسات عشان الرسمة تكون واضحة والسكروول يشتغل يا هندسة
+        canvas.width = 800;
+        canvas.height = 500;
+        const padding = 60;
         const drawW = canvas.width - padding * 2;
         const drawH = canvas.height - padding * 2;
 
         // حساب الإحداثيات (بافتراض أنه متساوي الساقين تقريباً للرسم فقط أو بناء على الفرق)
         const diff = (b - a) / 2;
         
-        let p1 = { x: 0, y: 0 };           // أسفل يسار
-        let p2 = { x: b, y: 0 };           // أسفل يمين
-        let p3 = { x: b - diff, y: h };    // أعلى يمين
-        let p4 = { x: diff, y: h };        // أعلى يسار
+        let p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة الكبرى)
+        let p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة الكبرى)
+        let p3 = { x: b - diff, y: h };    // أعلى يمين (نهاية القاعدة الصغرى)
+        let p4 = { x: diff, y: h };        // أعلى يسار (بداية القاعدة الصغرى)
 
-        const scaleX = drawW / b;
+        const scaleX = drawW / Math.max(a, b);
         const scaleY = drawH / h;
         const scale = Math.min(scaleX, scaleY);
 
-        const offsetX = padding + (drawW - b * scale) / 2;
-        const offsetY = padding + (drawH - h * scale) / 2;
+        const offsetX = (canvas.width - b * scale) / 2;
+        const offsetY = padding;
 
         const pts = [p1, p2, p3, p4].map(p => ({
             x: offsetX + p.x * scale,
@@ -271,6 +299,75 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // ستايل الرسمة
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const strokeColor = isDarkMode ? '#4dabf7' : '#3498db';
+        const textColor = isDarkMode ? '#e0e0e0' : '#2c3e50';
+
+        // رسم خلفية للشكل
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.05)' : 'rgba(52, 152, 219, 0.03)';
+        ctx.fill();
+
+        // رسم الأقطار لو موجودة
+        if (diags) {
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 1;
+            
+            // القطر الأول
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            ctx.lineTo(pts[2].x, pts[2].y);
+            ctx.stroke();
+            
+            // القطر الثاني
+            ctx.beginPath();
+            ctx.moveTo(pts[1].x, pts[1].y);
+            ctx.lineTo(pts[3].x, pts[3].y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+
+        // رسم خطوط التقسيم
+        if (divisions && divisions.length > 0) {
+            ctx.setLineDash([8, 4]);
+            ctx.strokeStyle = '#e67e22'; // لون برتقالي للتقسيم
+            ctx.lineWidth = 2;
+            
+            divisions.forEach(div => {
+                const ratio = div.h / h;
+                // النقط على الضلعين المائلين
+                const dL = {
+                    x: pts[0].x + (pts[3].x - pts[0].x) * ratio,
+                    y: pts[0].y + (pts[3].y - pts[0].y) * ratio
+                };
+                const dR = {
+                    x: pts[1].x + (pts[2].x - pts[1].x) * ratio,
+                    y: pts[1].y + (pts[2].y - pts[1].y) * ratio
+                };
+
+                ctx.beginPath();
+                ctx.moveTo(dL.x, dL.y);
+                ctx.lineTo(dR.x, dR.y);
+                ctx.stroke();
+
+                // كتابة مساحة القسم فوق الخط
+                ctx.fillStyle = '#e67e22';
+                ctx.font = 'bold 12px Tajawal';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 5);
+            });
+            ctx.setLineDash([]);
+        }
+
+        // رسم الحدود الأساسية
         ctx.beginPath();
         ctx.moveTo(pts[0].x, pts[0].y);
         ctx.lineTo(pts[1].x, pts[1].y);
@@ -278,26 +375,75 @@
         ctx.lineTo(pts[3].x, pts[3].y);
         ctx.closePath();
 
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
         ctx.stroke();
-        ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
-        ctx.fill();
 
-        ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#e0e0e0' : '#2c3e50';
-        ctx.font = 'bold 12px Tajawal';
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 16px Tajawal';
         ctx.textAlign = 'center';
 
-        function drawLabel(pA, pB, label, isVertical = false) {
+        // فنكشن لرسم الملصقات بشكل احترافي مع الدوران
+        function drawLabel(pA, pB, label) {
             const midX = (pA.x + pB.x) / 2;
             const midY = (pA.y + pB.y) / 2;
-            ctx.fillText(label + ' م', midX, isVertical ? midY : midY - 5);
+            
+            ctx.save();
+            ctx.translate(midX, midY);
+            
+            const angle = Math.atan2(pB.y - pA.y, pB.x - pA.x);
+            let labelAngle = angle;
+            
+            if (labelAngle > Math.PI/2 || labelAngle < -Math.PI/2) {
+                labelAngle += Math.PI;
+            }
+            
+            ctx.rotate(labelAngle);
+            ctx.fillText(label + ' م', 0, -12);
+            ctx.restore();
         }
 
         drawLabel(pts[0], pts[1], b.toFixed(1)); // القاعدة الكبرى
         drawLabel(pts[2], pts[3], a.toFixed(1)); // القاعدة الصغرى
-        drawLabel(pts[1], pts[2], L2.toFixed(1), true); // المائل يمين
-        drawLabel(pts[3], pts[0], L1.toFixed(1), true); // المائل يسار
+        drawLabel(pts[1], pts[2], L2.toFixed(1)); // المائل يمين
+        drawLabel(pts[3], pts[0], L1.toFixed(1)); // المائل يسار
+
+        // لو فيه أقطار، نكتب قيمتها في نص الرسمة بخط خفيف
+        if (diags) {
+            ctx.font = '12px Tajawal';
+            ctx.fillStyle = isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)';
+            ctx.fillText(`القطر 1: ${diags.diagonal1.toFixed(2)} م`, canvas.width/2, canvas.height - 20);
+            ctx.fillText(`القطر 2: ${diags.diagonal2.toFixed(2)} م`, canvas.width/2, canvas.height - 5);
+        }
+    }
+
+    // إضافة دعم السحب بالماوس للتمرير يا معلم
+    const scrollContainer = document.getElementById('canvasScroll');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    if (scrollContainer) {
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; 
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
     }
 
     function calculateDiagonals(a, b, h) {
@@ -305,6 +451,21 @@
         const diagonal1 = Math.sqrt(a * a + h * h - 2 * a * baseDifference);
         const diagonal2 = Math.sqrt(b * b + h * h + 2 * b * baseDifference);
         return { diagonal1, diagonal2 };
+    }
+
+    function convertToFeddans(m2) {
+        const feddan = 4200.83;
+        const qirat = 175.034;
+        const sahm = 7.293;
+
+        let remaining = m2;
+        let f = Math.floor(remaining / feddan);
+        remaining -= f * feddan;
+        let q = Math.floor(remaining / qirat);
+        remaining -= q * qirat;
+        let s = remaining / sahm;
+
+        return { feddan: f, qirat: q, sahm: s.toFixed(2) };
     }
 
     function toggleDivisionInputs() {
@@ -330,6 +491,9 @@
         const resultsDiv = document.getElementById("results");
         resultsDiv.innerHTML = `<h3>نتائج التقسيم:</h3>`;
 
+        const divisionsData = [];
+        let accumulatedHeight = 0;
+
         if (divisionType === "manual") {
             const manualAreas = document.getElementById("manualAreas").value.split(',').map(Number).filter(n => n > 0);
             if (manualAreas.length === 0) return;
@@ -344,7 +508,6 @@
             let currentTopBase = a;
             let currentBottomBase = b;
             let remainingHeight = h;
-            let totalUsedArea = 0;
 
             for (let i = 0; i < manualAreas.length; i++) {
                 const area = manualAreas[i];
@@ -356,7 +519,13 @@
                 }
 
                 const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
-                const sectionAreaConverted = convertToFeddans(area);
+                accumulatedHeight += x;
+                
+                divisionsData.push({
+                    h: accumulatedHeight,
+                    area: area,
+                    base: newBase
+                });
 
                 resultsDiv.innerHTML += `
                     <li>
@@ -369,7 +538,6 @@
 
                 currentTopBase = newBase;
                 remainingHeight -= x;
-                totalUsedArea += area;
             }
         } else {
             const parts = parseInt(document.getElementById("parts").value);
@@ -385,6 +553,14 @@
                 if (x === null) break;
 
                 const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
+                accumulatedHeight += x;
+
+                divisionsData.push({
+                    h: accumulatedHeight,
+                    area: partArea,
+                    base: newBase
+                });
+
                 resultsDiv.innerHTML += `
                     <li>
                         <strong>القسم ${i + 1}:</strong><br>
@@ -397,6 +573,10 @@
             }
         }
         resultsDiv.classList.remove('hidden');
+
+        // تحديث الرسمة بالأقسام والأقطار يا معلم
+        const diags = calculateDiagonals(a, b, h);
+        drawTrapezoid(a, b, L1, L2, h, diags, divisionsData);
     }
 
     function computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, area) {

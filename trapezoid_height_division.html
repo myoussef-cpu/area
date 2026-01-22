@@ -8,147 +8,131 @@
   <link rel="icon" type="image/png" href="icon.png">
   <meta name="theme-color" content="#3498db">
   <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #1c1e21;
-            direction: rtl;
-            transition: background-color 0.3s, color 0.3s;
-        }
+    body {
+        font-family: 'Tajawal', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        direction: rtl;
+        transition: background-color 0.3s, color 0.3s;
+    }
 
-        .dark-mode body {
-            background-color: #1c1c1e;
-            color: #ffffff;
-        }
+    .container {
+        padding: 15px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-        .container {
-            padding: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .card {
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+    }
 
-        .card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    .dark-mode .card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
 
-        .dark-mode .card {
-            background: #2c2c2e;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+    h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        h3 {
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            color: #007aff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .input-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
 
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+    .input-group {
+        margin-bottom: 18px;
+        text-align: right;
+    }
 
-        .input-group {
-            margin-bottom: 16px;
-            text-align: right;
-        }
+    .input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-light);
+        opacity: 0.8;
+    }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #8e8e93;
-        }
+    .dark-mode .input-group label {
+        color: var(--text-dark);
+    }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            background: #f8f9fa;
-            box-sizing: border-box;
-            transition: border-color 0.3s, background-color 0.3s;
-        }
+    .result-card {
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(0, 122, 255, 0.1);
+        border-radius: 18px;
+        border-right: 6px solid var(--primary);
+        transition: all 0.3s ease;
+    }
 
-        .dark-mode input {
-            background: #1c1c1e;
-            border-color: #3a3a3c;
-            color: white;
-        }
+    .dark-mode .result-card {
+        background: rgba(0, 122, 255, 0.15);
+        border-right-color: var(--primary);
+    }
 
-        input:focus {
-            border-color: #007aff;
-            outline: none;
-        }
+    .section-item {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 15px;
+        border-radius: 14px;
+        margin-top: 10px;
+        font-size: 0.95rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        backdrop-filter: blur(5px);
+    }
 
-        .result-card {
-            margin-top: 20px;
-            padding: 16px;
-            background: #eef7ff;
-            border-radius: 12px;
-            border-right: 4px solid #007aff;
-        }
+    .dark-mode .section-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
 
-        .dark-mode .result-card {
-            background: #1c3d5a;
-            border-right-color: #4dabff;
-        }
+    /* حاوية الرسمة عشان تكون قابلة للتمرير */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 25px 0 10px;
+        padding: 5px;
+        cursor: grab;
+    }
 
-        .section-item {
-            background: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            font-size: 0.9rem;
-            border: 1px solid #eee;
-        }
+    .canvas-scroll-container:active {
+        cursor: grabbing;
+    }
 
-        .dark-mode .section-item {
-            background: #2c2c2e;
-            border-color: #3a3a3c;
-        }
+    canvas {
+        display: block;
+        margin: 0 auto;
+        background: var(--card-light);
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+        /* شيلنا الـ max-width عشان يقدر يخرج عن الشاشة ونمرره */
+    }
 
-        .save-btn {
-            width: 100%;
-            padding: 14px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .hidden {
-            display: none;
-        }
-        canvas {
-            display: block;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            max-width: 100%;
-        }
-        /* يعني عشان الرسمة تبان حلوة في الـ Dark Mode */
-        .dark-mode canvas {
-            background: #2c2c2e;
-        }
-    </style>
+    .dark-mode canvas {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+</style>
 </head>
 <body class="mobile-view">
     <div class="container">
@@ -181,8 +165,10 @@
 
             <div id="results" class="hidden"></div>
             
-            <!-- هنا يا سيدي هنرسم المنحرف بالتقسيمات بتاعته -->
-            <canvas id="trapezoidCanvas"></canvas>
+            <!-- هنا يا سيدي هنرسم المنحرف بالتقسيمات بتاعة يوسف الزغبي -->
+            <div class="canvas-scroll-container" id="canvasScroll">
+                <canvas id="trapezoidCanvas"></canvas>
+            </div>
             
             <button id="saveBtn" class="save-btn hidden" onclick="saveResult()">
                 <i class="fas fa-save"></i> حفظ النتائج
@@ -199,10 +185,11 @@
             const canvas = document.getElementById('trapezoidCanvas');
             const ctx = canvas.getContext('2d');
             
-            // تظبيط مقاس الكانفاس
-            canvas.width = 500;
-            canvas.height = 400;
-            const padding = 50;
+            // تظبيط مقاس الكانفاس عشان يبقى كبير وواضح ونقدر نمسحه
+            // هنخلي العرض 1000 والارتفاع 600 عشان التفاصيل تبان والسكروول يشتغل
+            canvas.width = 1000;
+            canvas.height = 600;
+            const padding = 80; // زيادة البادنج عشان الأرقام متطلعش بره
             const drawW = canvas.width - padding * 2;
             const drawH = canvas.height - padding * 2;
 
@@ -212,51 +199,56 @@
             if (!a || !b || !L1 || !L2 || h <= 0) return;
 
             // حساب مكان القاعدة الصغرى بالنسبة للكبرى
+            // x1 هي المسافة الأفقية من بداية القاعدة الكبرى لبداية القاعدة الصغرى
             const x1 = (b * b + L1 * L1 - L2 * L2 - a * a) / (2 * (b - a));
             const x_offset = x1; 
 
-            // تظبيط الـ Scale عشان الرسمة تملى الكانفاس
+            // تظبيط الـ Scale - بنكبر الرسمة عشان تملى الكانفاس الـ 1000px
             const scale = Math.min(drawW / Math.max(a, b), drawH / h);
             
+            // توسيط الرسمة في الكانفاس
             const startX = (canvas.width - b * scale) / 2;
             const startY = canvas.height - padding;
 
             // إحداثيات النقط
-            const p1 = { x: startX, y: startY }; // شمال تحت
-            const p2 = { x: startX + b * scale, y: startY }; // يمين تحت
+            const p1 = { x: startX, y: startY }; // شمال تحت (بداية القاعدة الكبرى)
+            const p2 = { x: startX + b * scale, y: startY }; // يمين تحت (نهاية القاعدة الكبرى)
             const p3 = { x: startX + (x_offset + a) * scale, y: startY - h * scale }; // يمين فوق
             const p4 = { x: startX + x_offset * scale, y: startY - h * scale }; // شمال فوق
 
             const isDarkMode = document.documentElement.classList.contains('dark-mode');
-            const textColor = isDarkMode ? '#e0e0e0' : '#333';
+            const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
             const strokeColor = isDarkMode ? '#4dabf7' : '#1971c2';
             const divisionColor = isDarkMode ? '#ff922b' : '#e67e22';
+            const areaFillColor = isDarkMode ? 'rgba(77, 171, 247, 0.1)' : 'rgba(25, 113, 194, 0.05)';
 
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = strokeColor;
-            ctx.lineJoin = 'round';
-
-            // رسم المنحرف الكبير
+            // رسم خلفية خفيفة للشكل
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.lineTo(p3.x, p3.y);
             ctx.lineTo(p4.x, p4.y);
             ctx.closePath();
+            ctx.fillStyle = areaFillColor;
+            ctx.fill();
+
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineJoin = 'round';
             ctx.stroke();
 
             // رسم خطوط التقسيم
-            ctx.setLineDash([5, 5]);
+            ctx.setLineDash([8, 6]);
             ctx.strokeStyle = divisionColor;
             ctx.lineWidth = 2;
-            ctx.font = '12px Arial';
+            ctx.font = 'bold 14px Tajawal, Arial';
             ctx.fillStyle = textColor;
             ctx.textAlign = 'center';
 
             divisionHeights.forEach(dh => {
                 if (dh > 0 && dh < h) {
                     const ratio = dh / h;
-                    // النقط على الضلعين المائلين
+                    // النقط على الضلعين المائلين (بناخد النسبة من الارتفاع الكلي)
                     const dL = {
                         x: p1.x + (p4.x - p1.x) * ratio,
                         y: p1.y + (p4.y - p1.y) * ratio
@@ -271,8 +263,8 @@
                     ctx.lineTo(dR.x, dR.y);
                     ctx.stroke();
 
-                    // نكتب الارتفاع عند الخط
-                    ctx.fillText(`h=${dh.toFixed(2)}`, (dL.x + dR.x) / 2, dL.y - 5);
+                    // نكتب الارتفاع عند الخط بشكل شيك
+                    ctx.fillText(`h = ${dh.toFixed(2)}`, (dL.x + dR.x) / 2, dL.y - 10);
                 }
             });
 
@@ -280,23 +272,48 @@
 
             // كتابة أطوال الأضلاع الأساسية
             ctx.fillStyle = textColor;
-            ctx.font = 'bold 14px Arial';
+            ctx.font = 'bold 16px Tajawal, Arial';
             
-            // القاعدة الكبرى
-            ctx.fillText(b.toFixed(2), (p1.x + p2.x) / 2, p1.y + 20);
-            // القاعدة الصغرى
-            ctx.fillText(a.toFixed(2), (p3.x + p4.x) / 2, p3.y - 10);
+            // القاعدة الكبرى (b)
+            ctx.fillText(`القاعدة الكبرى: ${b.toFixed(2)}`, (p1.x + p2.x) / 2, p1.y + 35);
+            
+            // القاعدة الصغرى (a)
+            ctx.fillText(`القاعدة الصغرى: ${a.toFixed(2)}`, (p3.x + p4.x) / 2, p3.y - 20);
+            
             // الأضلاع المائلة
             ctx.save();
             ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
-            ctx.rotate(Math.atan2(p4.y - p1.y, p4.x - p1.x));
-            ctx.fillText(L1.toFixed(2), 0, -10);
+            const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
+            ctx.rotate(angleL);
+            ctx.fillText(L1.toFixed(2), 0, -15);
             ctx.restore();
 
             ctx.save();
             ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
-            ctx.rotate(Math.atan2(p3.y - p2.y, p3.x - p2.x));
-            ctx.fillText(L2.toFixed(2), 0, -10);
+            const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+            ctx.rotate(angleR);
+            ctx.fillText(L2.toFixed(2), 0, -15);
+            ctx.restore();
+
+            // رسم سهم الارتفاع الكلي في الجنب
+            const hX = p1.x - 40;
+            ctx.beginPath();
+            ctx.strokeStyle = textColor;
+            ctx.lineWidth = 1;
+            ctx.moveTo(hX, p1.y);
+            ctx.lineTo(hX, p4.y);
+            ctx.stroke();
+            
+            // رؤوس السهم
+            ctx.beginPath();
+            ctx.moveTo(hX - 5, p1.y - 5); ctx.lineTo(hX, p1.y); ctx.lineTo(hX + 5, p1.y - 5);
+            ctx.moveTo(hX - 5, p4.y + 5); ctx.lineTo(hX, p4.y); ctx.lineTo(hX + 5, p4.y + 5);
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(hX - 15, (p1.y + p4.y) / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(`H = ${h.toFixed(2)}`, 0, 0);
             ctx.restore();
         }
 
@@ -419,6 +436,32 @@
                 alert('تم الحفظ محلياً يا ريس! 😎');
             }
         }
+
+        // إضافة دعم السحب بالماوس للتمرير
+        const scrollContainer = document.getElementById('canvasScroll');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; // سرعة السحب
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
     </script>
 </body>
 </html>

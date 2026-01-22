@@ -175,6 +175,19 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
 
+        // 5. إخفاء زر المحفوظات من شريط التنقل السفلي
+        const savedNavBtn = document.getElementById('nav-saved');
+        if (savedNavBtn) {
+            window.forceHideSaved = true; // نمنع أي حد يظهره تاني دلوقت
+            savedNavBtn.style.setProperty('display', 'none', 'important');
+            
+            // تحديث مكان المؤشر فوراً
+            if (window.updateUIState) {
+                const currentHash = window.location.hash.replace('#', '') || 'main';
+                window.updateUIState(currentHash);
+            }
+        }
+
         // أنيميشن خفيف عشان اليوزر يحس إنه عمل حاجة
         resetBtn.style.transform = 'rotate(-360deg) scale(0.9)';
         setTimeout(() => {
@@ -192,6 +205,18 @@
     let initialY;
     let xOffset = 0;
     let yOffset = 0;
+
+    // استعادة المكان المتسجل لو موجود
+    const savedResetPos = localStorage.getItem('reset-btn-position');
+    if (savedResetPos) {
+        const { x, y } = JSON.parse(savedResetPos);
+        xOffset = x;
+        yOffset = y;
+        // نأجل التنفيذ ثانية عشان نتأكد إن الزرار اترسم
+        setTimeout(() => {
+            setTranslate(xOffset, yOffset, resetBtn);
+        }, 200);
+    }
 
     resetBtn.addEventListener("touchstart", dragStart, false);
     resetBtn.addEventListener("touchend", dragEnd, false);
@@ -218,6 +243,12 @@
         initialX = currentX;
         initialY = currentY;
         isDragging = false;
+        
+        // حفظ المكان
+        localStorage.setItem('reset-btn-position', JSON.stringify({
+            x: xOffset,
+            y: yOffset
+        }));
     }
 
     function drag(e) {

@@ -9,211 +9,189 @@
     <meta name="theme-color" content="#3498db">
     <link rel="stylesheet" href="css/common-styles.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
-        }
+    body {
+        font-family: 'Tajawal', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-light);
+        color: var(--text-light);
+        transition: background-color 0.3s, color 0.3s;
+    }
 
-        .dark-mode body {
-            background-color: #1c1c1e;
-            color: #ffffff;
-        }
+    .container {
+        padding: 15px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-        .container {
-            padding: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .result-card {
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        text-align: right;
+    }
 
-        .result-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s, background-color 0.3s;
-            cursor: pointer;
-            position: relative;
-            border: 1px solid #eee;
-            text-align: right;
-        }
+    .dark-mode .result-card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
 
-        .dark-mode .result-card {
-            background: #2c2c2e;
-            border-color: #3a3a3c;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+    .result-card:active {
+        transform: scale(0.98);
+        background: rgba(0,0,0,0.02);
+    }
 
-        .result-card:active {
-            transform: scale(0.98);
-        }
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
 
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
+    .result-type {
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--primary);
+    }
 
-        .result-type {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #007aff;
-        }
+    .result-date {
+        font-size: 0.85rem;
+        color: #8e8e93;
+        font-weight: 500;
+    }
 
-        .result-date {
-            font-size: 0.8rem;
-            color: #8e8e93;
-        }
+    .result-summary-text {
+        font-size: 1rem;
+        margin: 10px 0;
+        color: var(--text-light);
+        line-height: 1.5;
+    }
 
-        .result-summary-text {
-            font-size: 1rem;
-            margin: 8px 0;
-            color: #333;
-        }
+    .dark-mode .result-summary-text {
+        color: var(--text-dark);
+    }
 
-        .dark-mode .result-summary-text {
-            color: #ebebf5;
-        }
+    .result-details {
+        display: none;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-light);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: var(--text-light);
+        opacity: 0.9;
+        white-space: pre-line;
+    }
 
-        .result-details {
-            display: none;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #666;
-            white-space: pre-line;
-        }
+    .dark-mode .result-details {
+        border-top-color: var(--border-dark);
+        color: var(--text-dark);
+    }
 
-        .dark-mode .result-details {
-            border-top-color: #3a3a3c;
-            color: #aeaeb2;
-        }
+    .result-details.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
 
-        .result-details.show {
-            display: block;
-        }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-            gap: 10px;
-        }
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 0 5px;
+    }
 
-        .delete-btn {
-            background: #ff3b30;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-family: 'Tajawal', sans-serif;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: opacity 0.2s;
-        }
+    .header-actions h2 {
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--text-light);
+    }
 
-        .delete-btn:hover {
-            opacity: 0.8;
-        }
+    .dark-mode .header-actions h2 {
+        color: var(--text-dark);
+    }
 
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    .reload-btn {
+        background: var(--glass-light);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: var(--primary);
+        border: 1px solid var(--border-light);
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+    }
 
-        .reload-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
-            transition: transform 0.3s;
-        }
+    .dark-mode .reload-btn {
+        background: var(--glass-dark);
+        border-color: var(--border-dark);
+    }
 
-        .reload-btn:active i {
-            transform: rotate(360deg);
-            transition: transform 0.5s;
-        }
+    .reload-btn:active {
+        transform: scale(0.9);
+    }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    .sync-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-right: 8px;
+    }
 
-        .spinning {
-            animation: spin 1s linear infinite;
-        }
+    .sync-true { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+    .sync-false { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
 
-        .sync-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 5px;
-        }
+    .delete-btn {
+        background: rgba(255, 59, 48, 0.1);
+        color: #ff3b30;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
 
-        .sync-true { background: #e1f5fe; color: #0288d1; }
-        .sync-false { background: #fff3e0; color: #f57c00; }
+    .delete-btn:active {
+        background: #ff3b30;
+        color: white;
+    }
 
-        .dark-mode .sync-true { background: #01579b; color: #e1f5fe; }
-        .dark-mode .sync-false { background: #e65100; color: #fff3e0; }   animation: fadeIn 0.3s ease;
-        }
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8e8e93;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .delete-btn {
-            background: #ff3b30;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #8e8e93;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        /* اخفاء الهيدر والباك بوتون لان index.html بيقوم بالواجب */
-        .page-header {
-            display: none;
-        }
-    </style>
+    .empty-state i {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        display: block;
+        opacity: 0.5;
+    }
+</style>
 </head>
 <body class="mobile-view">
     <div class="container">

@@ -321,6 +321,16 @@
     let startX, startY, initialX, initialY;
     const dragThreshold = 10; // حساسية السحب
 
+    // استعادة المكان المتسجل لو موجود
+    const savedPos = localStorage.getItem('mini-calc-position');
+    if (savedPos) {
+        const { left, top } = JSON.parse(savedPos);
+        container.style.left = left;
+        container.style.top = top;
+        container.style.right = 'auto';
+        container.style.bottom = 'auto';
+    }
+
     const handleStart = (e) => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         
@@ -364,6 +374,14 @@
         if (!isDragging) return;
         isDragging = false;
         toggle.releasePointerCapture(e.pointerId);
+        
+        // حفظ المكان لو اتحرك
+        if (dragMoved) {
+            localStorage.setItem('mini-calc-position', JSON.stringify({
+                left: container.style.left,
+                top: container.style.top
+            }));
+        }
     };
 
     // لما يدوس كليك عادية
