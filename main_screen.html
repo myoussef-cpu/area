@@ -1,0 +1,580 @@
+<title>الرئيسية</title>
+<div class="main-dashboard">
+    <!-- سكشن الترحيب -->
+    <div class="welcome-header">
+        <div class="welcome-text">
+            <h2>أهلاً بيك يا هندسة 👋</h2>
+            <p>جاهز نحسب مساحات النهاردة؟</p>
+        </div>
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </div>
+
+    <!-- شبكة الأدوات -->
+    <div class="section-title">الأدوات الهندسية</div>
+    <div class="tools-list">
+        <div class="tool-item" onclick="navigateTo('trapezoid')">
+            <div class="tool-icon-box" style="--bg: #e3f2fd; --color: #1e88e5;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مساحة شبه المنحرف</h3>
+                <p>حساب المساحة الأساسية</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('trapezoid_height_division')">
+            <div class="tool-icon-box" style="--bg: #f1f8e9; --color: #7cb342;">
+                <i class="fas fa-ruler-combined"></i>
+            </div>
+            <div class="tool-details">
+                <h3>تقسيم شبه المنحرف</h3>
+                <p>التقسيم بناءً على الارتفاع</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('cyclicQuadrilateral')">
+            <div class="tool-icon-box" style="--bg: #fff3e0; --color: #fb8c00;">
+                <i class="fas fa-circle-notch"></i>
+            </div>
+            <div class="tool-details">
+                <h3>رباعي دائري</h3>
+                <p>حساب المساحة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('irregular_quadrilateral')">
+            <div class="tool-icon-box" style="--bg: #f3e5f5; --color: #8e24aa;">
+                <i class="fas fa-vector-square"></i>
+            </div>
+            <div class="tool-details">
+                <h3>رباعي غير منتظم</h3>
+                <p>أشكال حرة</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('triangle')">
+            <div class="tool-icon-box" style="--bg: #e8f5e9; --color: #43a047;">
+                <i class="fas fa-triangle"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مساحة مثلث</h3>
+                <p>قاعدة هيرون</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('circle_sector')">
+            <div class="tool-icon-box" style="--bg: #e0f7fa; --color: #00acc1;">
+                <i class="fas fa-circle"></i>
+            </div>
+            <div class="tool-details">
+                <h3>الدائرة والقطاعات</h3>
+                <p>دائرة، بيضاوي، قطاع</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('regular_polygon')">
+            <div class="tool-icon-box" style="--bg: #fce4ec; --color: #d81b60;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <div class="tool-details">
+                <h3>مضلعات منتظمة</h3>
+                <p>خماسي، سداسي، إلخ</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('volumes_3d')">
+            <div class="tool-icon-box" style="--bg: #fffde7; --color: #fbc02d;">
+                <i class="fas fa-cube"></i>
+            </div>
+            <div class="tool-details">
+                <h3>حساب الأحجام</h3>
+                <p>أسطوانة، كرة، مخروط</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('concrete_calc')">
+            <div class="tool-icon-box" style="--bg: #efebe9; --color: #5d4037;">
+                <i class="fas fa-hard-hat"></i>
+            </div>
+            <div class="tool-details">
+                <h3>كميات الخرسانة</h3>
+                <p>بلاطات، أعمدة، قواعد</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('land_leveling')">
+            <div class="tool-icon-box" style="--bg: #f1f8e9; --color: #33691e;">
+                <i class="fas fa-mountain"></i>
+            </div>
+            <div class="tool-details">
+                <h3>تسوية وميول</h3>
+                <p>حساب الميل والتسوية</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+
+        <div class="tool-item" onclick="navigateTo('divide_area')">
+            <div class="tool-icon-box" style="--bg: #efebe9; --color: #6d4c41;">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="tool-details">
+                <h3>تحويل وحدات</h3>
+                <p>فدان، قيراط، سهم</p>
+            </div>
+            <div class="tool-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- سكشن الوصول السريع -->
+    <div class="section-title">وصول سريع</div>
+    <div class="quick-scroll">
+        <div class="quick-item" onclick="navigateTo('saved_results')">
+            <div class="qc-icon" style="background: rgba(0,122,255,0.1); color: #007aff;">
+                <i class="fas fa-clock-rotate"></i>
+            </div>
+            <span>المحفوظات</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('calculator')">
+            <div class="qc-icon" style="background: rgba(255,149,0,0.1); color: #ff9500;">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <span>آلة حاسبة</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('trapezoid')">
+            <div class="qc-icon" style="background: rgba(52,199,89,0.1); color: #34c759;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <span>شبه منحرف</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('triangle')">
+            <div class="qc-icon" style="background: rgba(175,82,222,0.1); color: #af52de;">
+                <i class="fas fa-triangle"></i>
+            </div>
+            <span>مثلث</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('circle_sector')">
+            <div class="qc-icon" style="background: rgba(90,200,250,0.1); color: #5ac8fa;">
+                <i class="fas fa-circle"></i>
+            </div>
+            <span>دائرة</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('all_tools')">
+            <div class="qc-icon" style="background: rgba(142,142,147,0.08); color: #8e8e93;">
+                <i class="fas fa-th"></i>
+            </div>
+            <span>كل الأدوات</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .main-dashboard {
+        padding-top: 10px;
+    }
+
+    .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 0 10px;
+    }
+
+    .welcome-text h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-light);
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .dark-mode .welcome-text h2 {
+        color: var(--text-dark);
+    }
+
+    .welcome-text p {
+        margin: 4px 0 0;
+        color: #8e8e93;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    .user-avatar {
+        font-size: 2.8rem;
+        color: var(--primary);
+        filter: drop-shadow(0 4px 10px rgba(0, 122, 255, 0.2));
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 25px 10px 15px;
+        color: var(--text-light);
+        text-align: right;
+        opacity: 0.9;
+    }
+
+    .dark-mode .section-title {
+        color: var(--text-dark);
+    }
+
+    .tools-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .tool-item {
+        background: var(--card-light);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 16px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* تأثير اللمعان "Liquid" */
+    .tool-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .tool-item:hover::before {
+        left: 100%;
+    }
+
+    .dark-mode .tool-item {
+        background: var(--card-dark);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .tool-item:active {
+        transform: scale(0.96) translateY(2px);
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .dark-mode .tool-item:active {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tool-icon-box {
+        width: 52px;
+        height: 52px;
+        background: var(--bg);
+        color: var(--color);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .dark-mode .tool-icon-box {
+        background: rgba(255,255,255,0.05) !important;
+        color: var(--color) !important;
+    }
+
+    .tool-details {
+        flex: 1;
+        text-align: right;
+    }
+
+    .tool-details h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .dark-mode .tool-details h3 {
+        color: var(--text-dark);
+    }
+
+    .tool-details p {
+        margin: 4px 0 0;
+        font-size: 0.85rem;
+        color: #8e8e93;
+        font-weight: 500;
+    }
+
+    .tool-arrow {
+        color: #c7c7cc;
+        font-size: 0.9rem;
+    }
+
+    .quick-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 8px 10px 16px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin-bottom: 4px;
+    }
+
+    .quick-scroll::-webkit-scrollbar { display: none; }
+
+    .quick-item {
+        flex: 0 0 96px;
+        scroll-snap-align: start;
+        background: var(--card-light);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        padding: 14px 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .dark-mode .quick-item {
+        background: var(--card-dark);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .quick-item:active {
+        transform: scale(0.92);
+    }
+
+    .qc-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .dark-mode .qc-icon {
+        background: rgba(255,255,255,0.06) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .quick-item span {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-light);
+        text-align: center;
+        line-height: 1.35;
+    }
+
+    .dark-mode .quick-item span {
+        color: var(--text-dark);
+    }
+
+    /* الشاشات الصغيرة جداً (iphon se,iphon mini) */
+    @media screen and (max-width: 320px) {
+        .tool-item {
+            padding: 12px;
+            gap: 12px;
+            border-radius: 16px;
+        }
+
+        .tool-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+        }
+
+        .tool-details h3 {
+            font-size: 0.95rem;
+        }
+
+        .tool-details p {
+            font-size: 0.75rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* الشاشات المتوسطة (Plus, Max) */
+    @media screen and (min-width: 376px) and (max-width: 414px) {
+        .tool-item {
+            padding: 16px;
+            gap: 16px;
+            border-radius: 20px;
+        }
+
+        .tool-icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            font-size: 1.35rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.4rem;
+        }
+    }
+
+    /* الشاشات الكبيرة (tablet, iPad mini) */
+    @media screen and (min-width: 768px) and (max-width: 1024px) {
+        .tool-item {
+            padding: 20px;
+            gap: 20px;
+            border-radius: 24px;
+        }
+
+        .tool-icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            font-size: 1.6rem;
+        }
+
+        .tool-details h3 {
+            font-size: 1.2rem;
+        }
+
+        .tool-details p {
+            font-size: 0.95rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.8rem;
+        }
+
+        .quick-scroll {
+            gap: 16px;
+            padding: 8px 10px 16px;
+        }
+
+        .quick-item {
+            flex: 0 0 110px;
+            padding: 18px 10px;
+        }
+
+        .qc-icon {
+            width: 52px;
+            height: 52px;
+            font-size: 1.5rem;
+        }
+
+        .quick-item span {
+            font-size: 0.82rem;
+        }
+    }
+
+    /* الشاشات الكبيرة جداً (iPad Pro, desktop) */
+    @media screen and (min-width: 1025px) {
+        .main-dashboard {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tool-item {
+            padding: 22px;
+            gap: 22px;
+            border-radius: 26px;
+        }
+
+        .tool-icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            font-size: 1.7rem;
+        }
+
+        .tool-details h3 {
+            font-size: 1.25rem;
+        }
+
+        .tool-details p {
+            font-size: 1rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 2rem;
+        }
+
+        .quick-scroll {
+            gap: 18px;
+            padding: 8px 10px 20px;
+        }
+
+        .quick-item {
+            flex: 0 0 120px;
+            padding: 20px 12px;
+            border-radius: 24px;
+        }
+
+        .qc-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.6rem;
+            border-radius: 18px;
+        }
+
+        .quick-item span {
+            font-size: 0.85rem;
+        }
+    }
+</style>

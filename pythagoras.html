@@ -1,0 +1,44 @@
+<title>فيثاغورس</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>الضلع الأول (a)</label>
+            <input type="number" id="sideA" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>الضلع الثاني (b)</label>
+            <input type="number" id="sideB" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>الوتر (c) - اتركه فارغاً لحسابه</label>
+            <input type="number" id="sideC" placeholder="0.00" step="any">
+        </div>
+        <button class="btn-main" onclick="calculatePythagoras()">احسب</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    function calculatePythagoras() {
+        const a = parseFloat(document.getElementById('sideA').value);
+        const b = parseFloat(document.getElementById('sideB').value);
+        const c = parseFloat(document.getElementById('sideC').value);
+        const resCard = document.getElementById('resultCard');
+        
+        if (!isNaN(a) && !isNaN(b) && isNaN(c)) {
+            const result = Math.sqrt(a * a + b * b);
+            resCard.innerHTML = `<h3>الوتر (c):</h3><p><span>${result.toFixed(4)}</span></p>`;
+        } else if (!isNaN(a) && isNaN(b) && !isNaN(c)) {
+            const result = Math.sqrt(c * c - a * a);
+            resCard.innerHTML = `<h3>الضلع (b):</h3><p><span>${result.toFixed(4)}</span></p>`;
+        } else if (isNaN(a) && !isNaN(b) && !isNaN(c)) {
+            const result = Math.sqrt(c * c - b * b);
+            resCard.innerHTML = `<h3>الضلع (a):</h3><p><span>${result.toFixed(4)}</span></p>`;
+        } else {
+            alert('يرجى إدخال قيمتين فقط لحساب الثالثة');
+            return;
+        }
+        resCard.classList.remove('hidden');
+    }
+</script>

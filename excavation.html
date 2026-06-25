@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب أعمال الحفر والردم - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success-color: #34C759;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-item.full-width {
+            grid-column: span 2;
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .unit {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            .result-item.full-width {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب أعمال الحفر والردم</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>طول منطقة الحفر (متر)</label>
+                <input type="number" id="length" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>عرض منطقة الحفر (متر)</label>
+                <input type="number" id="width" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>عمق الحفر (متر)</label>
+                <input type="number" id="depth" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>معامل الانتفاش (Swell Factor)</label>
+                <select id="swellFactor">
+                    <option value="1.1">1.1 (رمل وحصى)</option>
+                    <option value="1.25" selected>1.25 (تربة عادية)</option>
+                    <option value="1.4">1.4 (تربة طينية)</option>
+                    <option value="1.6">1.6 (صخر مكسر)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>سعة القلاب / الشاحنة (متر مكعب)</label>
+                <input type="number" id="truckCapacity" value="10" step="1">
+            </div>
+
+            <button class="btn-calc" onclick="calculateExcavation()">حساب الكميات</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-grid">
+                <div class="result-item full-width">
+                    <span class="result-label">حجم الحفر الهندسي (In-Situ)</span>
+                    <div>
+                        <span class="result-value" id="volumeInSitu">0</span>
+                        <span class="unit">متر مكعب</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">الحجم بعد الانتفاش (Loose)</span>
+                    <div>
+                        <span class="result-value" id="volumeLoose">0</span>
+                        <span class="unit">متر مكعب</span>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">عدد النقلات المطلوبة</span>
+                    <div>
+                        <span class="result-value" id="truckCount">0</span>
+                        <span class="unit">نقلة</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateExcavation() {
+            const l = parseFloat(document.getElementById('length').value);
+            const w = parseFloat(document.getElementById('width').value);
+            const d = parseFloat(document.getElementById('depth').value);
+            const swell = parseFloat(document.getElementById('swellFactor').value);
+            const truckCapacity = parseFloat(document.getElementById('truckCapacity').value) || 10;
+
+            if (isNaN(l) || isNaN(w) || isNaN(d) || l <= 0 || w <= 0 || d <= 0) {
+                alert('يرجى إدخال قيم صحيحة للأبعاد');
+                return;
+            }
+
+            // Calculations
+            const volumeInSitu = l * w * d;
+            const volumeLoose = volumeInSitu * swell;
+            const truckCount = Math.ceil(volumeLoose / truckCapacity);
+
+            // Update UI
+            document.getElementById('volumeInSitu').innerText = volumeInSitu.toLocaleString(undefined, {maximumFractionDigits: 2});
+            document.getElementById('volumeLoose').innerText = volumeLoose.toLocaleString(undefined, {maximumFractionDigits: 2});
+            document.getElementById('truckCount').innerText = truckCount;
+
+            document.getElementById('resultCard').style.display = 'block';
+            
+            window.lastCalc = {
+                toolId: 'excavation_calc',
+                name: 'حساب أعمال الحفر',
+                dimensions: `${l}x${w}x${d}`,
+                volume: volumeInSitu.toFixed(2),
+                looseVolume: volumeLoose.toFixed(2),
+                trucks: truckCount,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ التقدير بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

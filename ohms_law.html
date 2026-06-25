@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>قانون أوم - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success-color: #34C759;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .result-value {
+            color: var(--text-main);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">قانون أوم (Ohm's Law)</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>ما الذي تريد حسابه؟</label>
+                <select id="calcMode" onchange="updateInputs()">
+                    <option value="voltage">الجهد (V) - فولت</option>
+                    <option value="current">التيار (I) - أمبير</option>
+                    <option value="resistance">المقاومة (R) - أوم</option>
+                </select>
+            </div>
+
+            <div id="input1Group" class="input-group">
+                <label id="label1">التيار (أمبير)</label>
+                <input type="number" id="input1" placeholder="0.00" step="any">
+            </div>
+
+            <div id="input2Group" class="input-group">
+                <label id="label2">المقاومة (أوم)</label>
+                <input type="number" id="input2" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateOhm()">حساب النتائج</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">
+                <i class="fas fa-bolt"></i>
+                نتائج الحساب الكهربائي
+            </div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label" id="resultLabel">الجهد الناتج</span>
+                    <div>
+                        <span class="result-value" id="resultValue">0</span>
+                        <span class="unit" id="resultUnit">فولت</span>
+                    </div>
+                </div>
+                
+                <div class="result-item" id="powerResult">
+                    <span class="result-label">القدرة المستهلكة (P)</span>
+                    <div>
+                        <span class="result-value" id="powerValue">0</span>
+                        <span class="unit">واط</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateInputs() {
+            const mode = document.getElementById('calcMode').value;
+            const label1 = document.getElementById('label1');
+            const label2 = document.getElementById('label2');
+            const resCard = document.getElementById('resultCard');
+            resCard.style.display = 'none';
+
+            if (mode === 'voltage') {
+                label1.innerText = 'التيار (أمبير)';
+                label2.innerText = 'المقاومة (أوم)';
+            } else if (mode === 'current') {
+                label1.innerText = 'الجهد (فولت)';
+                label2.innerText = 'المقاومة (أوم)';
+            } else {
+                label1.innerText = 'الجهد (فولت)';
+                label2.innerText = 'التيار (أمبير)';
+            }
+        }
+
+        function calculateOhm() {
+            const mode = document.getElementById('calcMode').value;
+            const v1 = parseFloat(document.getElementById('input1').value);
+            const v2 = parseFloat(document.getElementById('input2').value);
+            const resCard = document.getElementById('resultCard');
+            const resLabel = document.getElementById('resultLabel');
+            const resValue = document.getElementById('resultValue');
+            const resUnit = document.getElementById('resultUnit');
+            const powerVal = document.getElementById('powerValue');
+
+            if (isNaN(v1) || isNaN(v2) || v1 <= 0 || v2 <= 0) {
+                alert('يرجى إدخال قيم صحيحة أكبر من الصفر');
+                return;
+            }
+
+            let result = 0;
+            let unit = '';
+            let label = '';
+            let power = 0;
+
+            if (mode === 'voltage') {
+                result = v1 * v2;
+                unit = 'فولت';
+                label = 'الجهد الناتج (V)';
+                power = result * v1;
+            } else if (mode === 'current') {
+                result = v1 / v2;
+                unit = 'أمبير';
+                label = 'التيار الناتج (I)';
+                power = v1 * result;
+            } else {
+                result = v1 / v2;
+                unit = 'أوم';
+                label = 'المقاومة الناتجة (R)';
+                power = v1 * v2;
+            }
+
+            resLabel.innerText = label;
+            resValue.innerText = result.toLocaleString(undefined, {maximumFractionDigits: 3});
+            resUnit.innerText = unit;
+            powerVal.innerText = power.toLocaleString(undefined, {maximumFractionDigits: 3});
+
+            resCard.style.display = 'block';
+
+            window.lastCalc = {
+                id: Date.now(),
+                toolId: 'ohms_law',
+                name: 'حساب قانون أوم',
+                details: `${mode}: ${v1}, ${v2}`,
+                result: `${result.toFixed(2)} ${unit}`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

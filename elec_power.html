@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>القدرة الكهربائية - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .result-value {
+            color: var(--text-main);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">القدرة الكهربائية</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>نوع التيار</label>
+                <select id="phaseType" onchange="updateInputs()">
+                    <option value="dc">تيار مستمر (DC)</option>
+                    <option value="1phase">تيار متردد (1 فاز)</option>
+                    <option value="3phase">تيار متردد (3 فاز)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>الجهد (فولت)</label>
+                <input type="number" id="voltage" placeholder="220" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>التيار (أمبير)</label>
+                <input type="number" id="current" placeholder="10" step="any">
+            </div>
+
+            <div id="pfGroup" class="input-group" style="display:none">
+                <label>معامل القدرة (Power Factor)</label>
+                <input type="number" id="pf" value="0.85" step="0.01" min="0" max="1">
+            </div>
+
+            <button class="btn-calc" onclick="calculatePower()">حساب القدرة</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">
+                <i class="fas fa-bolt"></i>
+                نتائج حساب القدرة
+            </div>
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">القدرة (P)</span>
+                    <div>
+                        <span class="result-value" id="wattsValue">0</span>
+                        <span class="unit">واط</span>
+                    </div>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">القدرة بالكيلو</span>
+                    <div>
+                        <span class="result-value" id="kwValue">0</span>
+                        <span class="unit">kW</span>
+                    </div>
+                </div>
+                <div id="vaResult" class="result-item" style="display:none">
+                    <span class="result-label">القدرة الظاهرية (S)</span>
+                    <div>
+                        <span class="result-value" id="vaValue">0</span>
+                        <span class="unit">VA</span>
+                    </div>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateInputs() {
+            const type = document.getElementById('phaseType').value;
+            const pfGroup = document.getElementById('pfGroup');
+            const resCard = document.getElementById('resultCard');
+            resCard.style.display = 'none';
+
+            if (type === 'dc') {
+                pfGroup.style.display = 'none';
+            } else {
+                pfGroup.style.display = 'block';
+            }
+        }
+
+        function calculatePower() {
+            const type = document.getElementById('phaseType').value;
+            const V = parseFloat(document.getElementById('voltage').value);
+            const I = parseFloat(document.getElementById('current').value);
+            const pf = parseFloat(document.getElementById('pf').value) || 0.85;
+            
+            if (isNaN(V) || isNaN(I) || V <= 0 || I <= 0) {
+                alert('يرجى إدخال قيم صحيحة للجهد والتيار');
+                return;
+            }
+
+            let watts = 0;
+            let va = 0;
+
+            if (type === 'dc') {
+                watts = V * I;
+                va = watts;
+            } else if (type === '1phase') {
+                va = V * I;
+                watts = va * pf;
+            } else {
+                va = Math.sqrt(3) * V * I;
+                watts = va * pf;
+            }
+
+            document.getElementById('wattsValue').innerText = watts.toLocaleString(undefined, {maximumFractionDigits: 2});
+            document.getElementById('kwValue').innerText = (watts / 1000).toLocaleString(undefined, {maximumFractionDigits: 3});
+            
+            const vaResult = document.getElementById('vaResult');
+            if (type !== 'dc') {
+                vaResult.style.display = 'flex';
+                document.getElementById('vaValue').innerText = va.toLocaleString(undefined, {maximumFractionDigits: 2});
+            } else {
+                vaResult.style.display = 'none';
+            }
+
+            document.getElementById('resultCard').style.display = 'block';
+
+            window.lastCalc = {
+                id: Date.now(),
+                toolId: 'elec_power',
+                name: 'حساب القدرة الكهربائية',
+                type: type === 'dc' ? 'DC' : (type === '1phase' ? '1 Phase' : '3 Phase'),
+                details: `${V}V, ${I}A, PF: ${type === 'dc' ? '1.0' : pf}`,
+                result: `${(watts/1000).toFixed(2)} kW`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

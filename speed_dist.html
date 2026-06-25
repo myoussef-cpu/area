@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>السرعة والزمن - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label { color: var(--text-dim); }
+        .result-value { font-weight: 700; color: var(--primary-color); font-size: 1.2rem; }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">السرعة والزمن والمسافة</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>ما الذي تريد حسابه؟</label>
+                <select id="calcMode" onchange="updateInputs()">
+                    <option value="distance">المسافة (Distance)</option>
+                    <option value="speed">السرعة (Speed)</option>
+                    <option value="time">الزمن (Time)</option>
+                </select>
+            </div>
+
+            <div id="input1Group" class="input-group">
+                <label id="label1">السرعة (كم/س)</label>
+                <input type="number" id="input1" placeholder="0.00" step="any">
+            </div>
+
+            <div id="input2Group" class="input-group">
+                <label id="label2">الزمن (ساعة)</label>
+                <input type="number" id="input2" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateSpeedDist()">حساب النتيجة</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-item">
+                <span class="result-label" id="resultLabel">المسافة:</span>
+                <span class="result-value" id="resultValue">0</span>
+            </div>
+            <div id="secondaryResult" class="result-item" style="display:none">
+                <span class="result-label" id="secondaryLabel">وحدات أخرى:</span>
+                <span class="result-value" id="secondaryValue">0</span>
+            </div>
+            <button class="save-btn" onclick="saveSpeedResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateInputs() {
+            const mode = document.getElementById('calcMode').value;
+            const label1 = document.getElementById('label1');
+            const label2 = document.getElementById('label2');
+            const resCard = document.getElementById('resultCard');
+            resCard.style.display = 'none';
+
+            if (mode === 'distance') {
+                label1.innerText = 'السرعة (كم/س)';
+                label2.innerText = 'الزمن (ساعة)';
+            } else if (mode === 'speed') {
+                label1.innerText = 'المسافة (كم)';
+                label2.innerText = 'الزمن (ساعة)';
+            } else {
+                label1.innerText = 'المسافة (كم)';
+                label2.innerText = 'السرعة (كم/س)';
+            }
+        }
+
+        function calculateSpeedDist() {
+            const mode = document.getElementById('calcMode').value;
+            const v1 = parseFloat(document.getElementById('input1').value);
+            const v2 = parseFloat(document.getElementById('input2').value);
+            const resCard = document.getElementById('resultCard');
+            const resLabel = document.getElementById('resultLabel');
+            const resValue = document.getElementById('resultValue');
+            const secRes = document.getElementById('secondaryResult');
+            const secLabel = document.getElementById('secondaryLabel');
+            const secValue = document.getElementById('secondaryValue');
+
+            if (isNaN(v1) || isNaN(v2) || v1 <= 0 || v2 <= 0) {
+                alert('يرجى إدخال قيم صحيحة أكبر من الصفر');
+                return;
+            }
+
+            let result = 0;
+            let unit = '';
+            let label = '';
+            let secondary = '';
+            let secondaryLabelText = '';
+
+            if (mode === 'distance') {
+                // d = v * t
+                result = v1 * v2;
+                unit = 'كم';
+                label = 'المسافة الناتجة:';
+                secondary = (result * 1000).toFixed(0) + ' متر';
+                secondaryLabelText = 'بالمتر:';
+            } else if (mode === 'speed') {
+                // v = d / t
+                result = v1 / v2;
+                unit = 'كم/س';
+                label = 'السرعة الناتجة:';
+                secondary = (result / 3.6).toFixed(2) + ' م/ث';
+                secondaryLabelText = 'بالمتر/ثانية:';
+            } else {
+                // t = d / v
+                result = v1 / v2;
+                unit = 'ساعة';
+                label = 'الزمن الناتج:';
+                const totalMinutes = result * 60;
+                const hours = Math.floor(result);
+                const minutes = Math.round((result - hours) * 60);
+                secondary = `${hours} ساعة و ${minutes} دقيقة`;
+                secondaryLabelText = 'بالساعات والدقائق:';
+            }
+
+            resLabel.innerText = label;
+            resValue.innerText = `${result.toFixed(2)} ${unit}`;
+            
+            secRes.style.display = 'flex';
+            secLabel.innerText = secondaryLabelText;
+            secValue.innerText = secondary;
+
+            resCard.style.display = 'block';
+
+            window.lastCalc = {
+                toolId: 'speed_dist',
+                name: 'السرعة والزمن',
+                mode: mode,
+                input1: v1,
+                input2: v2,
+                result: result,
+                unit: unit,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveSpeedResult() {
+            if (!window.lastCalc) return;
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            alert('تم حفظ النتيجة بنجاح');
+        }
+    </script>
+</body>
+</html>

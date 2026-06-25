@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>تسوية الأراضي والميول - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-item.full-width {
+            grid-column: span 2;
+        }
+
+        .result-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .unit {
+            font-size: 0.8rem;
+            margin-right: 4px;
+            color: var(--text-dim);
+        }
+
+        .save-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            position: relative;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="font-size: 1.5rem; margin: 0;">تسوية الأراضي والميول</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>المسافة الأفقية (متر)</label>
+                <input type="number" id="hDist" placeholder="البعد بين النقطتين" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>فرق المنسوب (متر)</label>
+                <input type="number" id="vDist" placeholder="الارتفاع أو الانخفاض" step="any">
+            </div>
+
+            <div class="divider">أو أدخل الميل مباشرة</div>
+
+            <div class="input-group">
+                <label>الميل (%)</label>
+                <input type="number" id="slopePercent" placeholder="مثلاً 2%" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateLeveling()">حساب النتائج</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">نتائج التسوية والميول</div>
+            <div class="result-grid">
+                <div class="result-item full-width">
+                    <span class="result-label">نسبة الميل</span>
+                    <span class="result-value" id="resSlope">0</span>
+                    <span class="unit">%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">زاوية الميل</span>
+                    <span class="result-value" id="resAngle">0</span>
+                    <span class="unit">درجة (°)</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">المسافة المائلة</span>
+                    <span class="result-value" id="resHypo">0</span>
+                    <span class="unit">متر</span>
+                </div>
+                <div id="vDistResult" class="result-item full-width" style="display: none;">
+                    <span class="result-label">فرق المنسوب المحسوب</span>
+                    <span class="result-value" id="resVDist">0</span>
+                    <span class="unit">متر</span>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateLeveling() {
+            const h = parseFloat(document.getElementById('hDist').value);
+            const vInput = document.getElementById('vDist').value;
+            const sInput = document.getElementById('slopePercent').value;
+            
+            if (isNaN(h) || h <= 0) {
+                alert('يرجى إدخال مسافة أفقية صحيحة (رقم موجب)');
+                return;
+            }
+
+            let v, slope, angle, hypo;
+
+            if (sInput !== "" && !isNaN(parseFloat(sInput))) {
+                // الحساب من الميل
+                slope = parseFloat(sInput);
+                v = (slope / 100) * h;
+                document.getElementById('vDist').value = v.toFixed(3);
+                document.getElementById('vDistResult').style.display = 'flex';
+            } else if (vInput !== "" && !isNaN(parseFloat(vInput))) {
+                // الحساب من فرق المنسوب
+                v = parseFloat(vInput);
+                slope = (v / h) * 100;
+                document.getElementById('vDistResult').style.display = 'none';
+            } else {
+                alert('يرجى إدخال إما فرق المنسوب أو نسبة الميل');
+                return;
+            }
+
+            angle = Math.atan(v / h) * (180 / Math.PI);
+            hypo = Math.sqrt(h * h + v * v);
+
+            document.getElementById('resSlope').innerText = slope.toFixed(2);
+            document.getElementById('resAngle').innerText = angle.toFixed(2);
+            document.getElementById('resHypo').innerText = hypo.toFixed(2);
+            document.getElementById('resVDist').innerText = v.toFixed(3);
+
+            document.getElementById('resultCard').style.display = 'block';
+
+            window.lastCalc = {
+                toolId: 'land_leveling',
+                name: 'تسوية الأراضي والميول',
+                details: `أفقي: ${h}m - منسوب: ${v.toFixed(3)}m`,
+                result: `ميل: ${slope.toFixed(2)}% (${angle.toFixed(2)}°)`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

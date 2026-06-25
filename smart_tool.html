@@ -1,0 +1,217 @@
+<title id="toolTitle">أداة هندسية</title>
+
+<div class="smart-tool-container">
+    <div id="toolUI" class="card">
+        <!-- الواجهة هتتبني هنا ديناميكياً -->
+        <div class="loading-tool">جاري تحميل الأداة...</div>
+    </div>
+
+    <div id="resultCard" class="result-card hidden">
+        <!-- النتائج -->
+    </div>
+
+    <button class="btn-main" onclick="saveSmartResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<style>
+    .smart-tool-container { display: flex; flex-direction: column; gap: 15px; }
+    .loading-tool { text-align: center; padding: 40px; color: #888; }
+    .tool-header { margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px; }
+    .dark-mode .tool-header { border-color: var(--border-dark); }
+    .tool-header h2 { margin: 0; font-size: 1.3rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+    .tool-header p { margin: 5px 0 0; font-size: 0.85rem; color: #8e8e93; }
+</style>
+
+<script type="module">
+    import { TOOLS } from './tools-data.js';
+    import { onUserChange } from './firebase-logic.js';
+
+    // استلام المعاملات من الـ URL أو الـ State أو الـ Hash
+    const getToolId = () => {
+        // 1. من الـ window params (الناتج من navigateTo)
+        if (window.currentPageParams?.toolId) return window.currentPageParams.toolId;
+        
+        // 2. من الـ URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('toolId')) return urlParams.get('toolId');
+        
+        // 3. من الـ Hash (في حالة عمل Refresh)
+        const hash = window.location.hash;
+        if (hash.includes('toolId=')) {
+            return hash.split('toolId=')[1].split('&')[0];
+        }
+        
+        return null;
+    };
+
+    const toolId = getToolId();
+    const tool = TOOLS.find(t => t.id === toolId);
+
+    if (tool && tool.legacy) {
+        // لو الأداة دي أصلًا ليها صفحة مستقلة (Legacy)، حول المستخدم ليها فوراً
+        window.parent.navigateTo(tool.id);
+    } else if (!tool) {
+        document.getElementById('toolUI').innerHTML = `
+            <div class="card" style="text-align:center; padding: 40px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9500; margin-bottom: 20px;"></i>
+                <h3 style="margin-bottom: 10px;">عذراً، الأداة غير موجودة!</h3>
+                <p style="color: #8e8e93; margin-bottom: 20px;">يبدو أن الرابط الذي تحاول الوصول إليه غير صحيح أو تم نقل الأداة.</p>
+                <button class="btn-main" onclick="window.parent.navigateTo('all_tools')">استعرض كل الأدوات</button>
+            </div>
+        `;
+    } else {
+        document.getElementById('toolTitle').innerText = tool.name;
+        renderToolUI(tool);
+    }
+
+    function renderToolUI(tool) {
+        let html = `
+            <div class="tool-header">
+                <h2><i class="${tool.icon}"></i> ${tool.name}</h2>
+                <p>${tool.desc}</p>
+            </div>
+            <div class="tool-inputs">
+        `;
+
+        // توليد المدخلات بناءً على نوع الأداة (بناء منطق مبسط لكل فئة)
+        if (tool.cat === 'area') {
+            html += generateInput('dim1', 'البعد الأول (متر)');
+            html += generateInput('dim2', 'البعد الثاني (متر)');
+        } else if (tool.cat === 'volumes') {
+            html += generateInput('dim1', 'البعد الأساسي (نصف القطر أو الطول)');
+            html += generateInput('dim2', 'الارتفاع (إن وجد)');
+        } else if (tool.cat === 'const') {
+            html += generateInput('len', 'الطول (متر)');
+            html += generateInput('width', 'العرض (متر)');
+            html += generateInput('thick', 'السمك/الارتفاع (متر)');
+        } else if (tool.cat === 'math' || tool.cat === 'elec' || tool.cat === 'mech') {
+            html += generateInput('val1', 'القيمة الأولى');
+            html += generateInput('val2', 'القيمة الثانية');
+        } else {
+            html += generateInput('v1', 'القيمة');
+        }
+
+        html += `</div>`;
+        document.getElementById('toolUI').innerHTML = html;
+        
+        // ربط أحداث الإدخال
+        document.querySelectorAll('.smart-input').forEach(input => {
+            input.addEventListener('input', () => calculateSmart(tool));
+        });
+    }
+
+    function generateInput(id, label) {
+        return `
+            <div class="input-group">
+                <label>${label}</label>
+                <input type="number" id="${id}" class="smart-input" placeholder="0.00" step="any">
+            </div>
+        `;
+    }
+
+    function calculateSmart(tool) {
+        const v1 = parseFloat(document.getElementById('dim1')?.value || document.getElementById('len')?.value || document.getElementById('val1')?.value || 0);
+        const v2 = parseFloat(document.getElementById('dim2')?.value || document.getElementById('width')?.value || document.getElementById('val2')?.value || 0);
+        const v3 = parseFloat(document.getElementById('thick')?.value || 0);
+
+        let result = { title: tool.name, value: 0, unit: '', details: '' };
+
+        // منطق حسابي سريع لـ 50 أداة (تجميعي)
+        switch(tool.id) {
+            case 'square': result.value = v1 * v1; result.unit = 'م²'; result.details = `المحيط: ${(v1*4).toFixed(2)} م`; break;
+            case 'rectangle': result.value = v1 * v2; result.unit = 'م²'; result.details = `المحيط: ${(2*(v1+v2)).toFixed(2)} م`; break;
+            case 'parallelogram': result.value = v1 * v2; result.unit = 'م²'; break;
+            case 'rhombus': result.value = (v1 * v2) / 2; result.unit = 'م²'; break;
+            case 'cube': result.value = Math.pow(v1, 3); result.unit = 'م³'; result.details = `المساحة السطحية: ${(6*v1*v1).toFixed(2)} م²`; break;
+            case 'bricks_calc': 
+                const wallArea = v1 * v2;
+                const bricks = wallArea * 55; // متوسط 55 طوبة للمتر
+                result.value = bricks; result.unit = 'طوبة'; result.details = `لمساحة ${wallArea} م² (سمك 12سم)`; 
+                break;
+            case 'steel_weight':
+                const weight = (v1 * v1 / 162) * v2; // قطر v1، طول v2
+                result.value = weight; result.unit = 'كجم'; result.details = `لسيخ قطر ${v1} مم وطول ${v2} م`;
+                break;
+            case 'ohms_law':
+                result.value = v1 * v2; result.unit = 'فولت'; result.details = `التيار ${v1}A × المقاومة ${v2}Ω`;
+                break;
+            case 'percentage':
+                result.value = (v1 / 100) * v2; result.unit = ''; result.details = `${v1}% من ${v2}`;
+                break;
+            case 'pythagoras':
+                result.value = Math.sqrt(v1*v1 + v2*v2); result.unit = 'م'; result.details = `طول الوتر`;
+                break;
+            case 'annulus':
+                result.value = Math.PI * (Math.pow(v1, 2) - Math.pow(v2, 2)); result.unit = 'م²'; result.details = `المساحة بين نصف قطر ${v1} و ${v2}`;
+                break;
+            case 'tiles_calc':
+                const roomArea = v1 * v2;
+                const tileArea = 0.36; // بلاطة 60x60 افتراضياً
+                result.value = roomArea / tileArea; result.unit = 'بلاطة'; result.details = `لمساحة ${roomArea} م² (بلاط 60×60)`;
+                break;
+            case 'steel_plate':
+                result.value = v1 * v2 * v3 * 7.85; result.unit = 'كجم'; result.details = `وزن صاج (طول×عرض×سمك) بممانعة 7.85`;
+                break;
+            case 'speed_dist':
+                result.value = v1 / v2; result.unit = 'كم/س'; result.details = `السرعة = المسافة (${v1}) ÷ الزمن (${v2})`;
+                break;
+            case 'temp_conv':
+                result.value = (v1 * 9/5) + 32; result.unit = '°F'; result.details = `تحويل ${v1}°C إلى فهرنهايت`;
+                break;
+            case 'unit_price':
+                result.value = v1 / v2; result.unit = 'جنيه/وحدة'; result.details = `السعر ${v1} ÷ الكمية ${v2}`;
+                break;
+            case 'slope_deg':
+                result.value = Math.atan(v1/100) * (180/Math.PI); result.unit = 'درجة'; result.details = `زاوية الميل لميل ${v1}%`;
+                break;
+            default:
+                if (tool.cat === 'area') { result.value = v1 * v2; result.unit = 'م²'; }
+                else if (tool.cat === 'volumes') { result.value = v1 * v2 * v3; result.unit = 'م³'; }
+                else { result.value = v1 * v2; result.unit = 'وحدة'; }
+        }
+
+        if (result.value > 0) {
+            const resCard = document.getElementById('resultCard');
+            const conv = window.convertToFeddans ? window.convertToFeddans(result.value) : null;
+            
+            resCard.innerHTML = `
+                <h3>النتيجة:</h3>
+                <p>القيمة: <span>${result.value.toFixed(2)}</span> ${result.unit}</p>
+                ${result.details ? `<p>${result.details}</p>` : ''}
+                ${(tool.cat === 'area' && conv) ? `<p>بالوحدات: ${conv.feddan} فدان، ${conv.qirat} قيراط، ${conv.sahm} سهم</p>` : ''}
+            `;
+            resCard.classList.remove('hidden');
+            document.getElementById('saveBtn').style.display = 'block';
+            window.lastSmartCalc = result;
+        } else {
+            document.getElementById('resultCard').classList.add('hidden');
+            document.getElementById('saveBtn').style.display = 'none';
+        }
+    }
+
+    window.saveSmartResult = async function() {
+        const res = window.lastSmartCalc;
+        if (!res) return;
+        
+        const data = {
+            type: "أداة ذكية",
+            name: res.title,
+            result: `${res.value.toFixed(2)} ${res.unit} - ${res.details}`,
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            if (window.firebaseLogic?.saveResult) {
+                await window.firebaseLogic.saveResult(data);
+                alert('تم الحفظ بنجاح ✅');
+            } else {
+                let saved = JSON.parse(localStorage.getItem('savedResults') || '[]');
+                saved.push(data);
+                localStorage.setItem('savedResults', JSON.stringify(saved));
+                alert('تم الحفظ محلياً ✅');
+            }
+        } catch(e) { alert('خطأ في الحفظ!'); }
+    }
+</script>

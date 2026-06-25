@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب قوة الهيدروليك - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success-color: #34C759;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-item.full-width {
+            grid-column: span 2;
+        }
+
+        .result-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .unit {
+            font-size: 0.8rem;
+            margin-right: 4px;
+            color: var(--text-dim);
+        }
+
+        .save-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب قوة الهيدروليك</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>قطر البستم (مليمتر)</label>
+                <input type="number" id="pistonDia" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>الضغط (Bar)</label>
+                <input type="number" id="pressure" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateHydraulic()">حساب القوة</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">نتائج حساب قوة الهيدروليك</div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">مساحة البستم</span>
+                    <span class="result-value" id="pistonArea">0</span>
+                    <span class="unit">سم²</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">القوة بالكجم</span>
+                    <span class="result-value" id="forceKg">0</span>
+                    <span class="unit">كجم</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">القوة الناتجة (بالطن)</span>
+                    <span class="result-value" id="forceTon">0</span>
+                    <span class="unit">طن</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">القوة بالنيوتن (تقريباً)</span>
+                    <span class="result-value" id="forceNewton">0</span>
+                    <span class="unit">N</span>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateHydraulic() {
+            const D = parseFloat(document.getElementById('pistonDia').value);
+            const P = parseFloat(document.getElementById('pressure').value);
+            
+            if (D > 0 && P > 0) {
+                // Calculation:
+                // Area (cm2) = PI * (D_mm / 20)^2
+                const areaCm2 = Math.PI * Math.pow((D / 20), 2);
+                // Force (kg) = Area (cm2) * Pressure (bar)
+                // Note: 1 bar = 1.0197 kg/cm2, we use 1:1 for common engineering estimates
+                const forceKg = areaCm2 * P;
+                const forceTon = forceKg / 1000;
+                const forceNewton = forceKg * 9.80665;
+                
+                // Update UI
+                document.getElementById('pistonArea').innerText = areaCm2.toFixed(2);
+                document.getElementById('forceKg').innerText = forceKg.toLocaleString(undefined, {maximumFractionDigits: 2});
+                document.getElementById('forceTon').innerText = forceTon.toLocaleString(undefined, {maximumFractionDigits: 3});
+                document.getElementById('forceNewton').innerText = forceNewton.toLocaleString(undefined, {maximumFractionDigits: 0});
+                
+                document.getElementById('resultCard').style.display = 'block';
+                
+                window.lastCalc = {
+                    toolId: 'hydraulic_force_calc',
+                    type: 'قوة الهيدروليك',
+                    details: `قطر ${D} مم، ضغط ${P} بار`,
+                    result: `${forceTon.toFixed(3)} طن (${forceKg.toFixed(2)} كجم)`,
+                    timestamp: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة للقطر والضغط (أرقام موجبة)');
+            }
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

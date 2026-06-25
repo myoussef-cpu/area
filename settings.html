@@ -1,0 +1,282 @@
+<title>الإعدادات</title>
+<div class="settings-container">
+    <div class="section-title">الحساب الشخصي</div>
+    <div class="settings-list">
+        <div class="setting-item liquid-glass" id="profile-btn">
+            <div class="setting-icon-box" style="--bg: #e3f2fd; --color: #1e88e5;">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="setting-details">
+                <h3>إدارة الحساب</h3>
+                <p id="user-email">تحميل البيانات...</p>
+            </div>
+            <div class="setting-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">التطبيق</div>
+    <div class="settings-list">
+        <div class="setting-item liquid-glass" onclick="toggleDarkMode()">
+            <div class="setting-icon-box" style="--bg: #f3e5f5; --color: #8e24aa;">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="setting-details">
+                <h3>الوضع الليلي</h3>
+                <p>تبديل بين الوضع الفاتح والمظلم</p>
+            </div>
+            <div class="custom-toggle" id="dark-mode-toggle">
+                <div class="toggle-thumb">
+                    <i id="toggle-icon" class="fas fa-sun"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">حول</div>
+    <div class="settings-list">
+        <div class="setting-item liquid-glass">
+            <div class="setting-icon-box" style="--bg: #fff3e0; --color: #fb8c00;">
+                <i class="fas fa-code"></i>
+            </div>
+            <div class="setting-details">
+                <h3>المطور</h3>
+                <p>محمد <span class="developer-glow">يوسف عيد</span></p>
+            </div>
+        </div>
+        <div class="setting-item liquid-glass">
+            <div class="setting-icon-box" style="--bg: #f1f8e9; --color: #7cb342;">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="setting-details">
+                <h3>عن التطبيق</h3>
+                <p>الإصدار 2.0.0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .settings-container {
+        padding: 10px 5px;
+    }
+
+    .settings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .setting-item {
+        background: var(--card-light);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 16px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark-mode .setting-item {
+        background: var(--card-dark);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .setting-item:active {
+        transform: scale(0.97);
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .dark-mode .setting-item:active {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .setting-icon-box {
+        width: 45px;
+        height: 45px;
+        background: var(--bg);
+        color: var(--color);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .setting-details {
+        flex: 1;
+        text-align: right;
+    }
+
+    .setting-details h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .dark-mode .setting-details h3 {
+        color: var(--text-dark);
+    }
+
+    .setting-details p {
+        margin: 3px 0 0;
+        font-size: 0.8rem;
+        color: #8e8e93;
+    }
+
+    .setting-arrow, .setting-toggle {
+        color: #c7c7cc;
+        font-size: 0.9rem;
+    }
+
+    /* التوجيل المخصص - Custom Liquid Toggle */
+    .custom-toggle {
+        width: 50px;
+        height: 28px;
+        background: rgba(120, 120, 128, 0.16);
+        border-radius: 14px;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+    }
+
+    .dark-mode .custom-toggle {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .custom-toggle.active {
+        background: var(--primary);
+    }
+
+    .toggle-thumb {
+        width: 24px;
+        height: 24px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 1px;
+        left: 2px;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+
+    .custom-toggle.active .toggle-thumb {
+        left: calc(100% - 26px);
+        transform: rotate(360deg);
+        background: #f0f0f0;
+    }
+
+    .toggle-thumb i {
+        color: #8e8e93;
+        transition: all 0.3s;
+    }
+
+    .custom-toggle.active .toggle-thumb i {
+        color: #5e35b1;
+    }
+
+    /* تأثير لمعان اسم المطور */
+    .developer-glow {
+        color: #fb8c00;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgba(251, 140, 0, 0.5), 0 0 16px rgba(251, 140, 0, 0.3);
+        animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { text-shadow: 0 0 8px rgba(251, 140, 0, 0.5), 0 0 16px rgba(251, 140, 0, 0.3); }
+        50% { text-shadow: 0 0 12px rgba(251, 140, 0, 0.8), 0 0 24px rgba(251, 140, 0, 0.5); }
+    }
+</style>
+
+<script type="module">
+    import { onUserChange } from './firebase-logic.js';
+
+    const profileBtn = document.getElementById('profile-btn');
+    const userEmail = document.getElementById('user-email');
+
+    profileBtn.addEventListener('click', () => {
+        window.location.href = 'profile.html';
+    });
+
+    onUserChange((user) => {
+        if (user) {
+            userEmail.textContent = user.email || 'مستخدم مسجل';
+            if (user.photoURL) {
+                const iconBox = profileBtn.querySelector('.setting-icon-box');
+                iconBox.innerHTML = `<img src="${user.photoURL}" style="width:100%; height:100%; border-radius:14px; object-fit:cover;">`;
+                iconBox.style.background = 'transparent';
+            }
+        } else {
+            userEmail.textContent = 'لم يتم تسجيل الدخول';
+        }
+    });
+
+    // تحديث حالة زر التوجيل بناءً على الوضع الحالي
+    function updateToggleState() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const toggleContainer = document.getElementById('dark-mode-toggle');
+        const toggleIcon = document.getElementById('toggle-icon');
+        
+        console.log("🔄 Updating toggle state. Dark mode:", isDarkMode);
+        
+        if (toggleContainer) {
+            if (isDarkMode) {
+                toggleContainer.classList.add('active');
+                if (toggleIcon) {
+                    toggleIcon.className = 'fas fa-moon';
+                    toggleIcon.style.color = '#5e35b1';
+                }
+            } else {
+                toggleContainer.classList.remove('active');
+                if (toggleIcon) {
+                    toggleIcon.className = 'fas fa-sun';
+                    toggleIcon.style.color = '#f1c40f';
+                }
+            }
+        }
+    }
+
+    // ربط الضغط على التوجيل أو الـ item كله
+    const settingItem = document.querySelector('.setting-item[onclick="toggleDarkMode()"]');
+    if (settingItem) {
+        // بنلغي الـ onclick القديم ونحط واحد جديد أشطر
+        settingItem.onclick = null; 
+        settingItem.addEventListener('click', (e) => {
+            console.log("🔘 Toggle clicked!");
+            if (window.toggleDarkMode) {
+                window.toggleDarkMode();
+                // الأنيميشن بيحصل لوحده عشان فيه MutationObserver بيسمع التغيير في الـ body
+            }
+        });
+    }
+
+    // نراقب التغيير في الـ body عشان نحدث الزرار فوراً لو اتغير من الهيدر
+    if (window.darkModeObserver) window.darkModeObserver.disconnect();
+    window.darkModeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                updateToggleState();
+            }
+        });
+    });
+    window.darkModeObserver.observe(document.body, { attributes: true });
+
+    // تشغيل مبدئي للتأكد من الحالة
+    setTimeout(updateToggleState, 50);
+</script>
