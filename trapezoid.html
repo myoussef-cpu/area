@@ -215,15 +215,6 @@
 </style>
 
 <script>
-    // مسح الجلسة المحفوظة لبدء نظيف
-    localStorage.removeItem('formState_trapezoid');
-
-    // استدعاء الحساب بعد استعادة الجلسة بأمان
-    setTimeout(function() {
-        const a = document.getElementById('a');
-        if (a && a.value) { calculateArea(); calculateDivisions(); }
-    }, 400);
-
     function onTrapezoidUnitChange(unitId) {
         window.setSelectedUnit('area', unitId);
         renderTrapezoidResult();
@@ -431,9 +422,9 @@
 
                 // كتابة مساحة القسم فوق الخط
                 ctx.fillStyle = '#e67e22';
-                ctx.font = 'bold 11px Tajawal';
+                ctx.font = 'bold 12px Tajawal';
                 ctx.textAlign = 'center';
-                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 8);
+                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 5);
 
                 // حساب وكتابة طولي الضلعين المائلين لهذا القسم
                 const slants = computeSectionSlants(sectionH, h, L1, L2, swapped);
@@ -450,20 +441,20 @@
 
                 ctx.save();
                 ctx.fillStyle = slantColor;
-                ctx.font = 'bold 10px Tajawal';
+                ctx.font = 'bold 11px Tajawal';
 
                 const angL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
                 ctx.save();
                 ctx.translate(segLeftMid.x, segLeftMid.y);
                 ctx.rotate(angL);
-                ctx.fillText(`l₂=${slants.l1.toFixed(2)}`, 0, -7);
+                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
                 ctx.restore();
 
                 const angR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
                 ctx.save();
                 ctx.translate(segRightMid.x, segRightMid.y);
                 ctx.rotate(angR);
-                ctx.fillText(`l₁=${slants.l2.toFixed(2)}`, 0, -7);
+                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
                 ctx.restore();
 
                 ctx.restore();
@@ -496,29 +487,47 @@
         // القاعدة الصغرى (a)
         ctx.fillText(`القاعدة الصغرى: ${a.toFixed(2)} م`, (pts[2].x + pts[3].x) / 2, pts[3].y - 20);
 
-        // الطول الفعلي للضلع الأيسر والأيمن حسب التبديل الهندسي
-        const leftActual = swapped ? L2 : L1;
-        const rightActual = swapped ? L1 : L2;
+        if (swapped) {
+            // الضلع المائل الأيسر L2
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.rotate(angleL);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.restore();
 
-        // الضلع المائل الأيسر (L₂)
-        ctx.save();
-        ctx.fillStyle = slantColor;
-        ctx.font = 'bold 16px Tajawal';
-        ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
-        const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
-        ctx.rotate(angleL);
-        ctx.fillText(`L₂ = ${leftActual.toFixed(2)} م`, 0, -30);
-        ctx.restore();
+            // الضلع المائل الأيمن L1
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.rotate(angleR);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+        } else {
+            // الضلع المائل الأيسر L1
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.rotate(angleL);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.restore();
 
-        // الضلع المائل الأيمن (L₁)
-        ctx.save();
-        ctx.fillStyle = slantColor;
-        ctx.font = 'bold 16px Tajawal';
-        ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
-        const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
-        ctx.rotate(angleR);
-        ctx.fillText(`L₁ = ${rightActual.toFixed(2)} م`, 0, -30);
-        ctx.restore();
+            // الضلع المائل الأيمن L2
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.rotate(angleR);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+        }
 
         // رسم سهم الارتفاع الكلي
         const hX = pts[0].x - 40;
