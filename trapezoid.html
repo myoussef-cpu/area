@@ -422,9 +422,9 @@
 
                 // كتابة مساحة القسم فوق الخط
                 ctx.fillStyle = '#e67e22';
-                ctx.font = 'bold 12px Tajawal';
+                ctx.font = 'bold 11px Tajawal';
                 ctx.textAlign = 'center';
-                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 5);
+                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 8);
 
                 // حساب وكتابة طولي الضلعين المائلين لهذا القسم
                 const slants = computeSectionSlants(sectionH, h, L1, L2, swapped);
@@ -441,20 +441,20 @@
 
                 ctx.save();
                 ctx.fillStyle = slantColor;
-                ctx.font = 'bold 11px Tajawal';
+                ctx.font = 'bold 10px Tajawal';
 
                 const angL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
                 ctx.save();
                 ctx.translate(segLeftMid.x, segLeftMid.y);
                 ctx.rotate(angL);
-                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -7);
                 ctx.restore();
 
                 const angR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
                 ctx.save();
                 ctx.translate(segRightMid.x, segRightMid.y);
                 ctx.rotate(angR);
-                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -7);
                 ctx.restore();
 
                 ctx.restore();
@@ -495,7 +495,7 @@
             ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
             const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
             ctx.rotate(angleL);
-            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -30);
             ctx.restore();
 
             // الضلع المائل الأيمن L1
@@ -505,7 +505,7 @@
             ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
             const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
             ctx.rotate(angleR);
-            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -30);
             ctx.restore();
         } else {
             // الضلع المائل الأيسر L1
@@ -515,7 +515,7 @@
             ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
             const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
             ctx.rotate(angleL);
-            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -30);
             ctx.restore();
 
             // الضلع المائل الأيمن L2
@@ -525,7 +525,7 @@
             ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
             const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
             ctx.rotate(angleR);
-            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -30);
             ctx.restore();
         }
 
