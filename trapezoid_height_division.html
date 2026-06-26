@@ -308,11 +308,11 @@
             const startX = (canvas.width - b * scale) / 2;
             const startY = canvas.height - padding;
 
-            // إحداثيات الرؤوس
-            const p1 = { x: startX, y: startY };
-            const p2 = { x: startX + b * scale, y: startY };
-            const p3 = { x: startX + (x_offset + a) * scale, y: startY - h * scale };
-            const p4 = { x: startX + x_offset * scale, y: startY - h * scale };
+            // إحداثيات الرؤوس (RTL - من اليمين لليسار)
+            const p1 = { x: startX + b * scale, y: startY };
+            const p2 = { x: startX, y: startY };
+            const p3 = { x: startX + (b - x_offset - a) * scale, y: startY - h * scale };
+            const p4 = { x: startX + (b - x_offset) * scale, y: startY - h * scale };
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
