@@ -390,20 +390,20 @@
                     ctx.fillStyle = slantColor;
                     ctx.font = 'bold 12px Tajawal, Arial';
 
-                    // l₁ على الضلع الأيسر
+                    // l₂ على الضلع الأيسر
                     const angL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
                     ctx.save();
                     ctx.translate(segLeftMid.x, segLeftMid.y);
                     ctx.rotate(angL);
-                    ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                    ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
-                    // l₂ على الضلع الأيمن
+                    // l₁ على الضلع الأيمن
                     const angR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                     ctx.save();
                     ctx.translate(segRightMid.x, segRightMid.y);
                     ctx.rotate(angR);
-                    ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                    ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
                     ctx.restore();

@@ -456,14 +456,14 @@
                 ctx.save();
                 ctx.translate(segLeftMid.x, segLeftMid.y);
                 ctx.rotate(angL);
-                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
                 ctx.restore();
 
                 const angR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
                 ctx.save();
                 ctx.translate(segRightMid.x, segRightMid.y);
                 ctx.rotate(angR);
-                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
                 ctx.restore();
 
                 ctx.restore();
