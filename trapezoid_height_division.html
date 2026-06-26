@@ -211,6 +211,15 @@
     </div>
 
     <script>
+        // مسح الجلسة المحفوظة لبدء نظيف
+        localStorage.removeItem('formState_trapezoid_height_division');
+
+        // استدعاء الحساب بعد استعادة الجلسة بأمان
+        setTimeout(function() {
+            const a = document.getElementById('a');
+            if (a && a.value) { calculate(); }
+        }, 400);
+
         /**
          * حساب خصائص المنحرف العام بناءً على القاعدتين والضلعين المائلين
          * المعادلات:
@@ -416,22 +425,6 @@
             ctx.fillText(`القاعدة الصغرى: ${a.toFixed(2)} م`, (p3.x + p4.x) / 2, p3.y - 20);
             
             if (geo.swapped) {
-                // الضلع المائل الأيسر L2
-                ctx.save();
-                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
-                const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
-                ctx.rotate(angleL);
-                ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -30);
-                ctx.restore();
-
-                // الضلع المائل الأيمن L1
-                ctx.save();
-                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
-                const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
-                ctx.rotate(angleR);
-                ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -30);
-                ctx.restore();
-            } else {
                 // الضلع المائل الأيسر L1
                 ctx.save();
                 ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
@@ -446,6 +439,22 @@
                 const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                 ctx.rotate(angleR);
                 ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -30);
+                ctx.restore();
+            } else {
+                // الضلع المائل الأيسر L2
+                ctx.save();
+                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
+                const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
+                ctx.rotate(angleL);
+                ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -30);
+                ctx.restore();
+
+                // الضلع المائل الأيمن L1
+                ctx.save();
+                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
+                const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+                ctx.rotate(angleR);
+                ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -30);
                 ctx.restore();
             }
 
