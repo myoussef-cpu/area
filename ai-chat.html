@@ -1,0 +1,565 @@
+<title>المساعد الذكي</title>
+
+<style>
+    .chat-page {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 130px);
+        max-height: calc(100vh - 130px);
+        background: var(--bg-light);
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+    }
+
+    .dark-mode .chat-page {
+        background: var(--bg-dark);
+        border-color: var(--border-dark);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        background: linear-gradient(135deg, var(--primary), #5856d6);
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-avatar {
+        width: 38px;
+        height: 38px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .chat-header-info h3 { font-size: 0.95rem; font-weight: 700; margin: 0; }
+    .chat-header-info span { font-size: 0.72rem; opacity: 0.8; }
+
+    .chat-header-actions { display: flex; gap: 6px; }
+
+    .chat-header-actions button {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 7px 12px;
+        cursor: pointer;
+        font-family: 'Tajawal', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .chat-header-actions button:hover { background: rgba(255,255,255,0.25); }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        scroll-behavior: smooth;
+        background: var(--bg-light);
+    }
+
+    .dark-mode .chat-messages { background: var(--bg-dark); }
+
+    .msg {
+        max-width: 82%;
+        padding: 11px 15px;
+        border-radius: 18px;
+        font-size: 0.92rem;
+        line-height: 1.7;
+        word-wrap: break-word;
+        animation: msgSlide 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes msgSlide {
+        from { opacity: 0; transform: translateY(12px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .msg-user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, var(--primary), #5856d6);
+        color: white;
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 4px 14px rgba(0,122,255,0.25);
+    }
+
+    .msg-ai {
+        align-self: flex-start;
+        background: var(--card-light);
+        color: var(--text-light);
+        border: 1px solid var(--border-light);
+        border-bottom-right-radius: 18px;
+        border-bottom-left-radius: 6px;
+    }
+
+    .dark-mode .msg-ai {
+        background: var(--card-dark);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+
+    .msg-ai code {
+        background: rgba(0,122,255,0.08);
+        padding: 1px 5px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        direction: ltr;
+        display: inline;
+        color: var(--primary);
+    }
+
+    .dark-mode .msg-ai code { background: rgba(90,200,250,0.12); color: #5ac8fa; }
+
+    .msg-ai pre {
+        background: rgba(0,0,0,0.04);
+        padding: 10px 12px;
+        border-radius: 12px;
+        overflow-x: auto;
+        direction: ltr;
+        text-align: left;
+        margin: 8px 0 4px;
+        font-size: 0.82rem;
+    }
+
+    .dark-mode .msg-ai pre { background: rgba(255,255,255,0.05); }
+
+    .msg-ai strong { font-weight: 700; color: var(--primary); }
+    .dark-mode .msg-ai strong { color: #5ac8fa; }
+    .msg-ai ul, .msg-ai ol { padding-right: 18px; margin: 5px 0; }
+
+    .msg-tool {
+        align-self: flex-start;
+        max-width: 88%;
+        background: rgba(255, 149, 0, 0.06);
+        border: 1px solid rgba(255, 149, 0, 0.15);
+        border-radius: 14px;
+        font-size: 0.8rem;
+        padding: 10px 13px;
+    }
+
+    .dark-mode .msg-tool { background: rgba(255, 149, 0, 0.1); border-color: rgba(255, 149, 0, 0.2); color: var(--text-dark); }
+
+    .msg-tool .tool-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255,149,0,0.12);
+        color: #e67e22;
+        padding: 3px 10px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+    }
+
+    .msg-tool pre {
+        margin: 4px 0 0;
+        padding: 6px 9px;
+        background: rgba(0,0,0,0.03);
+        border-radius: 8px;
+        overflow-x: auto;
+        direction: ltr;
+        text-align: left;
+        font-size: 0.75rem;
+    }
+
+    .dark-mode .msg-tool pre { background: rgba(255,255,255,0.05); }
+
+    .typing-indicator {
+        align-self: flex-start;
+        display: none;
+        padding: 12px 18px;
+        background: var(--card-light);
+        border: 1px solid var(--border-light);
+        border-radius: 18px;
+        border-bottom-left-radius: 6px;
+        margin-left: 16px;
+    }
+
+    .dark-mode .typing-indicator { background: var(--card-dark); border-color: var(--border-dark); }
+    .typing-indicator.active { display: flex; }
+
+    .typing-dots { display: flex; gap: 5px; align-items: center; }
+
+    .typing-dots span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--primary);
+        animation: dotPulse 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotPulse {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+        40% { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-input-area {
+        display: flex;
+        gap: 10px;
+        padding: 12px 14px;
+        background: var(--card-light);
+        border-top: 1px solid var(--border-light);
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    .dark-mode .chat-input-area { background: var(--card-dark); border-color: var(--border-dark); }
+
+    .chat-input-area textarea {
+        flex: 1;
+        resize: none;
+        border: 1.5px solid var(--border-light);
+        border-radius: 16px;
+        padding: 10px 16px;
+        font-family: 'Tajawal', sans-serif;
+        font-size: 0.92rem;
+        outline: none;
+        min-height: 42px;
+        max-height: 90px;
+        line-height: 1.5;
+        direction: rtl;
+        background: rgba(0,0,0,0.02);
+        transition: border 0.25s, box-shadow 0.25s;
+    }
+
+    .dark-mode .chat-input-area textarea {
+        background: rgba(255,255,255,0.04);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+
+    .chat-input-area textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+
+    .chat-send-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), #5856d6);
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        transition: transform 0.2s;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(0,122,255,0.3);
+    }
+
+    .chat-send-btn:hover { transform: scale(0.92); }
+    .chat-send-btn:active { transform: scale(0.88); }
+    .chat-send-btn:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+
+    .no-key-warning {
+        text-align: center;
+        padding: 50px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .no-key-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, rgba(255,149,0,0.12), rgba(231,76,60,0.08));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: #e67e22;
+        margin-bottom: 20px;
+    }
+
+    .no-key-warning h4 { font-size: 1.15rem; color: var(--text-light); margin-bottom: 8px; }
+    .dark-mode .no-key-warning h4 { color: var(--text-dark); }
+
+    .no-key-warning p { color: #8e8e93; margin-bottom: 22px; line-height: 1.7; font-size: 0.9rem; max-width: 300px; }
+
+    .no-key-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--primary), #5856d6);
+        color: white;
+        padding: 11px 28px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: transform 0.2s;
+        box-shadow: 0 6px 20px rgba(0,122,255,0.3);
+    }
+
+    .no-key-btn:hover { transform: scale(0.97); }
+
+    .quick-suggestions {
+        display: flex;
+        gap: 6px;
+        padding: 0 16px 10px;
+        overflow-x: auto;
+        flex-shrink: 0;
+        scrollbar-width: none;
+    }
+
+    .quick-suggestions::-webkit-scrollbar { display: none; }
+
+    .quick-chip {
+        flex-shrink: 0;
+        background: var(--card-light);
+        border: 1px solid var(--border-light);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 0.78rem;
+        font-family: 'Tajawal', sans-serif;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .dark-mode .quick-chip { background: var(--card-dark); border-color: var(--border-dark); color: var(--text-dark); }
+    .quick-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .loading-msg {
+        align-self: flex-start;
+        padding: 11px 15px;
+        background: var(--card-light);
+        border: 1px solid var(--border-light);
+        border-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-bottom-left-radius: 6px;
+        color: var(--text-light);
+        font-size: 0.85rem;
+    }
+
+    .dark-mode .loading-msg { background: var(--card-dark); border-color: var(--border-dark); color: var(--text-dark); }
+</style>
+
+<div class="chat-page">
+    <div class="chat-header">
+        <div class="chat-header-left">
+            <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+            <div class="chat-header-info">
+                <h3>المساعد الذكي</h3>
+                <span>powered by AI</span>
+            </div>
+        </div>
+        <div class="chat-header-actions">
+            <button onclick="clearChat()"><i class="fas fa-eraser"></i> مسح</button>
+        </div>
+    </div>
+
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div id="typingIndicator" class="typing-indicator">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="quick-suggestions" id="quickSuggestions">
+        <div class="quick-chip" onclick="quickSend('احسب مساحة مثلث بأضلاع 3 و 4 و 5')">مثلث 3-4-5</div>
+        <div class="quick-chip" onclick="quickSend('احسب مساحة شبه منحرف بقاعدة صغرى 5 وكبرى 10 ومائلين 5 و 6')">شبه منحرف</div>
+        <div class="quick-chip" onclick="quickSend('اعرضلي كل الأدوات المتاحة')">كل الأدوات</div>
+        <div class="quick-chip" onclick="quickSend('حوّل 100 متر لقدم')">تحويل وحدات</div>
+        <div class="quick-chip" onclick="quickSend('فتح آلة حاسبة')">آلة حاسبة</div>
+    </div>
+
+    <div class="chat-input-area">
+        <textarea id="chatInput" placeholder="اكتب سؤالك..." rows="1"></textarea>
+        <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    var chatMessages = document.getElementById('chatMessages');
+    var chatInput = document.getElementById('chatInput');
+    var sendBtn = document.getElementById('sendBtn');
+    var typingIndicator = document.getElementById('typingIndicator');
+    var quickSuggestions = document.getElementById('quickSuggestions');
+
+    // ── Markdown ──
+    function escHtml(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    function renderMd(t) {
+        if (!t) return '';
+        var h = escHtml(t);
+        h = h.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+        h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+        h = h.replace(/^### (.+)$/gm, '<strong>$1</strong>');
+        h = h.replace(/^## (.+)$/gm, '<strong>$1</strong>');
+        h = h.replace(/^# (.+)$/gm, '<strong>$1</strong>');
+        h = h.replace(/\n/g, '<br>');
+        return h;
+    }
+
+    function scrollDown() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+
+    function addMsg(text, type) {
+        var d = document.createElement('div');
+        d.className = 'msg msg-' + type;
+        d.innerHTML = type === 'ai' ? renderMd(text) : escHtml(text);
+        chatMessages.appendChild(d);
+        scrollDown();
+    }
+
+    function addToolMsg(name, result) {
+        var d = document.createElement('div');
+        d.className = 'msg msg-tool';
+        var r = '';
+        if (result) {
+            if (result.formula) r = result.area + ' ' + (result.unit||'') + '\n' + result.formula;
+            else if (result.formatted) r = result.formatted;
+            else if (result.summary) r = result.summary;
+            else r = JSON.stringify(result, null, 2);
+        }
+        d.innerHTML = '<div class="tool-badge"><i class="fas fa-wrench"></i> ' + name + '</div><pre>' + escHtml(r).substring(0, 300) + '</pre>';
+        chatMessages.appendChild(d);
+        scrollDown();
+    }
+
+    function showLoading() {
+        var d = document.createElement('div');
+        d.className = 'loading-msg';
+        d.id = 'loadingMsg';
+        d.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفكير...';
+        chatMessages.appendChild(d);
+        scrollDown();
+    }
+
+    function hideLoading() {
+        var el = document.getElementById('loadingMsg');
+        if (el) el.remove();
+    }
+
+    // ── فحص المفتاح ──
+    function getApiKey() {
+        try {
+            if (window.AppConfig && window.AppConfig.hasApiKey()) return window.AppConfig.getApiKey();
+        } catch(e) {}
+        return localStorage.getItem('NVIDIA_API_KEY') || '';
+    }
+
+    if (!getApiKey()) {
+        chatMessages.innerHTML = '<div class="no-key-warning">' +
+            '<div class="no-key-icon"><i class="fas fa-key"></i></div>' +
+            '<h4>مفتاح الـ API غير موجود</h4>' +
+            '<p>محتاج تدخل مفتاح NVIDIA API عشان تستخدم المساعد الذكي</p>' +
+            '<a class="no-key-btn" href="setup.html"><i class="fas fa-cog"></i> إعداد المفتاح</a>' +
+            '</div>';
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        quickSuggestions.style.display = 'none';
+        return;
+    }
+
+    addMsg('أهلاً بيك! أنا المساعد الذكي. أقدر أساعدك في:\n\n• حساب مساحات الأشكال الهندسية\n• فتح أي أداة في التطبيق\n• تحويل وحدات القياس\n• عرض النتائج المحفوظة\n\nجرب تسألني!', 'ai');
+
+    // ── انتظار AIAgent ──
+    function waitForAgent(cb) {
+        if (window.AIAgent) { cb(); return; }
+        var tries = 0;
+        var timer = setInterval(function() {
+            if (window.AIAgent || tries > 50) {
+                clearInterval(timer);
+                if (window.AIAgent) cb();
+                else addMsg('مش قادر أحمل الـ Agent. جرب تحميل الصفحة تاني.', 'ai');
+            }
+            tries++;
+        }, 100);
+    }
+
+    waitForAgent(function() {
+        // callback لعرض tool calls
+        window.AIAgent.setOnMessage(function(m) {
+            if (m.type === 'tool_call') addToolMsg(m.name, m.result);
+        });
+    });
+
+    // ── إرسال ──
+    window.sendMessage = function() {
+        var text = chatInput.value.trim();
+        if (!text) return;
+        if (window.AIAgent && window.AIAgent.isRunning) return;
+
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        addMsg(text, 'user');
+        quickSuggestions.style.display = 'none';
+
+        if (!window.AIAgent) {
+            addMsg('الـ Agent لسه بيحمل. جرب تاني بعد ثانية.', 'ai');
+            return;
+        }
+
+        typingIndicator.classList.add('active');
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        showLoading();
+        scrollDown();
+
+        window.AIAgent.agentLoop(text).then(function(reply) {
+            hideLoading();
+            addMsg(reply, 'ai');
+        }).catch(function(e) {
+            hideLoading();
+            addMsg('حصلت مشكلة: ' + e.message, 'ai');
+        }).finally(function() {
+            typingIndicator.classList.remove('active');
+            sendBtn.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+        });
+    };
+
+    window.quickSend = function(text) {
+        chatInput.value = text;
+        sendMessage();
+    };
+
+    window.clearChat = function() {
+        if (window.AIAgent) window.AIAgent.clearHistory();
+        chatMessages.innerHTML = '';
+        addMsg('تم المسح. أهلاً بيك تاني!', 'ai');
+        quickSuggestions.style.display = 'flex';
+    };
+
+    // ── Enter + auto-resize ──
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    chatInput.addEventListener('input', function() {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 90) + 'px';
+    });
+})();
+</script>

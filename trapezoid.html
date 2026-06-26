@@ -315,7 +315,7 @@
         saveBtn.style.display = 'block';
 
         // حساب الأقطار عشان نرسمها
-        const diags = calculateDiagonals(a, b, h);
+        const diags = calculateDiagonals(a, b, h, geo.x1, geo.x2);
 
         // رسم شبه المنحرف مع الأقطار
         drawTrapezoid(a, b, L1, L2, h, diags, [], geo.x1, geo.x2, geo.swapped);
@@ -501,8 +501,8 @@
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
-            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
-            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleL = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
             ctx.rotate(angleL);
             ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
             ctx.restore();
@@ -511,8 +511,8 @@
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
-            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
-            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleR = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
             ctx.rotate(angleR);
             ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
             ctx.restore();
@@ -521,8 +521,8 @@
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
-            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
-            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleL = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
             ctx.rotate(angleL);
             ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
             ctx.restore();
@@ -531,29 +531,29 @@
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
-            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
-            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleR = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
             ctx.rotate(angleR);
             ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
             ctx.restore();
         }
 
         // رسم سهم الارتفاع الكلي
-        const hX = pts[0].x - 40;
+        const hX = pts[1].x - 40;
         ctx.beginPath();
         ctx.strokeStyle = textColor;
         ctx.lineWidth = 1;
-        ctx.moveTo(hX, pts[0].y);
-        ctx.lineTo(hX, pts[3].y);
+        ctx.moveTo(hX, pts[1].y);
+        ctx.lineTo(hX, pts[2].y);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(hX - 5, pts[0].y - 5); ctx.lineTo(hX, pts[0].y); ctx.lineTo(hX + 5, pts[0].y - 5);
-        ctx.moveTo(hX - 5, pts[3].y + 5); ctx.lineTo(hX, pts[3].y); ctx.lineTo(hX + 5, pts[3].y + 5);
+        ctx.moveTo(hX - 5, pts[1].y - 5); ctx.lineTo(hX, pts[1].y); ctx.lineTo(hX + 5, pts[1].y - 5);
+        ctx.moveTo(hX - 5, pts[2].y + 5); ctx.lineTo(hX, pts[2].y); ctx.lineTo(hX + 5, pts[2].y + 5);
         ctx.stroke();
 
         ctx.save();
-        ctx.translate(hX - 15, (pts[0].y + pts[3].y) / 2);
+        ctx.translate(hX - 15, (pts[1].y + pts[2].y) / 2);
         ctx.rotate(-Math.PI / 2);
         ctx.fillStyle = textColor;
         ctx.font = 'bold 14px Tajawal';
@@ -653,10 +653,9 @@
         return { l1: ratio * L1, l2: ratio * L2 };
     }
 
-    function calculateDiagonals(a, b, h) {
-        const baseDifference = Math.abs(b - a) / 2;
-        const diagonal1 = Math.sqrt(a * a + h * h - 2 * a * baseDifference);
-        const diagonal2 = Math.sqrt(b * b + h * h + 2 * b * baseDifference);
+    function calculateDiagonals(a, b, h, x1, x2) {
+        const diagonal1 = Math.sqrt(h * h + (a + x2) * (a + x2));
+        const diagonal2 = Math.sqrt(h * h + (a + x1) * (a + x1));
         return { diagonal1, diagonal2 };
     }
 
@@ -818,7 +817,7 @@
         resultsDiv.classList.remove('hidden');
 
         // تحديث الرسمة بالأقسام والأقطار يا معلم
-        const diags = calculateDiagonals(a, b, h);
+        const diags = calculateDiagonals(a, b, h, geo.x1, geo.x2);
         drawTrapezoid(a, b, L1, L2, h, diags, divisionsData, geo.x1, geo.x2, geo.swapped);
     }
 
