@@ -388,20 +388,20 @@
                     ctx.fillStyle = slantColor;
                     ctx.font = 'bold 12px Tajawal, Arial';
 
-                    // l₂ على الضلع الأيسر
+                    // الضلع الأيمن (segLeftMid)
                     const angL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
                     ctx.save();
                     ctx.translate(segLeftMid.x, segLeftMid.y);
                     ctx.rotate(angL);
-                    ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                    ctx.fillText(geo.swapped ? `l₁=${slants.l1.toFixed(2)}` : `l₂=${slants.l2.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
-                    // l₁ على الضلع الأيمن
+                    // الضلع الأيسر (segRightMid)
                     const angR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                     ctx.save();
                     ctx.translate(segRightMid.x, segRightMid.y);
                     ctx.rotate(angR);
-                    ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                    ctx.fillText(geo.swapped ? `l₂=${slants.l2.toFixed(2)}` : `l₁=${slants.l1.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
                     ctx.restore();
@@ -668,11 +668,11 @@
                                 <strong>${newBase.toFixed(3)} م</strong>
                             </div>
                             <div style="background:rgba(255,149,0,0.1); padding:8px 10px; border-radius:10px; text-align:center;">
-                                <div style="opacity:0.6; font-size:0.75rem;">المائل الأيسر l₁</div>
+                                <div style="opacity:0.6; font-size:0.75rem;">l₁ (المائل الأول)</div>
                                 <strong style="color:#e67e22;">${slants.l1.toFixed(3)} م</strong>
                             </div>
                             <div style="background:rgba(255,149,0,0.1); padding:8px 10px; border-radius:10px; text-align:center;">
-                                <div style="opacity:0.6; font-size:0.75rem;">المائل الأيمن l₂</div>
+                                <div style="opacity:0.6; font-size:0.75rem;">l₂ (المائل الثاني)</div>
                                 <strong style="color:#e67e22;">${slants.l2.toFixed(3)} م</strong>
                             </div>
                         </div>
