@@ -215,6 +215,15 @@
 </style>
 
 <script>
+    // مسح الجلسة المحفوظة لبدء نظيف
+    localStorage.removeItem('formState_trapezoid');
+
+    // استدعاء الحساب بعد استعادة الجلسة بأمان
+    setTimeout(function() {
+        const a = document.getElementById('a');
+        if (a && a.value) { calculateArea(); calculateDivisions(); }
+    }, 400);
+
     function onTrapezoidUnitChange(unitId) {
         window.setSelectedUnit('area', unitId);
         renderTrapezoidResult();

@@ -211,6 +211,15 @@
     </div>
 
     <script>
+        // مسح الجلسة المحفوظة لبدء نظيف
+        localStorage.removeItem('formState_trapezoid_height_division');
+
+        // استدعاء الحساب بعد استعادة الجلسة بأمان
+        setTimeout(function() {
+            const a = document.getElementById('a');
+            if (a && a.value) { calculate(); }
+        }, 400);
+
         /**
          * حساب خصائص المنحرف العام بناءً على القاعدتين والضلعين المائلين
          * المعادلات:
