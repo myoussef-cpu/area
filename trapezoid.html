@@ -569,13 +569,13 @@
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        // حجم الكانفاس يناسب عدد الأقسام
-        const minWidth = 350;
-        const sectionWidth = 220;
-        const sectionSpacing = 50;
-        const totalWidth = Math.max(minWidth, divisionsData.length * (sectionWidth + sectionSpacing) + 100);
-        canvas.width = totalWidth;
-        canvas.height = 400;
+        // حجم الكانفاس ثابت في العرض ومتغير في الطول (عمود واحد)
+        const paddingX = 40;
+        const drawW = 260; // عرض منطقة الرسم لكل قسم
+        canvas.width = drawW + paddingX * 2;
+        // حساب الطول حسب عدد الأقسام
+        const sectionGap = 280; // المسافة بين كل قسم والآخر
+        canvas.height = Math.max(400, divisionsData.length * sectionGap + 40);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (!divisionsData || divisionsData.length === 0) return;
@@ -586,37 +586,23 @@
         const slantColor = isDarkMode ? '#69db7c' : '#2ecc71';
         const fillColor = isDarkMode ? 'rgba(77, 171, 247, 0.08)' : 'rgba(52, 152, 219, 0.05)';
 
-        const paddingX = 60;
-        const availableWidth = canvas.width - paddingX * 2;
-        const numSections = divisionsData.length;
-        const colWidth = availableWidth / numSections;
-        const drawW = Math.min(colWidth - 30, 200);
-        const maxDrawH = 200;
-
-        let row = 0;
-        let col = 0;
-        const colsPerRow = numSections; // يمكن تعديله لعرض متعدد الصفوف لاحقاً
+        const maxDrawH = 180;
+        const centerX = canvas.width / 2;
 
         divisionsData.forEach((section, i) => {
-            // دعم تعدد الصفوف لو الأقسام كثيرة
-            col = i % colsPerRow;
-            if (i > 0 && col === 0) row++;
-
-            const offsetX = paddingX + col * colWidth + (colWidth - drawW) / 2;
-            const offsetY = 50 + row * 280;
-            const centerX = offsetX + drawW / 2;
+            const offsetY = 30 + i * sectionGap;
 
             // مقياس الرسم حسب أبعاد القسم
             const maxBase = Math.max(section.topBase, section.bottomBase) || 1;
-            const baseScale = (drawW - 20) / maxBase;
-            const hScale = (maxDrawH - 40) / (section.sectionHeight || 1);
+            const baseScale = (drawW - 40) / maxBase;
+            const hScale = (maxDrawH - 30) / (section.sectionHeight || 1);
             const scale = Math.min(baseScale, hScale * 1.5);
 
             const topW = (section.topBase || 0) * scale;
             const botW = (section.bottomBase || 0) * scale;
             const secH = Math.max((section.sectionHeight || 0) * scale, 40);
 
-            const topY = offsetY;
+            const topY = offsetY + 40;
             const bottomY = topY + secH;
 
             const botLeft = { x: centerX - botW / 2, y: bottomY };
