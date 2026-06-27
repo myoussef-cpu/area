@@ -212,43 +212,64 @@
 
     <script>
         /**
-         * حساب خصائص المنحرف العام بناءً على القاعدتين والضلعين المائلين
-         * المعادلات:
-         *   x1 = ((b-a) + (L1²-L2²)/(b-a)) / 2  — الإزاحة الأفقية للضلع الأيسر
-         *   x2 = (b-a) - x1                       — الإزاحة الأفقية للضلع الأيمن
-         *   h  = sqrt(L1² - x1²)                  — الارتفاع العمودي
-         */
-        function computeTrapezoidGeometry(a, b, L1, L2) {
-            const diff = b - a;
-            if (diff <= 0) return null;
-            // الاحتمال أ: L1 على اليسار، L2 على اليمين
-            const x1_A = (diff + (L1 * L1 - L2 * L2) / diff) / 2;
-            const x2_A = diff - x1_A;
-            // الاحتمال ب: L2 على اليسار، L1 على اليمين (مقلوب)
-            const x1_B = (diff + (L2 * L2 - L1 * L1) / diff) / 2;
-            const x2_B = diff - x1_B;
-            const candidates = [];
-            if (Math.abs(x1_A) <= L1 && Math.abs(x2_A) <= L2) {
-                const hSq = L1 * L1 - x1_A * x1_A;
-                if (hSq > 0) {
-                    const negProj = (x1_A < 0 ? -x1_A : 0) + (x2_A < 0 ? -x2_A : 0);
-                    candidates.push({ h: Math.sqrt(hSq), x1: x1_A, x2: x2_A, negProj, swapped: false });
-                }
-            }
-            if (Math.abs(x1_B) <= L2 && Math.abs(x2_B) <= L1) {
-                const hSq = L2 * L2 - x1_B * x1_B;
-                if (hSq > 0) {
-                    const negProj = (x1_B < 0 ? -x1_B : 0) + (x2_B < 0 ? -x2_B : 0);
-                    candidates.push({ h: Math.sqrt(hSq), x1: x1_B, x2: x2_B, negProj, swapped: true });
-                }
-            }
-            if (candidates.length === 0) return null;
-            candidates.sort((a, b) => {
-                if (a.negProj !== b.negProj) return a.negProj - b.negProj;
-                return b.h - a.h;
-            });
-            return candidates[0];
-        }
+* حساب خصائص المنحرف العام بناءً على القاعدتين والضلعين المائلين
+          * المعادلات:
+          *   diff = |b-a| - الفرق المطلق بين القاعدتين
+          *   x1 = (diff + (L1²-L2²)/diff) / 2  — الإسقاط الأفقي للضلع الأيسر
+          *   x2 = diff - x1                       — الإسقاط الأفقي للضلع الأيمن
+          *   h  = sqrt(L1² - x1²)                  — الارتفاع العمودي
+          * في حالة a > b (القاعدة العلوية أكبر)، نعكس إشارات الإسقاطات
+          */
+         function computeTrapezoidGeometry(a, b, L1, L2) {
+             const diff = Math.abs(b - a);
+             
+             if (diff < 0.0001) {
+                 const hSq = L1 * L1;
+                 if (hSq > 0) {
+                     return { h: Math.sqrt(hSq), x1: 0, x2: 0, negProj: 0, swapped: false };
+                 }
+                 return null;
+             }
+             
+             const x1_A = (diff + (L1 * L1 - L2 * L2) / diff) / 2;
+             const x2_A = diff - x1_A;
+             const x1_B = (diff + (L2 * L2 - L1 * L1) / diff) / 2;
+             const x2_B = diff - x1_B;
+             const candidates = [];
+             
+             // لو القاعدة العلوية أكبر من السفلية (a > b)، نعكس الإسقاطات
+             const isTopLarger = (a > b);
+             
+             function adjustProjection(x1, x2) {
+                 if (isTopLarger) {
+                     return { x1: -x2, x2: -x1 };
+                 }
+                 return { x1: x1, x2: x2 };
+             }
+             
+             if (Math.abs(x1_A) <= L1 && Math.abs(x2_A) <= L2) {
+                 const hSq = L1 * L1 - x1_A * x1_A;
+                 if (hSq > 0) {
+                     const negProj = (x1_A < 0 ? -x1_A : 0) + (x2_A < 0 ? -x2_A : 0);
+                     const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_A, x2_A);
+                     candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: false });
+                 }
+             }
+             if (Math.abs(x1_B) <= L2 && Math.abs(x2_B) <= L1) {
+                 const hSq = L2 * L2 - x1_B * x1_B;
+                 if (hSq > 0) {
+                     const negProj = (x1_B < 0 ? -x1_B : 0) + (x2_B < 0 ? -x2_B : 0);
+                     const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_B, x2_B);
+                     candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: true });
+                 }
+             }
+             if (candidates.length === 0) return null;
+             candidates.sort((a, b) => {
+                 if (a.negProj !== b.negProj) return a.negProj - b.negProj;
+                 return b.h - a.h;
+             });
+             return candidates[0];
+         }
 
         /**
          * حساب طولي الضلعين المائلين الجديدين لقسم معين
@@ -290,20 +311,35 @@
             if (!a || !b || !L1 || !L2 || h <= 0) return;
 
             // حساب الإزاحة الأفقية بالصيغة الصحيحة للمنحرف العام
+            const geo contains signed x1, x2
             const geo = computeTrapezoidGeometry(a, b, L1, L2);
             if (!geo) return;
-            const x_offset = geo.x1;
+            const x1 = geo.x1;
+            const x2 = geo.x2;
 
             const scale = Math.min(drawW / Math.max(a, b), drawH / h);
             
-            const startX = (canvas.width - b * scale) / 2;
+            // إحداثيات الرؤوس - نبدأ من قاعدة سفلية (b) في الأسفل وقاعدة علوية (a) في الأعلى
+            // x1, x2 تأتيان بقيم موقعة صحيحة من computeTrapezoidGeometry
+            const p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة السفلية)
+            const p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة السفلية)
+            const p3 = { x: b - x2, y: h };      // أعلى يمين (نهاية القاعدة العلوية)
+            const p4 = { x: x1, y: h };          // أعلى يسار (بداية القاعدة العلوية)
+
+            // توسيط الرسم أفقياً
+            const allX = [p1.x, p2.x, p3.x, p4.x];
+            const minX = Math.min(...allX);
+            const maxX = Math.max(...allX);
+            const totalWidth = maxX - minX;
+            
+            const startX = (canvas.width - totalWidth * scale) / 2 - minX * scale;
             const startY = canvas.height - padding;
 
-            // إحداثيات الرؤوس
-            const p1 = { x: startX, y: startY };
-            const p2 = { x: startX + b * scale, y: startY };
-            const p3 = { x: startX + (x_offset + a) * scale, y: startY - h * scale };
-            const p4 = { x: startX + x_offset * scale, y: startY - h * scale };
+            // تطبيق المقياس والإزاحة
+            const pts = [p1, p2, p3, p4].map(p => ({
+                x: startX + p.x * scale,
+                y: startY - p.y * scale
+            }));
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';

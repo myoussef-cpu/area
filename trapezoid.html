@@ -237,25 +237,51 @@
     }
 
     function computeTrapezoidGeometry(a, b, L1, L2) {
-        const diff = b - a;
-        if (diff <= 0) return null;
+        // نستخدم الفرق المطلق لدعم أي ترتيب (العلوية أكبر أو السفلية)
+        const diff = Math.abs(b - a);
+        
+        if (diff < 0.0001) {
+            // شكل متوازي أضلاع تقريباً
+            const hSq = L1 * L1;
+            if (hSq > 0) {
+                return { h: Math.sqrt(hSq), x1: 0, x2: 0, negProj: 0, swapped: false };
+            }
+            return null;
+        }
+        
+        // المعادلة الأساسية (تعمل بغض النظر عن أي قاعدة أكبر)
         const x1_A = (diff + (L1 * L1 - L2 * L2) / diff) / 2;
         const x2_A = diff - x1_A;
         const x1_B = (diff + (L2 * L2 - L1 * L1) / diff) / 2;
         const x2_B = diff - x1_B;
+        
         const candidates = [];
+        // لو القاعدة العلوية أكبر من السفلية (a > b)، نعكس الإسقاطات
+        const isTopLarger = (a > b);
+        
+        // دوال مساعدة لتعديل الإسقاطات حسب حجم القاعدتين
+        function adjustProjection(x1, x2) {
+            // لو العلوية أكبر، نعكس الإسقاطات
+            if (isTopLarger) {
+                return { x1: -x2, x2: -x1 };
+            }
+            return { x1: x1, x2: x2 };
+        }
+        
         if (Math.abs(x1_A) <= L1 && Math.abs(x2_A) <= L2) {
             const hSq = L1 * L1 - x1_A * x1_A;
             if (hSq > 0) {
                 const negProj = (x1_A < 0 ? -x1_A : 0) + (x2_A < 0 ? -x2_A : 0);
-                candidates.push({ h: Math.sqrt(hSq), x1: x1_A, x2: x2_A, negProj, swapped: false });
+                const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_A, x2_A);
+                candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: false });
             }
         }
         if (Math.abs(x1_B) <= L2 && Math.abs(x2_B) <= L1) {
             const hSq = L2 * L2 - x1_B * x1_B;
             if (hSq > 0) {
                 const negProj = (x1_B < 0 ? -x1_B : 0) + (x2_B < 0 ? -x2_B : 0);
-                candidates.push({ h: Math.sqrt(hSq), x1: x1_B, x2: x2_B, negProj, swapped: true });
+                const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_B, x2_B);
+                candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: true });
             }
         }
         if (candidates.length === 0) return null;
@@ -335,19 +361,38 @@
         const drawH = canvas.height - padding * 2;
 
         // حساب الإحداثيات للمنحرف العام
-        const _x1 = (x1 != null) ? x1 : (b - a) / 2;
-        const _x2 = (x2 != null) ? x2 : (b - a) / 2;
+        // x1, x2 هما الإسقاطات الأفقية للضلعين (موجبتين دائماً)
+        // في الحالة العادية (b > a): القاعدة العلوية تبدأ من x1 وتنتهي عند b - x2
+        // في الحالة المقلوبة (a > b): القاعدة العلوية تبدأ من -x1 وتنتهي عند b + x2
+        const isTopLarger = (a > b);
+        const _x1 = (x1 != null) ? x1 : (isTopLarger ? -(a - b) / 2 : (b - a) / 2);
+        const _x2 = (x2 != null) ? x2 : (isTopLarger ? -(a - b) / 2 : (b - a) / 2);
         
         let p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة السفلية)
         let p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة السفلية)
-        let p3 = { x: b - _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
-        let p4 = { x: _x1, y: h };         // أعلى يسار (بداية القاعدة العلوية)
+        let p3, p4;
+        
+        if (isTopLarger) {
+            // القاعدة العلوية أكبر: تمتد للخارج عن القاعدة السفلية
+            p3 = { x: b + _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
+            p4 = { x: -_x1, y: h };        // أعلى يسار (بداية القاعدة العلوية)
+        } else {
+            // القاعدة السفلية أكبر أو متساوية
+            p3 = { x: b - _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
+            p4 = { x: _x1, y: h };         // أعلى يسار (بداية القاعدة العلوية)
+        }
 
         const scaleX = drawW / Math.max(a, b);
         const scaleY = drawH / h;
         const scale = Math.min(scaleX, scaleY);
 
-        const offsetX = (canvas.width - b * scale) / 2;
+        // توسيط الرسم أفقياً - نحتاج لحساب min و max إحداثيات X
+        const allX = [p1.x, p2.x, p3.x, p4.x];
+        const minX = Math.min(...allX);
+        const maxX = Math.max(...allX);
+        const totalWidth = maxX - minX;
+        
+        const offsetX = (canvas.width - totalWidth * scale) / 2 - minX * scale;
         const offsetY = padding;
 
         const pts = [p1, p2, p3, p4].map(p => ({
