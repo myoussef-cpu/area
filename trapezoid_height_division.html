@@ -505,6 +505,121 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
             ctx.restore();
         }
 
+        /**
+         * رسم كل قسم كمنحرف منفرد مع توضيح أبعاده الجديدة:
+         * القاعدتين الجديدتين، المائلين الجديدين، والارتفاع الجديد
+         */
+        function drawSectionTrapezoids(sectionsData) {
+            const canvas = document.getElementById('trapezoidCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // حجم الكانفاس ثابت في العرض ومتغير في الطول (عمود واحد)
+            const paddingX = 40;
+            const drawW = 260; // عرض منطقة الرسم لكل قسم
+            canvas.width = drawW + paddingX * 2;
+            // حساب الطول حسب عدد الأقسام
+            const sectionGap = 280; // المسافة بين كل قسم والآخر
+            canvas.height = Math.max(400, sectionsData.length * sectionGap + 40);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!sectionsData || sectionsData.length === 0) return;
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#e0e0e0' : '#2c3e50';
+            const strokeColor = isDarkMode ? '#4dabf7' : '#3498db';
+            const slantColor = isDarkMode ? '#69db7c' : '#2ecc71';
+            const fillColor = isDarkMode ? 'rgba(77, 171, 247, 0.08)' : 'rgba(52, 152, 219, 0.05)';
+
+            const maxDrawH = 180;
+            const centerX = canvas.width / 2;
+
+            sectionsData.forEach((section, i) => {
+                const offsetY = 30 + i * sectionGap;
+
+                // مقياس الرسم حسب أبعاد القسم
+                const maxBase = Math.max(section.topBase, section.bottomBase) || 1;
+                const baseScale = (drawW - 40) / maxBase;
+                const hScale = (maxDrawH - 30) / (section.sectionHeight || 1);
+                const scale = Math.min(baseScale, hScale * 1.5);
+
+                const topW = (section.topBase || 0) * scale;
+                const botW = (section.bottomBase || 0) * scale;
+                const secH = Math.max((section.sectionHeight || 0) * scale, 40);
+
+                const topY = offsetY + 40;
+                const bottomY = topY + secH;
+
+                const botLeft = { x: centerX - botW / 2, y: bottomY };
+                const botRight = { x: centerX + botW / 2, y: bottomY };
+                const topLeft = { x: centerX - topW / 2, y: topY };
+                const topRight = { x: centerX + topW / 2, y: topY };
+
+                // رسم المنحرف
+                ctx.beginPath();
+                ctx.moveTo(botLeft.x, botLeft.y);
+                ctx.lineTo(botRight.x, botRight.y);
+                ctx.lineTo(topRight.x, topRight.y);
+                ctx.lineTo(topLeft.x, topLeft.y);
+                ctx.closePath();
+
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // عنوان القسم والمساحة
+                ctx.fillStyle = isDarkMode ? '#4dabf7' : '#3498db';
+                ctx.font = 'bold 14px Tajawal, Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`القسم ${i + 1}`, centerX, topY - 30);
+                ctx.font = 'bold 12px Tajawal, Arial';
+                ctx.fillText(`مساحة: ${(section.area || 0).toFixed(2)} م²`, centerX, topY - 12);
+
+                // القاعدة السفلية
+                ctx.fillStyle = textColor;
+                ctx.font = 'bold 12px Tajawal, Arial';
+                ctx.fillText(section.bottomBase.toFixed(2), centerX, bottomY + 18);
+
+                // القاعدة العلوية
+                ctx.fillText(section.topBase.toFixed(2), centerX, topY - 4);
+
+                // المائل الأيسر l1
+                const midLeft = { x: (botLeft.x + topLeft.x) / 2, y: (botLeft.y + topLeft.y) / 2 };
+                ctx.save();
+                ctx.translate(midLeft.x, midLeft.y);
+                const angL = Math.atan2(topLeft.y - botLeft.y, topLeft.x - botLeft.x);
+                ctx.rotate(angL);
+                ctx.font = 'bold 11px Tajawal, Arial';
+                ctx.fillStyle = slantColor;
+                ctx.fillText(`l\u2081=${(section.l1 || 0).toFixed(2)}`, 0, -8);
+                ctx.restore();
+
+                // المائل الأيمن l2
+                const midRight = { x: (botRight.x + topRight.x) / 2, y: (botRight.y + topRight.y) / 2 };
+                ctx.save();
+                ctx.translate(midRight.x, midRight.y);
+                const angR = Math.atan2(topRight.y - botRight.y, topRight.x - botRight.x);
+                ctx.rotate(angR);
+                ctx.font = 'bold 11px Tajawal, Arial';
+                ctx.fillStyle = slantColor;
+                ctx.fillText(`l\u2082=${(section.l2 || 0).toFixed(2)}`, 0, -8);
+                ctx.restore();
+
+                // الارتفاع (جانب القسم الأيسر)
+                const hX = botLeft.x - 15;
+                ctx.save();
+                ctx.translate(hX, (topY + bottomY) / 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillStyle = textColor;
+                ctx.font = 'bold 10px Tajawal, Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`h=${(section.sectionHeight || 0).toFixed(2)} م`, 0, 0);
+                ctx.restore();
+            });
+        }
+
         function clearAllErrors() {
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('show'));
             document.querySelectorAll('.input-group').forEach(el => el.classList.remove('has-error'));
@@ -563,6 +678,7 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
         }
 
         var _lastDivisionData = null;
+var _lastSectionsData = null;
 
         function onDivisionUnitChange(unitId) {
             window.setSelectedUnit('area', unitId);
@@ -634,6 +750,7 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
             _lastDivisionData = { a, b, L1, L2, totalHeight, totalArea, geo, heights };
             renderDivisionResults();
             drawTrapezoidDivision(a, b, L1, L2, totalHeight, heights);
+            if (_lastSectionsData) drawSectionTrapezoids(_lastSectionsData);
         }
 
         function renderDivisionResults() {
@@ -663,6 +780,7 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
             let currentBottomBase = b;
             let remainingHeight = totalHeight;
             let totalUsedArea = 0;
+            const sectionsData = [];
 
             for (let i = 0; i < heights.length; i++) {
                 const height = heights[i];
@@ -675,6 +793,16 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
                 const area = ((currentTopBase + newBase) / 2) * height;
                 const conv = convertToFeddans(area);
                 const slants = computeSectionSlants(height, totalHeight, L1, L2, d.geo.swapped);
+
+                // تخزين بيانات القسم للرسم
+                sectionsData.push({
+                    topBase: currentTopBase,
+                    bottomBase: newBase,
+                    sectionHeight: height,
+                    l1: slants.l1,
+                    l2: slants.l2,
+                    area: area
+                });
 
                 html += `
                     <div class="section-item">
@@ -705,6 +833,9 @@ function drawTrapezoidDivision(a, b, L1, L2, h, divisionHeights) {
                 remainingHeight -= height;
                 totalUsedArea += area;
             }
+
+            // تخزين بيانات الأقسام للرسم
+            _lastSectionsData = sectionsData;
 
             if (remainingHeight > 0.01) {
                 const remainingArea = totalArea - totalUsedArea;
