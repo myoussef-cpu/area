@@ -668,14 +668,10 @@
         return { l1: ratio * L1, l2: ratio * L2 };
     }
 
-    function calculateDiagonals(a, b, h, x1, x2) {
-<<<<<<< HEAD
-        const diagonal1 = Math.sqrt(h * h + (a + x2) * (a + x2));
-        const diagonal2 = Math.sqrt(h * h + (a + x1) * (a + x1));
-=======
-        const diagonal1 = Math.sqrt(h * h + (a + x1) * (a + x1));
-        const diagonal2 = Math.sqrt(h * h + (a + x2) * (a + x2));
->>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
+    function calculateDiagonals(a, b, h) {
+        const baseDifference = Math.abs(b - a) / 2;
+        const diagonal1 = Math.sqrt(a * a + h * h - 2 * a * baseDifference);
+        const diagonal2 = Math.sqrt(b * b + h * h + 2 * b * baseDifference);
         return { diagonal1, diagonal2 };
     }
 
