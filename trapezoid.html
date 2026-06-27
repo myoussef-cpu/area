@@ -343,31 +343,41 @@
         const drawW = canvas.width - padding * 2;
         const drawH = canvas.height - padding * 2;
 
-        // حساب الإحداثيات للمنحرف العام (RTL - من اليمين لليسار)
+        // حساب الإحداثيات في نظام الرياضيات (Y-up, X-right)
         const _x1 = (x1 != null) ? x1 : (b - a) / 2;
         const _x2 = (x2 != null) ? x2 : (b - a) / 2;
         
         let p1 = { x: b, y: 0 };           // أسفل يمين (بداية القاعدة الكبرى)
         let p2 = { x: 0, y: 0 };           // أسفل يسار (نهاية القاعدة الكبرى)
-<<<<<<< HEAD
         let p3 = { x: _x2, y: h };         // أعلى يسار (نهاية القاعدة الصغرى)
         let p4 = { x: b - _x1, y: h };     // أعلى يمين (بداية القاعدة الصغرى)
-=======
-        let p3 = { x: _x1, y: h };         // أعلى يسار (نهاية القاعدة الصغرى)
-        let p4 = { x: b - _x2, y: h };     // أعلى يمين (بداية القاعدة الصغرى)
->>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
 
-        const scaleX = drawW / Math.max(a, b);
-        const scaleY = drawH / h;
+        const scaleX = drawW / shapeW;
+        const scaleY = drawH / shapeH;
         const scale = Math.min(scaleX, scaleY);
 
-        const offsetX = (canvas.width - b * scale) / 2;
-        const offsetY = padding;
+        const totalShapeW = shapeW * scale;
+        const totalShapeH = shapeH * scale;
 
-        const pts = [p1, p2, p3, p4].map(p => ({
-            x: offsetX + p.x * scale,
-            y: canvas.height - (offsetY + p.y * scale)
-        }));
+        // إزاحات التوسيط في الـ Canvas
+        const offsetX = (canvas.width - totalShapeW) / 2 - shapeMinX * scale;
+        const topMargin = (canvas.height - totalShapeH) / 2;
+
+        // دالة تحويل الإحداثيات من واقع الرياضيات (0,0 أسفل يسار) إلى Canvas (0,0 أعلى يسار)
+        function toCanvas(x_m, y_m) {
+            return {
+                x: offsetX + x_m * scale,
+                y: topMargin + totalShapeH - y_m * scale
+            };
+        }
+
+        // نقاط الأركان للمنحرف (بالترتيب: أسفل يمين، أسفل يسار، أعلى يسار، أعلى يمين)
+        const p1 = toCanvas(b, 0);         // أسفل يمين (بداية القاعدة الكبرى)
+        const p2 = toCanvas(0, 0);         // أسفل يسار (نهاية القاعدة الكبرى)
+        const p3 = toCanvas(_x2, h);       // أعلى يسار (نهاية القاعدة الصغرى)
+        const p4 = toCanvas(b - _x1, h);   // أعلى يمين (بداية القاعدة الصغرى)
+
+        const pts = [p1, p2, p3, p4];
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
