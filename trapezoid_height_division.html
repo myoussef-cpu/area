@@ -168,24 +168,24 @@
         <div class="card">
             <h3><i class="fas fa-layer-group"></i> تقسيم شبه المنحرف</h3>
             
-            <div class="input-grid">
+                <div class="input-grid">
                 <div class="input-group">
-                    <label>القاعدة الصغرى (a):</label>
+                    <label>القاعدة العلوية (a):</label>
                     <input type="number" id="a" step="any" placeholder="0.00" oninput="calculate()">
                     <div class="input-error" id="error-a"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 </div>
                 <div class="input-group">
-                    <label>القاعدة الكبرى (b):</label>
+                    <label>القاعدة السفلية (b):</label>
                     <input type="number" id="b" step="any" placeholder="0.00" oninput="calculate()">
                     <div class="input-error" id="error-b"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 </div>
                 <div class="input-group">
-                    <label>المائل الأول (L₁):</label>
+                    <label>الضلع الأيسر (L₁):</label>
                     <input type="number" id="L1" step="any" placeholder="0.00" oninput="calculate()">
                     <div class="input-error" id="error-L1"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 </div>
                 <div class="input-group">
-                    <label>المائل الثاني (L₂):</label>
+                    <label>الضلع الأيمن (L₂):</label>
                     <input type="number" id="L2" step="any" placeholder="0.00" oninput="calculate()">
                     <div class="input-error" id="error-L2"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 </div>
@@ -409,14 +409,14 @@
             ctx.fillStyle = textColor;
             ctx.font = 'bold 16px Tajawal, Arial';
             
-            // القاعدة الكبرى (b)
-            ctx.fillText(`القاعدة الكبرى: ${b.toFixed(2)} م`, (p1.x + p2.x) / 2, p1.y + 35);
+            // القاعدة السفلية (b)
+            ctx.fillText(`القاعدة السفلية: ${b.toFixed(2)} م`, (p1.x + p2.x) / 2, p1.y + 35);
             
-            // القاعدة الصغرى (a)
-            ctx.fillText(`القاعدة الصغرى: ${a.toFixed(2)} م`, (p3.x + p4.x) / 2, p3.y - 20);
+            // القاعدة العلوية (a)
+            ctx.fillText(`القاعدة العلوية: ${a.toFixed(2)} م`, (p3.x + p4.x) / 2, p3.y - 20);
             
             if (geo.swapped) {
-                // الضلع المائل الأيسر L2
+                // الضلع الأيسر L2
                 ctx.save();
                 ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
                 const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
@@ -424,7 +424,7 @@
                 ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
                 ctx.restore();
 
-                // الضلع المائل الأيمن L1
+                // الضلع الأيمن L1
                 ctx.save();
                 ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
                 const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
@@ -432,7 +432,7 @@
                 ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
                 ctx.restore();
             } else {
-                // الضلع المائل الأيسر L1
+                // الضلع الأيسر L1
                 ctx.save();
                 ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
                 const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
@@ -440,7 +440,7 @@
                 ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
                 ctx.restore();
 
-                // الضلع المائل الأيمن L2
+                // الضلع الأيمن L2
                 ctx.save();
                 ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
                 const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
@@ -491,7 +491,7 @@
                 showInputError('a', 'يجب إدخال رقم موجب');
                 hasError = true;
             } else if (!isNaN(b) && b > 0 && a >= b) {
-                showInputError('a', 'يجب أن تكون القاعدة الصغرى أصغر من الكبرى');
+                showInputError('a', 'يجب أن تكون القاعدة العلوية أصغر من القاعدة السفلية');
                 hasError = true;
             }
 
@@ -499,7 +499,7 @@
                 showInputError('b', 'يجب إدخال رقم موجب');
                 hasError = true;
             } else if (!isNaN(a) && a > 0 && b <= a) {
-                showInputError('b', 'يجب أن تكون القاعدة الكبرى أكبر من الصغرى');
+                showInputError('b', 'يجب أن تكون القاعدة السفلية أكبر من القاعدة العلوية');
                 hasError = true;
             }
 
@@ -661,11 +661,11 @@
                                 <strong>${newBase.toFixed(3)} م</strong>
                             </div>
                             <div style="background:rgba(255,149,0,0.1); padding:8px 10px; border-radius:10px; text-align:center;">
-                                <div style="opacity:0.6; font-size:0.75rem;">المائل الأيسر l₁</div>
+                                <div style="opacity:0.6; font-size:0.75rem;">الضلع الأيسر l₁</div>
                                 <strong style="color:#e67e22;">${slants.l1.toFixed(3)} م</strong>
                             </div>
                             <div style="background:rgba(255,149,0,0.1); padding:8px 10px; border-radius:10px; text-align:center;">
-                                <div style="opacity:0.6; font-size:0.75rem;">المائل الأيمن l₂</div>
+                                <div style="opacity:0.6; font-size:0.75rem;">الضلع الأيمن l₂</div>
                                 <strong style="color:#e67e22;">${slants.l2.toFixed(3)} م</strong>
                             </div>
                         </div>
@@ -720,7 +720,7 @@
             
             const data = {
                 type: "تقسيم شبه منحرف (ارتفاعات)",
-                input: `القاعدة الصغرى (a): ${a}\nالقاعدة الكبرى (b): ${b}\nالمائل الأول (L1): ${L1}\nالمائل الثاني (L2): ${L2}\nالارتفاعات المطلوبة: ${heights}`,
+                input: `القاعدة العلوية (a): ${a}\nالقاعدة السفلية (b): ${b}\nالضلع الأيسر (L1): ${L1}\nالضلع الأيمن (L2): ${L2}\nالارتفاعات المطلوبة: ${heights}`,
                 result: "نتائج تقسيم شبه منحرف",
                 details: resultsDiv.innerText,
                 drawing: drawing

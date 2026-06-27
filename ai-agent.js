@@ -63,8 +63,8 @@ window.AIAgent = (function () {
                             type: 'object',
                             description: 'أبعاد الشكل (المتغيرات حسب الشكل)',
                             properties: {
-                                a: { type: 'number', description: 'القاعدة الصغرى (لمشبه المنحرف والمساوية)' },
-                                b: { type: 'number', description: 'القاعدة الكبرى (لمشبه المنحرف)' },
+                                a: { type: 'number', description: 'القاعدة العلوية (لمشبه المنحرف والمساوية)' },
+                                b: { type: 'number', description: 'القاعدة السفلية (لمشبه المنحرف)' },
                                 c: { type: 'number', description: 'الضلع الثالث (للمثلث)' },
                                 d: { type: 'number', description: 'الضلع الرابع (للأشكال الرباعية)' },
                                 side: { type: 'number', description: 'طول الضلع (للمربع)' },
@@ -72,8 +72,8 @@ window.AIAgent = (function () {
                                 width: { type: 'number', description: 'العرض (للمستطيل)' },
                                 radius: { type: 'number', description: 'نصف القطر (للدائرة)' },
                                 height: { type: 'number', description: 'الارتفاع (للمثلث وشبه المنحرف)' },
-                                L1: { type: 'number', description: 'المائل الأول (لمشبه المنحرف)' },
-                                L2: { type: 'number', description: 'المائل الثاني (لمشبه المنحرف)' },
+                                L1: { type: 'number', description: 'الضلع الأيسر (لمشبه المنحرف)' },
+                                L懂了，给我完整建议，这样可以确保用户继续输入时不会出现任何意外。 L2: { type: 'number', description: 'الضلع الأيمن (لمشبه المنحرف)' },
                                 angle: { type: 'number', description: 'الزاوية بالدرجات (للقطاع)' },
                                 diagonal1: { type: 'number', description: 'القطر الأول (للمعين)' },
                                 diagonal2: { type: 'number', description: 'القطر الثاني (للمعين)' },
@@ -235,7 +235,7 @@ window.AIAgent = (function () {
             case 'trapezoid':
                 if (d.a && d.b && d.L1 && d.L2) {
                     const diff = d.b - d.a;
-                    if (diff <= 0) return JSON.stringify({ error: 'القاعدة الكبرى لازم تكون أكبر من الصغرى' });
+                    if (diff <= 0) return JSON.stringify({ error: 'القاعدة السفلية لازم تكون أكبر من القاعدة العلوية' });
                     const x1 = (diff + (d.L1 * d.L1 - d.L2 * d.L2) / diff) / 2;
                     const h = Math.sqrt(d.L1 * d.L1 - x1 * x1);
                     if (h <= 0 || isNaN(h)) return JSON.stringify({ error: 'الأبعاد دي مش ممكن تكوّن شبه منحرف' });
@@ -442,7 +442,7 @@ window.AIAgent = (function () {
 
     function toolGetInfo(args) {
         const info = {
-            trapezoid: { name: 'مساحة شبه المنحرف', desc: 'يحسب مساحة شبه المنحرف العام بأبعاد القاعدتين والضلعين المائلين. بيحدد الارتفاع تلقائياً.', params: 'a (القاعدة الصغرى), b (القاعدة الكبرى), L1 (المائل الأول), L2 (المائل الثاني)' },
+            trapezoid: { name: 'مساحة شبه المنحرف', desc: 'يحسب مساحة شبه المنحرف العام بأبعاد القاعدتين والضلعين المائلين. بيحدد الارتفاع تلقائياً.', params: 'a (القاعدة العلوية), b (القاعدة السفلية), L1 (الضلع الأيسر), L2 (الضلع الأيمن)' },
             triangle: { name: 'مساحة مثلث', desc: 'يحسب مساحة المثلث بطريقة هيرون (بأضلاع الـ 3) أو بالقاعدة والارتفاع.', params: 'أضلاع a, b, c أو القاعدة والارتفاع' },
             rectangle: { name: 'المستطيل', desc: 'مساحة ومحيط المستطيل.', params: 'الطول والعرض' },
             square: { name: 'المربع', desc: 'مساحة ومحيط المربع.', params: 'طول الضلع' },

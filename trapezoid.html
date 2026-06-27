@@ -3,19 +3,19 @@
 <div class="calc-container">
     <div class="card">
         <div class="input-group">
-            <label><i class="fas fa-arrows-alt-h"></i> القاعدة الصغرى (a)</label>
+            <label><i class="fas fa-arrows-alt-h"></i> القاعدة العلوية (a)</label>
             <input type="number" id="a" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
         </div>
         <div class="input-group">
-            <label><i class="fas fa-arrows-alt-h"></i> القاعدة الكبرى (b)</label>
+            <label><i class="fas fa-arrows-alt-h"></i> القاعدة السفلية (b)</label>
             <input type="number" id="b" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
         </div>
         <div class="input-group">
-            <label><i class="fas fa-arrows-alt-v"></i> المائل الأول (L1)</label>
+            <label><i class="fas fa-arrows-alt-v"></i> الضلع الأيسر (L1)</label>
             <input type="number" id="L1" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
         </div>
         <div class="input-group">
-            <label><i class="fas fa-arrows-alt-v"></i> المائل الثاني (L2)</label>
+            <label><i class="fas fa-arrows-alt-v"></i> الضلع الأيمن (L2)</label>
             <input type="number" id="L2" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
         </div>
     </div>
@@ -338,10 +338,10 @@
         const _x1 = (x1 != null) ? x1 : (b - a) / 2;
         const _x2 = (x2 != null) ? x2 : (b - a) / 2;
         
-        let p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة الكبرى)
-        let p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة الكبرى)
-        let p3 = { x: b - _x2, y: h };     // أعلى يمين (نهاية القاعدة الصغرى)
-        let p4 = { x: _x1, y: h };         // أعلى يسار (بداية القاعدة الصغرى)
+        let p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة السفلية)
+        let p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة السفلية)
+        let p3 = { x: b - _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
+        let p4 = { x: _x1, y: h };         // أعلى يسار (بداية القاعدة العلوية)
 
         const scaleX = drawW / Math.max(a, b);
         const scaleY = drawH / h;
@@ -479,16 +479,16 @@
 
         ctx.textAlign = 'center';
 
-        // القاعدة الكبرى (b)
+        // القاعدة السفلية (b)
         ctx.fillStyle = textColor;
         ctx.font = 'bold 16px Tajawal';
-        ctx.fillText(`القاعدة الكبرى: ${b.toFixed(2)} م`, (pts[0].x + pts[1].x) / 2, pts[1].y + 35);
+        ctx.fillText(`القاعدة السفلية: ${b.toFixed(2)} م`, (pts[0].x + pts[1].x) / 2, pts[1].y + 35);
 
-        // القاعدة الصغرى (a)
-        ctx.fillText(`القاعدة الصغرى: ${a.toFixed(2)} م`, (pts[2].x + pts[3].x) / 2, pts[3].y - 20);
+        // القاعدة العلوية (a)
+        ctx.fillText(`القاعدة العلوية: ${a.toFixed(2)} م`, (pts[2].x + pts[3].x) / 2, pts[3].y - 20);
 
         if (swapped) {
-            // الضلع المائل الأيسر L2
+            // الضلع الأيسر L2
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
@@ -498,7 +498,7 @@
             ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
             ctx.restore();
 
-            // الضلع المائل الأيمن L1
+            // الضلع الأيمن L1
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
@@ -508,7 +508,7 @@
             ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
             ctx.restore();
         } else {
-            // الضلع المائل الأيسر L1
+            // الضلع الأيسر L1
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
@@ -518,7 +518,7 @@
             ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
             ctx.restore();
 
-            // الضلع المائل الأيمن L2
+            // الضلع الأيمن L2
             ctx.save();
             ctx.fillStyle = slantColor;
             ctx.font = 'bold 16px Tajawal';
@@ -640,7 +640,7 @@
             // القاعدة العلوية
             ctx.fillText(section.topBase.toFixed(2), centerX, topY - 4);
 
-            // المائل الأيسر l1
+            // الضلع الأيسر l1
             const midLeft = { x: (botLeft.x + topLeft.x) / 2, y: (botLeft.y + topLeft.y) / 2 };
             ctx.save();
             ctx.translate(midLeft.x, midLeft.y);
@@ -651,7 +651,7 @@
             ctx.fillText(`l₁=${(section.l1 || 0).toFixed(2)}`, 0, -8);
             ctx.restore();
 
-            // المائل الأيمن l2
+            // الضلع الأيمن l2
             const midRight = { x: (botRight.x + topRight.x) / 2, y: (botRight.y + topRight.y) / 2 };
             ctx.save();
             ctx.translate(midRight.x, midRight.y);
@@ -855,15 +855,16 @@
                     l2: manualSlant.l2
                 });
 
-                resultsDiv.innerHTML += `
-                    <li>
-                        <strong>القسم ${i + 1}:</strong><br>
-                        المساحة: <span>${area.toFixed(2)}</span> متر² <small style="opacity:0.6">(${conv.feddan} ف، ${conv.qirat} ق، ${conv.sahm} س)</small><br>
-                        الارتفاع: <span>${x.toFixed(2)}</span> متر<br>
-                        القاعدة الجديدة: <span>${newBase.toFixed(2)}</span> متر<br>
-                        l₁ = <span>${manualSlant.l1.toFixed(2)}</span> م | l₂ = <span>${manualSlant.l2.toFixed(2)}</span> م
-                    </li>
-                `;
+            // "القاعدة السفلية" -> newBase is the bottom base, currentTopBase is the top base
+            resultsDiv.innerHTML += `
+                <li>
+                    <strong>القسم ${i + 1}:</strong><br>
+                    المساحة: <span>${area.toFixed(2)}</span> متر² <small style="opacity:0.6">(${conv.feddan} ف، ${conv.qirat} ق، ${conv.sahm} س)</small><br>
+                    الارتفاع: <span>${x.toFixed(2)}</span> متر<br>
+                    القاعدة الجديدة: <span>${newBase.toFixed(2)}</span> متر<br>
+                    l₁ (الأيسر) = <span>${manualSlant.l1.toFixed(2)}</span> م | l₂ (الأيمن) = <span>${manualSlant.l2.toFixed(2)}</span> م
+                </li>
+            `;
 
                 currentTopBase = newBase;
                 remainingHeight -= x;
@@ -914,7 +915,7 @@
                         المساحة: <span>${partArea.toFixed(2)}</span> متر² <small style="opacity:0.6">(${conv.feddan} ف، ${conv.qirat} ق، ${conv.sahm} س)</small><br>
                         الارتفاع: <span>${x.toFixed(2)}</span> متر<br>
                         القاعدة الجديدة: <span>${newBase.toFixed(2)}</span> متر<br>
-                        l₁ = <span>${autoSlant.l1.toFixed(2)}</span> م | l₂ = <span>${autoSlant.l2.toFixed(2)}</span> م
+                        l₁ (الأيسر) = <span>${autoSlant.l1.toFixed(2)}</span> م | l₂ (الأيمن) = <span>${autoSlant.l2.toFixed(2)}</span> م
                     </li>
                 `;
                 currentTopBase = newBase;
@@ -960,7 +961,7 @@
         
         const data = {
             type: "شبه منحرف",
-            input: `القاعدة الصغرى (a): ${a}\nالقاعدة الكبرى (b): ${b}\nالمائل الأول (L1): ${L1}\nالمائل الثاني (L2): ${L2}`,
+            input: `القاعدة العلوية (a): ${a}\nالقاعدة السفلية (b): ${b}\nالضلع الأيسر (L1): ${L1}\nالضلع الأيمن (L2): ${L2}`,
             result: resultText,
             details: document.getElementById("results").innerText,
             drawing: drawing
