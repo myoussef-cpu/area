@@ -18,6 +18,7 @@ export const TOOLS = [
     // Existing tools (legacy compatibility)
     { id: 'trapezoid', name: 'مساحة شبه المنحرف', cat: 'area', icon: 'fas fa-draw-polygon', desc: 'حساب المساحة الأساسية', legacy: true },
     { id: 'trapezoid_height_division', name: 'تقسيم شبه المنحرف', cat: 'area', icon: 'fas fa-ruler-combined', desc: 'التقسيم بناءً على الارتفاع', legacy: true },
+    { id: 'survey_analyzer', name: 'تحليل مخطط مساحي', cat: 'area', icon: 'fas fa-camera', desc: 'تحليل الصور والرسومات الهندسية', legacy: true },
     { id: 'cyclicQuadrilateral', name: 'رباعي دائري', cat: 'area', icon: 'fas fa-circle-notch', desc: 'حساب المساحة', legacy: true },
     { id: 'irregular_quadrilateral', name: 'رباعي غير منتظم', cat: 'area', icon: 'fas fa-vector-square', desc: 'أشكال حرة', legacy: true },
     { id: 'triangle', name: 'مساحة مثلث', cat: 'area', icon: 'fas fa-triangle', desc: 'قاعدة هيرون', legacy: true },
