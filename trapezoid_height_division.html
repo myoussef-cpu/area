@@ -211,15 +211,6 @@
     </div>
 
     <script>
-        // مسح الجلسة المحفوظة لبدء نظيف
-        localStorage.removeItem('formState_trapezoid_height_division');
-
-        // استدعاء الحساب بعد استعادة الجلسة بأمان
-        setTimeout(function() {
-            const a = document.getElementById('a');
-            if (a && a.value) { calculate(); }
-        }, 400);
-
         /**
          * حساب خصائص المنحرف العام بناءً على القاعدتين والضلعين المائلين
          * المعادلات:
@@ -308,11 +299,11 @@
             const startX = (canvas.width - b * scale) / 2;
             const startY = canvas.height - padding;
 
-            // إحداثيات الرؤوس (RTL - من اليمين لليسار)
-            const p1 = { x: startX + b * scale, y: startY };
-            const p2 = { x: startX, y: startY };
-            const p3 = { x: startX + (b - x_offset - a) * scale, y: startY - h * scale };
-            const p4 = { x: startX + (b - x_offset) * scale, y: startY - h * scale };
+            // إحداثيات الرؤوس
+            const p1 = { x: startX, y: startY };
+            const p2 = { x: startX + b * scale, y: startY };
+            const p3 = { x: startX + (x_offset + a) * scale, y: startY - h * scale };
+            const p4 = { x: startX + x_offset * scale, y: startY - h * scale };
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
@@ -352,6 +343,8 @@
                 const dh = divisionHeights[i];
                 if (dh > 0) {
                     fromTop += dh;
+                    // لو وصلنا للحافة السفلية (آخر قسم)، نتخطى الرسم
+                    if (fromTop >= h - 0.001) break;
                     // النسبة من الأسفل (p1 = أسفل, p4 = أعلى)
                     const ratio = 1 - fromTop / h;
                     const dL = {
@@ -388,20 +381,20 @@
                     ctx.fillStyle = slantColor;
                     ctx.font = 'bold 12px Tajawal, Arial';
 
-                    // l₂ على الضلع الأيسر
+                    // l₁ على الضلع الأيسر
                     const angL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
                     ctx.save();
                     ctx.translate(segLeftMid.x, segLeftMid.y);
                     ctx.rotate(angL);
-                    ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                    ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
-                    // l₁ على الضلع الأيمن
+                    // l₂ على الضلع الأيمن
                     const angR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                     ctx.save();
                     ctx.translate(segRightMid.x, segRightMid.y);
                     ctx.rotate(angR);
-                    ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                    ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
                     ctx.restore();
 
                     ctx.restore();
@@ -425,53 +418,53 @@
             if (geo.swapped) {
                 // الضلع المائل الأيسر L2
                 ctx.save();
-                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
-                const angleL = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
+                const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
                 ctx.rotate(angleL);
                 ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
                 ctx.restore();
 
                 // الضلع المائل الأيمن L1
                 ctx.save();
-                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
-                const angleR = Math.atan2(p4.y - p1.y, p4.x - p1.x);
+                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
+                const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                 ctx.rotate(angleR);
                 ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
                 ctx.restore();
             } else {
                 // الضلع المائل الأيسر L1
                 ctx.save();
-                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
-                const angleL = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
+                const angleL = Math.atan2(p4.y - p1.y, p4.x - p1.x);
                 ctx.rotate(angleL);
                 ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
                 ctx.restore();
 
                 // الضلع المائل الأيمن L2
                 ctx.save();
-                ctx.translate((p1.x + p4.x) / 2, (p1.y + p4.y) / 2);
-                const angleR = Math.atan2(p4.y - p1.y, p4.x - p1.x);
+                ctx.translate((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
+                const angleR = Math.atan2(p3.y - p2.y, p3.x - p2.x);
                 ctx.rotate(angleR);
                 ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
                 ctx.restore();
             }
 
             // رسم سهم الارتفاع الكلي
-            const hX = p2.x - 40;
+            const hX = p1.x - 40;
             ctx.beginPath();
             ctx.strokeStyle = textColor;
             ctx.lineWidth = 1;
-            ctx.moveTo(hX, p2.y);
-            ctx.lineTo(hX, p3.y);
+            ctx.moveTo(hX, p1.y);
+            ctx.lineTo(hX, p4.y);
             ctx.stroke();
             
             ctx.beginPath();
-            ctx.moveTo(hX - 5, p2.y - 5); ctx.lineTo(hX, p2.y); ctx.lineTo(hX + 5, p2.y - 5);
-            ctx.moveTo(hX - 5, p3.y + 5); ctx.lineTo(hX, p3.y); ctx.lineTo(hX + 5, p3.y + 5);
+            ctx.moveTo(hX - 5, p1.y - 5); ctx.lineTo(hX, p1.y); ctx.lineTo(hX + 5, p1.y - 5);
+            ctx.moveTo(hX - 5, p4.y + 5); ctx.lineTo(hX, p4.y); ctx.lineTo(hX + 5, p4.y + 5);
             ctx.stroke();
 
             ctx.save();
-            ctx.translate(hX - 15, (p2.y + p3.y) / 2);
+            ctx.translate(hX - 15, (p1.y + p4.y) / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(`H = ${h.toFixed(2)} م`, 0, 0);
             ctx.restore();
