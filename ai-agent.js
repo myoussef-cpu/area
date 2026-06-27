@@ -10,6 +10,7 @@ window.AIAgent = (function () {
     let onMessage = null; // callback لكل رد جديد
 
     const SYSTEM_PROMPT = `أنت مساعد ذكي لتطبيق "حساب المساحات" — تطبيق موبايل لحساب مساحات الأشكال الهندسية والتحويلات الهندسية.
+<<<<<<< HEAD
 أنت تقدر تستخدم الأدوات المتاحة عشان:
 1. تحسب مساحات أشكال هندسية مختلفة
 2. تتنقل المستخدم لصفحة الأداة المناسبة
@@ -23,6 +24,23 @@ window.AIAgent = (function () {
 - لو المستخدم سأل عن حاجة مش في نطاق الأدوات، رد عادي من غير tool
 - لما تحسب مساحة، وضح المعادلة والخطوات باختصار
 - لو المستخدم عايز يفتح أداة معينة، استخدم navigate_to_tool`;
+=======
+أنت عندك أدوات حسابية مباشرة تقدر تستخدمها عشان تحسب وترجع النتيجة فوراً.
+
+الأدوات المتاحة:
+- calculate_area: تحسب مساحة أي شكل هندسي مباشرة من الأبعاد اللي المستخدم يديها
+- convert_units: تحول وحدات القياس مباشرة
+- get_saved_results: تعرض النتائج المحفوظة
+- list_tools: تعرض قائمة الأدوات
+- get_tool_info: معلومات عن أداة معينة
+
+التعليمات:
+- استخدم calculate_area دائماً لما المستخدم يطلب حساب مساحة — احسب بنفسك من الأبعاد وارجع النتيجة مباشرة
+- لا تستخدم navigate_to_tool أبداً — احسب بنفسك واعرض النتيجة
+- لا تفتح صفحات — الـ Agent هو اللي بيستخدم الأدوات وبيحسب
+- ردد بالعربي بشكل واضح ومختصر مع توضيح المعادلة والخطوات
+- لو المستخدم سأل عن حاجة مش في نطاق الأدوات، رد عادي من غير tool`;
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
 
     // ═══════════════════════════════════════════════════
     // تعريف الأدوات (OpenAI function calling format)
@@ -70,6 +88,7 @@ window.AIAgent = (function () {
         {
             type: 'function',
             function: {
+<<<<<<< HEAD
                 name: 'navigate_to_tool',
                 description: 'يفتح صفحة أداة معينة في التطبيق. مفيد لما المستخدم عايز يستخدم الأداة يدوياً.',
                 parameters: {
@@ -102,6 +121,8 @@ window.AIAgent = (function () {
         {
             type: 'function',
             function: {
+=======
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
                 name: 'get_saved_results',
                 description: 'يجيب النتائج المحفوظة من التطبيق (محلياً)',
                 parameters: { type: 'object', properties: {} }
@@ -167,7 +188,10 @@ window.AIAgent = (function () {
     function executeTool(name, args) {
         switch (name) {
             case 'calculate_area': return toolCalculateArea(args);
+<<<<<<< HEAD
             case 'navigate_to_tool': return toolNavigate(args);
+=======
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
             case 'get_saved_results': return toolGetSavedResults();
             case 'list_tools': return toolListTools(args);
             case 'convert_units': return toolConvertUnits(args);
@@ -268,6 +292,7 @@ window.AIAgent = (function () {
         });
     }
 
+<<<<<<< HEAD
     function toolNavigate(args) {
         if (typeof window.navigateTo === 'function') {
             window.navigateTo(args.page);
@@ -276,6 +301,8 @@ window.AIAgent = (function () {
         return JSON.stringify({ success: false, message: 'navigateTo مش متاح' });
     }
 
+=======
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
     function toolGetSavedResults() {
         try {
             const raw = localStorage.getItem('savedResults');

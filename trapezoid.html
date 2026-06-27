@@ -349,8 +349,13 @@
         
         let p1 = { x: b, y: 0 };           // أسفل يمين (بداية القاعدة الكبرى)
         let p2 = { x: 0, y: 0 };           // أسفل يسار (نهاية القاعدة الكبرى)
+<<<<<<< HEAD
         let p3 = { x: _x2, y: h };         // أعلى يسار (نهاية القاعدة الصغرى)
         let p4 = { x: b - _x1, y: h };     // أعلى يمين (بداية القاعدة الصغرى)
+=======
+        let p3 = { x: _x1, y: h };         // أعلى يسار (نهاية القاعدة الصغرى)
+        let p4 = { x: b - _x2, y: h };     // أعلى يمين (بداية القاعدة الصغرى)
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
 
         const scaleX = drawW / Math.max(a, b);
         const scaleY = drawH / h;
@@ -654,8 +659,13 @@
     }
 
     function calculateDiagonals(a, b, h, x1, x2) {
+<<<<<<< HEAD
         const diagonal1 = Math.sqrt(h * h + (a + x2) * (a + x2));
         const diagonal2 = Math.sqrt(h * h + (a + x1) * (a + x1));
+=======
+        const diagonal1 = Math.sqrt(h * h + (a + x1) * (a + x1));
+        const diagonal2 = Math.sqrt(h * h + (a + x2) * (a + x2));
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
         return { diagonal1, diagonal2 };
     }
 

@@ -39,7 +39,11 @@ const ASSETS_TO_CACHE = [
   'export-image.js',
   'zoom-handler.js',
   'ai-agent.js',
+<<<<<<< HEAD
   'config.js',
+=======
+  // config.js محذوف عشان موجود في .gitignore ومش في الـ repo
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
   'ai-chat.html',
   // الروابط الخارجية المهمة
   'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap',

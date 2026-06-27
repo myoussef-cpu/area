@@ -311,8 +311,13 @@
             // إحداثيات الرؤوس (RTL - من اليمين لليسار)
             const p1 = { x: startX + b * scale, y: startY };
             const p2 = { x: startX, y: startY };
+<<<<<<< HEAD
             const p3 = { x: startX + (b - x_offset - a) * scale, y: startY - h * scale };
             const p4 = { x: startX + (b - x_offset) * scale, y: startY - h * scale };
+=======
+            const p3 = { x: startX + x_offset * scale, y: startY - h * scale };
+            const p4 = { x: startX + (a + x_offset) * scale, y: startY - h * scale };
+>>>>>>> cc4199a (feat: add ai chat assistant, improve trapezoid tools and pwa)
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = isDarkMode ? '#ffffff' : '#1a1a1a';
