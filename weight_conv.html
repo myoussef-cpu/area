@@ -1,0 +1,60 @@
+<title>تحويل الأوزان</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>القيمة</label>
+            <input type="number" id="val" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>من</label>
+            <select id="fromUnit">
+                <option value="kg">كيلوجرام (kg)</option>
+                <option value="g">جرام (g)</option>
+                <option value="mg">مليجرام (mg)</option>
+                <option value="t">طن (t)</option>
+                <option value="lb">رطل (lb)</option>
+                <option value="oz">أونصة (oz)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>إلى</label>
+            <select id="toUnit">
+                <option value="kg">كيلوجرام (kg)</option>
+                <option value="g">جرام (g)</option>
+                <option value="mg">مليجرام (mg)</option>
+                <option value="t">طن (t)</option>
+                <option value="lb">رطل (lb)</option>
+                <option value="oz">أونصة (oz)</option>
+            </select>
+        </div>
+        <button class="btn-main" onclick="convertWeight()">تحويل</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    const units = {
+        kg: 1,
+        g: 0.001,
+        mg: 0.000001,
+        t: 1000,
+        lb: 0.453592,
+        oz: 0.0283495
+    };
+
+    function convertWeight() {
+        const val = parseFloat(document.getElementById('val').value);
+        const from = document.getElementById('fromUnit').value;
+        const to = document.getElementById('toUnit').value;
+
+        if (!isNaN(val)) {
+            const kgs = val * units[from];
+            const result = kgs / units[to];
+            
+            const resCard = document.getElementById('resultCard');
+            resCard.innerHTML = `<h3>النتيجة:</h3><p><span>${result.toLocaleString()}</span> ${to}</p>`;
+            resCard.classList.remove('hidden');
+        }
+    }
+</script>

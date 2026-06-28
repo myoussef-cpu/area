@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب القوة - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .result-value {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-right: 4px;
+        }
+
+        .save-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <button class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب القوة (F = ma)</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>ما الذي تريد حسابه؟</label>
+                <select id="calcMode" onchange="updateInputs()">
+                    <option value="force">القوة (Force)</option>
+                    <option value="mass">الكتلة (Mass)</option>
+                    <option value="accel">التسارع (Acceleration)</option>
+                </select>
+            </div>
+
+            <div id="input1Group" class="input-group">
+                <label id="label1">الكتلة (كجم)</label>
+                <input type="number" id="input1" placeholder="0.00" step="any">
+            </div>
+
+            <div id="input2Group" class="input-group">
+                <label id="label2">التسارع (م/ث²)</label>
+                <input type="number" id="input2" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateForce()">حساب النتيجة</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label" id="resultLabel">القوة الناتجة</span>
+                    <div>
+                        <span class="result-value" id="resultValue">0</span>
+                        <span class="unit" id="resultUnit"></span>
+                    </div>
+                </div>
+                <div id="weightResult" class="result-item" style="display:none">
+                    <span class="result-label">الوزن المكافئ</span>
+                    <div>
+                        <span class="result-value" id="weightValue">0</span>
+                        <span class="unit">كجم</span>
+                    </div>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateInputs() {
+            const mode = document.getElementById('calcMode').value;
+            const label1 = document.getElementById('label1');
+            const label2 = document.getElementById('label2');
+            const resCard = document.getElementById('resultCard');
+            resCard.style.display = 'none';
+
+            if (mode === 'force') {
+                label1.innerText = 'الكتلة (كجم)';
+                label2.innerText = 'التسارع (م/ث²)';
+            } else if (mode === 'mass') {
+                label1.innerText = 'القوة (نيوتن)';
+                label2.innerText = 'التسارع (م/ث²)';
+            } else {
+                label1.innerText = 'القوة (نيوتن)';
+                label2.innerText = 'الكتلة (كجم)';
+            }
+        }
+
+        function calculateForce() {
+            const mode = document.getElementById('calcMode').value;
+            const v1 = parseFloat(document.getElementById('input1').value);
+            const v2 = parseFloat(document.getElementById('input2').value);
+            const resCard = document.getElementById('resultCard');
+            const resLabel = document.getElementById('resultLabel');
+            const resValue = document.getElementById('resultValue');
+            const resUnit = document.getElementById('resultUnit');
+            const weightRes = document.getElementById('weightResult');
+            const weightVal = document.getElementById('weightValue');
+
+            if (isNaN(v1) || isNaN(v2) || v1 <= 0 || v2 <= 0) {
+                alert('يرجى إدخال قيم صحيحة أكبر من الصفر');
+                return;
+            }
+
+            let result = 0;
+            let unit = '';
+            let label = '';
+            let weightEq = 0;
+
+            if (mode === 'force') {
+                result = v1 * v2;
+                unit = 'نيوتن';
+                label = 'القوة الناتجة';
+                weightEq = result / 9.80665;
+            } else if (mode === 'mass') {
+                result = v1 / v2;
+                unit = 'كجم';
+                label = 'الكتلة الناتجة';
+                weightEq = 0;
+            } else {
+                result = v1 / v2;
+                unit = 'م/ث²';
+                label = 'التسارع الناتج';
+                weightEq = 0;
+            }
+
+            resLabel.innerText = label;
+            resValue.innerText = result.toFixed(3);
+            resUnit.innerText = unit;
+            
+            if (weightEq > 0) {
+                weightRes.style.display = 'flex';
+                weightVal.innerText = weightEq.toFixed(3);
+            } else {
+                weightRes.style.display = 'none';
+            }
+
+            resCard.style.display = 'block';
+
+            window.lastCalc = {
+                toolId: 'force_calc',
+                name: 'حساب القوة',
+                mode: mode,
+                input1: v1,
+                input2: v2,
+                result: result,
+                unit: unit,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            const results = JSON.parse(localStorage.getItem('engineering_results') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('engineering_results', JSON.stringify(results.slice(0, 50)));
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

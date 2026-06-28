@@ -1,0 +1,1030 @@
+<title>حساب مساحة شبه المنحرف</title>
+
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label><i class="fas fa-arrows-alt-h"></i> القاعدة العلوية (a)</label>
+            <input type="number" id="a" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-arrows-alt-h"></i> القاعدة السفلية (b)</label>
+            <input type="number" id="b" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-arrows-alt-v"></i> الضلع الأيسر (L1)</label>
+            <input type="number" id="L1" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-arrows-alt-v"></i> الضلع الأيمن (L2)</label>
+            <input type="number" id="L2" placeholder="أدخل الطول بالمتر" step="any" oninput="calculateArea()">
+        </div>
+    </div>
+
+    <div id="drawing-container" class="card hidden">
+        <div class="canvas-scroll-container" id="canvasScroll">
+            <canvas id="shapeCanvas"></canvas>
+        </div>
+    </div>
+
+    <div id="divisionSection" class="card hidden">
+        <div class="input-group">
+            <label><i class="fas fa-layer-group"></i> طريقة التقسيم</label>
+            <select id="divisionType" onchange="toggleDivisionInputs()">
+                <option value="manual">يدوياً (مساحات محددة)</option>
+                <option value="auto">تلقائياً (بالتساوي)</option>
+            </select>
+        </div>
+
+        <div id="manualInput" class="input-group">
+            <label><i class="fas fa-edit"></i> مساحة كل قسم (مفصولة بفاصلة)</label>
+            <input type="text" id="manualAreas" placeholder="مثلاً: 100, 150, 200" oninput="calculateDivisions()">
+        </div>
+
+        <div id="autoInput" class="input-group hidden">
+            <label><i class="fas fa-th-large"></i> عدد الأقسام</label>
+            <input type="number" id="parts" placeholder="أدخل عدد الأقسام" oninput="calculateDivisions()">
+        </div>
+
+        <button class="btn-main" onclick="calculateDivisions()" style="margin-top: 10px;">
+            <i class="fas fa-calculator"></i> حساب الأقسام
+        </button>
+    </div>
+
+    <div id="trapezoidResults">
+        <div id="initialArea" class="result-card hidden">
+            <!-- النتائج الأولية هتظهر هنا -->
+        </div>
+
+        <div id="results" class="result-card hidden">
+            <!-- نتائج التقسيم هتظهر هنا -->
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="saveResult()" id="saveBtn" style="display: none; margin-top: 10px; background: #27ae60;">
+        <i class="fas fa-save"></i> حفظ النتيجة النهائية
+    </button>
+</div>
+
+<style>
+    .calc-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding-bottom: 20px;
+    }
+
+    .input-group {
+        margin-bottom: 18px;
+        text-align: right;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-light);
+        padding-right: 5px;
+    }
+
+    .dark-mode .input-group label {
+        color: var(--text-dark);
+    }
+
+    .input-group label i {
+        color: var(--primary);
+        margin-left: 8px;
+        font-size: 1rem;
+    }
+
+    .result-card {
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        padding: 24px;
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        text-align: right;
+        transition: all 0.3s ease;
+    }
+
+    .dark-mode .result-card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+        border-right: 6px solid var(--primary);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    .result-card h3 {
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .result-card h4 {
+        margin: 20px 0 12px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 8px;
+    }
+
+    .dark-mode .result-card h4 {
+        border-bottom-color: var(--border-dark);
+    }
+
+    .result-card p {
+        margin: 10px 0;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .result-card span {
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .result-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .result-card li {
+        background: rgba(0,0,0,0.03);
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .dark-mode .result-card li {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .hidden { display: none; }
+
+    #drawing-container {
+        text-align: center;
+        padding: 20px;
+        background: var(--card-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .dark-mode #drawing-container {
+        background: var(--card-dark);
+        border: 1px solid var(--border-dark);
+    }
+
+    /* حاوية الرسمة عشان تكون قابلة للتمرير يا ريس */
+    .canvas-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 20px 0 10px;
+        padding: 5px;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+        cursor: grab;
+    }
+
+    .canvas-scroll-container:active {
+        cursor: grabbing;
+    }
+
+    #shapeCanvas {
+        display: block;
+        margin: 0 auto;
+        border-radius: 12px;
+        background: var(--card-light);
+        max-width: 100%;
+    }
+
+    .dark-mode #shapeCanvas {
+        background: var(--card-dark);
+    }
+</style>
+
+<script>
+    function onTrapezoidUnitChange(unitId) {
+        window.setSelectedUnit('area', unitId);
+        renderTrapezoidResult();
+    }
+
+    function renderTrapezoidResult() {
+        const r = window._lastResult;
+        if (!r) return;
+        const initialAreaDiv = document.getElementById("initialArea");
+        const totalFed = convertToFeddans(r.area);
+        initialAreaDiv.innerHTML = `
+            <h3>النتيجة الأولية:</h3>
+            <p>المساحة الكلية: <span>${window.formatAreaValue(r.area)}</span> <small style="opacity:0.6">(${totalFed.feddan} ف، ${totalFed.qirat} ق، ${totalFed.sahm} س)</small></p>
+            <div style="margin:10px 0;">
+                <label style="color:var(--text-light);font-size:0.9rem;">وحدة القياس: </label>
+                ${window.createUnitSelectorHTML('area', 'onTrapezoidUnitChange')}
+            </div>
+            <p>الارتفاع التقريبي: <span>${r.height.toFixed(3)}</span> متر | x₁ = <span>${r.x1.toFixed(3)}</span> م | x₂ = <span>${r.x2.toFixed(3)}</span> م</p>
+        `;
+    }
+
+    function computeTrapezoidGeometry(a, b, L1, L2) {
+        // نستخدم الفرق المطلق لدعم أي ترتيب (العلوية أكبر أو السفلية)
+        const diff = Math.abs(b - a);
+        
+        if (diff < 0.0001) {
+            // شكل متوازي أضلاع تقريباً
+            const hSq = L1 * L1;
+            if (hSq > 0) {
+                return { h: Math.sqrt(hSq), x1: 0, x2: 0, negProj: 0, swapped: false };
+            }
+            return null;
+        }
+        
+        // المعادلة الأساسية (تعمل بغض النظر عن أي قاعدة أكبر)
+        const x1_A = (diff + (L1 * L1 - L2 * L2) / diff) / 2;
+        const x2_A = diff - x1_A;
+        const x1_B = (diff + (L2 * L2 - L1 * L1) / diff) / 2;
+        const x2_B = diff - x1_B;
+        
+        const candidates = [];
+        // لو القاعدة العلوية أكبر من السفلية (a > b)، نعكس الإسقاطات
+        const isTopLarger = (a > b);
+        
+        // دوال مساعدة لتعديل الإسقاطات حسب حجم القاعدتين
+        function adjustProjection(x1, x2) {
+            // لو العلوية أكبر، نعكس الإسقاطات
+            if (isTopLarger) {
+                return { x1: -x2, x2: -x1 };
+            }
+            return { x1: x1, x2: x2 };
+        }
+        
+        if (Math.abs(x1_A) <= L1 && Math.abs(x2_A) <= L2) {
+            const hSq = L1 * L1 - x1_A * x1_A;
+            if (hSq > 0) {
+                const negProj = (x1_A < 0 ? -x1_A : 0) + (x2_A < 0 ? -x2_A : 0);
+                const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_A, x2_A);
+                candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: false });
+            }
+        }
+        if (Math.abs(x1_B) <= L2 && Math.abs(x2_B) <= L1) {
+            const hSq = L2 * L2 - x1_B * x1_B;
+            if (hSq > 0) {
+                const negProj = (x1_B < 0 ? -x1_B : 0) + (x2_B < 0 ? -x2_B : 0);
+                const { x1: adjX1, x2: adjX2 } = adjustProjection(x1_B, x2_B);
+                candidates.push({ h: Math.sqrt(hSq), x1: adjX1, x2: adjX2, negProj, swapped: true });
+            }
+        }
+        if (candidates.length === 0) return null;
+        candidates.sort((a, b) => {
+            if (a.negProj !== b.negProj) return a.negProj - b.negProj;
+            return b.h - a.h;
+        });
+        return candidates[0];
+    }
+
+    function calculateArea() {
+        const a = parseFloat(document.getElementById("a").value);
+        const b = parseFloat(document.getElementById("b").value);
+        const L1 = parseFloat(document.getElementById("L1").value);
+        const L2 = parseFloat(document.getElementById("L2").value);
+
+        const initialAreaDiv = document.getElementById("initialArea");
+        const drawingContainer = document.getElementById("drawing-container");
+        const divisionSection = document.getElementById("divisionSection");
+        const saveBtn = document.getElementById("saveBtn");
+
+        if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2) || a <= 0 || b <= 0 || L1 <= 0 || L2 <= 0) {
+            initialAreaDiv.classList.add('hidden');
+            drawingContainer.classList.add('hidden');
+            divisionSection.classList.add('hidden');
+            saveBtn.style.display = 'none';
+            return;
+        }
+
+        // حساب المساحة كشبه منحرف عام
+        const geo = computeTrapezoidGeometry(a, b, L1, L2);
+        if (!geo) {
+            initialAreaDiv.innerHTML = `<p style="color: #e74c3c;">الأطوال دي مستحيل تعمل شبه منحرف يا هندسة!</p>`;
+            initialAreaDiv.classList.remove('hidden');
+            drawingContainer.classList.add('hidden');
+            divisionSection.classList.add('hidden');
+            return;
+        }
+
+        const h = geo.h;
+        const area = ((a + b) / 2) * h;
+
+        window._lastResult = {area, height: h, title: "شبه المنحرف", x1: geo.x1, x2: geo.x2};
+        renderTrapezoidResult();
+        initialAreaDiv.classList.remove('hidden');
+        drawingContainer.classList.remove('hidden');
+        divisionSection.classList.remove('hidden');
+        saveBtn.style.display = 'block';
+
+        // حساب الأقطار عشان نرسمها
+        const diags = calculateDiagonals(a, b, h);
+
+        // رسم شبه المنحرف مع الأقطار
+        drawTrapezoid(a, b, L1, L2, h, diags, [], geo.x1, geo.x2, geo.swapped);
+    }
+
+    function computeCanvasSize() {
+        const container = document.getElementById('canvasScroll');
+        const containerWidth = container ? container.clientWidth - 10 : window.innerWidth - 70;
+        // نحافظ على أبعاد مناسبة للرسمة عشان النصوص تكون واضحة
+        const w = Math.max(containerWidth, 350);
+        const h = Math.max(w * 0.6, 350);
+        return { width: Math.min(w, 900), height: Math.min(h, 600) };
+    }
+
+    function drawTrapezoid(a, b, L1, L2, h, diags = null, divisions = [], x1, x2, swapped) {
+        const canvas = document.getElementById('shapeCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // مقاسات ديناميكية حسب حجم الشاشة
+        const size = computeCanvasSize();
+        canvas.width = size.width;
+        canvas.height = size.height;
+
+        const padding = 60;
+        const drawW = canvas.width - padding * 2;
+        const drawH = canvas.height - padding * 2;
+
+        // حساب الإحداثيات للمنحرف العام
+        // x1, x2 هما الإسقاطات الأفقية للضلعين (موجبتين دائماً)
+        // في الحالة العادية (b > a): القاعدة العلوية تبدأ من x1 وتنتهي عند b - x2
+        // في الحالة المقلوبة (a > b): القاعدة العلوية تبدأ من -x1 وتنتهي عند b + x2
+        const isTopLarger = (a > b);
+        const _x1 = (x1 != null) ? x1 : (isTopLarger ? -(a - b) / 2 : (b - a) / 2);
+        const _x2 = (x2 != null) ? x2 : (isTopLarger ? -(a - b) / 2 : (b - a) / 2);
+        
+        let p1 = { x: 0, y: 0 };           // أسفل يسار (بداية القاعدة السفلية)
+        let p2 = { x: b, y: 0 };           // أسفل يمين (نهاية القاعدة السفلية)
+        let p3, p4;
+        
+        if (isTopLarger) {
+            // القاعدة العلوية أكبر: تمتد للخارج عن القاعدة السفلية
+            p3 = { x: b + _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
+            p4 = { x: -_x1, y: h };        // أعلى يسار (بداية القاعدة العلوية)
+        } else {
+            // القاعدة السفلية أكبر أو متساوية
+            p3 = { x: b - _x2, y: h };     // أعلى يمين (نهاية القاعدة العلوية)
+            p4 = { x: _x1, y: h };         // أعلى يسار (بداية القاعدة العلوية)
+        }
+
+        const scaleX = drawW / Math.max(a, b);
+        const scaleY = drawH / h;
+        const scale = Math.min(scaleX, scaleY);
+
+        // توسيط الرسم أفقياً - نحتاج لحساب min و max إحداثيات X
+        const allX = [p1.x, p2.x, p3.x, p4.x];
+        const minX = Math.min(...allX);
+        const maxX = Math.max(...allX);
+        const totalWidth = maxX - minX;
+        
+        const offsetX = (canvas.width - totalWidth * scale) / 2 - minX * scale;
+        const offsetY = padding;
+
+        const pts = [p1, p2, p3, p4].map(p => ({
+            x: offsetX + p.x * scale,
+            y: canvas.height - (offsetY + p.y * scale)
+        }));
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // ستايل الرسمة
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const strokeColor = isDarkMode ? '#4dabf7' : '#3498db';
+        const textColor = isDarkMode ? '#e0e0e0' : '#2c3e50';
+        const slantColor = isDarkMode ? '#69db7c' : '#2ecc71';
+
+        // رسم خلفية للشكل
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+        ctx.fillStyle = isDarkMode ? 'rgba(77, 171, 247, 0.05)' : 'rgba(52, 152, 219, 0.03)';
+        ctx.fill();
+
+        // رسم الأقطار لو موجودة
+        if (diags) {
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 1;
+            
+            // القطر الأول
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            ctx.lineTo(pts[2].x, pts[2].y);
+            ctx.stroke();
+            
+            // القطر الثاني
+            ctx.beginPath();
+            ctx.moveTo(pts[1].x, pts[1].y);
+            ctx.lineTo(pts[3].x, pts[3].y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]);
+        }
+
+        // رسم خطوط التقسيم
+        if (divisions && divisions.length > 0) {
+            ctx.setLineDash([8, 4]);
+            ctx.strokeStyle = '#e67e22';
+            ctx.lineWidth = 2;
+
+            let prevH = 0;
+            divisions.forEach((div, i) => {
+                const ratio = div.h / h;
+                const prevRatio = prevH / h;
+                const sectionH = div.h - prevH;
+
+                const dL = {
+                    x: pts[0].x + (pts[3].x - pts[0].x) * ratio,
+                    y: pts[0].y + (pts[3].y - pts[0].y) * ratio
+                };
+                const dR = {
+                    x: pts[1].x + (pts[2].x - pts[1].x) * ratio,
+                    y: pts[1].y + (pts[2].y - pts[1].y) * ratio
+                };
+
+                ctx.beginPath();
+                ctx.moveTo(dL.x, dL.y);
+                ctx.lineTo(dR.x, dR.y);
+                ctx.stroke();
+
+                // كتابة مساحة القسم فوق الخط
+                ctx.fillStyle = '#e67e22';
+                ctx.font = 'bold 12px Tajawal';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${div.area.toFixed(1)} م²`, (dL.x + dR.x) / 2, dL.y - 5);
+
+                // حساب وكتابة طولي الضلعين المائلين لهذا القسم
+                const slants = computeSectionSlants(sectionH, h, L1, L2, swapped);
+
+                // نقطة المنتصف على الضلع الأيسر للقسم
+                const segLeftMid = {
+                    x: (pts[0].x + (pts[3].x - pts[0].x) * prevRatio + pts[0].x + (pts[3].x - pts[0].x) * ratio) / 2,
+                    y: (pts[0].y + (pts[3].y - pts[0].y) * prevRatio + pts[0].y + (pts[3].y - pts[0].y) * ratio) / 2
+                };
+                const segRightMid = {
+                    x: (pts[1].x + (pts[2].x - pts[1].x) * prevRatio + pts[1].x + (pts[2].x - pts[1].x) * ratio) / 2,
+                    y: (pts[1].y + (pts[2].y - pts[1].y) * prevRatio + pts[1].y + (pts[2].y - pts[1].y) * ratio) / 2
+                };
+
+                ctx.save();
+                ctx.fillStyle = slantColor;
+                ctx.font = 'bold 11px Tajawal';
+
+                const angL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+                ctx.save();
+                ctx.translate(segLeftMid.x, segLeftMid.y);
+                ctx.rotate(angL);
+                ctx.fillText(`l₁=${slants.l1.toFixed(2)}`, 0, -10);
+                ctx.restore();
+
+                const angR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+                ctx.save();
+                ctx.translate(segRightMid.x, segRightMid.y);
+                ctx.rotate(angR);
+                ctx.fillText(`l₂=${slants.l2.toFixed(2)}`, 0, -10);
+                ctx.restore();
+
+                ctx.restore();
+
+                prevH = div.h;
+            });
+            ctx.setLineDash([]);
+        }
+
+        // رسم الحدود الأساسية
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+        ctx.lineTo(pts[2].x, pts[2].y);
+        ctx.lineTo(pts[3].x, pts[3].y);
+        ctx.closePath();
+
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+
+        // القاعدة السفلية (b)
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 16px Tajawal';
+        ctx.fillText(`القاعدة السفلية: ${b.toFixed(2)} م`, (pts[0].x + pts[1].x) / 2, pts[1].y + 35);
+
+        // القاعدة العلوية (a)
+        ctx.fillText(`القاعدة العلوية: ${a.toFixed(2)} م`, (pts[2].x + pts[3].x) / 2, pts[3].y - 20);
+
+        if (swapped) {
+            // الضلع الأيسر L2
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.rotate(angleL);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+
+            // الضلع الأيمن L1
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.rotate(angleR);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+        } else {
+            // الضلع الأيسر L1
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[0].x + pts[3].x) / 2, (pts[0].y + pts[3].y) / 2);
+            const angleL = Math.atan2(pts[3].y - pts[0].y, pts[3].x - pts[0].x);
+            ctx.rotate(angleL);
+            ctx.fillText(`L₁ = ${L1.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+
+            // الضلع الأيمن L2
+            ctx.save();
+            ctx.fillStyle = slantColor;
+            ctx.font = 'bold 16px Tajawal';
+            ctx.translate((pts[1].x + pts[2].x) / 2, (pts[1].y + pts[2].y) / 2);
+            const angleR = Math.atan2(pts[2].y - pts[1].y, pts[2].x - pts[1].x);
+            ctx.rotate(angleR);
+            ctx.fillText(`L₂ = ${L2.toFixed(2)} م`, 0, -15);
+            ctx.restore();
+        }
+
+        // رسم سهم الارتفاع الكلي
+        const hX = pts[0].x - 40;
+        ctx.beginPath();
+        ctx.strokeStyle = textColor;
+        ctx.lineWidth = 1;
+        ctx.moveTo(hX, pts[0].y);
+        ctx.lineTo(hX, pts[3].y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(hX - 5, pts[0].y - 5); ctx.lineTo(hX, pts[0].y); ctx.lineTo(hX + 5, pts[0].y - 5);
+        ctx.moveTo(hX - 5, pts[3].y + 5); ctx.lineTo(hX, pts[3].y); ctx.lineTo(hX + 5, pts[3].y + 5);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(hX - 15, (pts[0].y + pts[3].y) / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 14px Tajawal';
+        ctx.fillText(`H = ${h.toFixed(2)} م`, 0, 0);
+        ctx.restore();
+
+        // لو فيه أقطار، نكتب قيمتها في نص الرسمة بخط خفيف
+        if (diags) {
+            ctx.font = '12px Tajawal';
+            ctx.fillStyle = isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)';
+            ctx.fillText(`القطر 1: ${diags.diagonal1.toFixed(2)} م`, canvas.width/2, canvas.height - 20);
+            ctx.fillText(`القطر 2: ${diags.diagonal2.toFixed(2)} م`, canvas.width/2, canvas.height - 5);
+        }
+    }
+
+    /**
+     * رسم كل قسم كمنحرف منفرد مع توضيح أبعاده الجديدة:
+     * القاعدتين الجديدتين، المائلين الجديدين، والارتفاع الجديد
+     */
+    function drawSectionTrapezoids(divisionsData) {
+        const canvas = document.getElementById('shapeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        // حجم الكانفاس ثابت في العرض ومتغير في الطول (عمود واحد)
+        const paddingX = 40;
+        const drawW = 260; // عرض منطقة الرسم لكل قسم
+        canvas.width = drawW + paddingX * 2;
+        // حساب الطول حسب عدد الأقسام
+        const sectionGap = 280; // المسافة بين كل قسم والآخر
+        canvas.height = Math.max(400, divisionsData.length * sectionGap + 40);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!divisionsData || divisionsData.length === 0) return;
+
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const textColor = isDarkMode ? '#e0e0e0' : '#2c3e50';
+        const strokeColor = isDarkMode ? '#4dabf7' : '#3498db';
+        const slantColor = isDarkMode ? '#69db7c' : '#2ecc71';
+        const fillColor = isDarkMode ? 'rgba(77, 171, 247, 0.08)' : 'rgba(52, 152, 219, 0.05)';
+
+        const maxDrawH = 180;
+        const centerX = canvas.width / 2;
+
+        divisionsData.forEach((section, i) => {
+            const offsetY = 30 + i * sectionGap;
+
+            // مقياس الرسم حسب أبعاد القسم
+            const maxBase = Math.max(section.topBase, section.bottomBase) || 1;
+            const baseScale = (drawW - 40) / maxBase;
+            const hScale = (maxDrawH - 30) / (section.sectionHeight || 1);
+            const scale = Math.min(baseScale, hScale * 1.5);
+
+            const topW = (section.topBase || 0) * scale;
+            const botW = (section.bottomBase || 0) * scale;
+            const secH = Math.max((section.sectionHeight || 0) * scale, 40);
+
+            const topY = offsetY + 40;
+            const bottomY = topY + secH;
+
+            const botLeft = { x: centerX - botW / 2, y: bottomY };
+            const botRight = { x: centerX + botW / 2, y: bottomY };
+            const topLeft = { x: centerX - topW / 2, y: topY };
+            const topRight = { x: centerX + topW / 2, y: topY };
+
+            // رسم المنحرف
+            ctx.beginPath();
+            ctx.moveTo(botLeft.x, botLeft.y);
+            ctx.lineTo(botRight.x, botRight.y);
+            ctx.lineTo(topRight.x, topRight.y);
+            ctx.lineTo(topLeft.x, topLeft.y);
+            ctx.closePath();
+
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // عنوان القسم والمساحة
+            ctx.fillStyle = isDarkMode ? '#4dabf7' : '#3498db';
+            ctx.font = 'bold 14px Tajawal';
+            ctx.textAlign = 'center';
+            ctx.fillText(`القسم ${i + 1}`, centerX, topY - 30);
+            ctx.font = 'bold 12px Tajawal';
+            ctx.fillText(`مساحة: ${(section.area || 0).toFixed(2)} م²`, centerX, topY - 12);
+
+            // القاعدة السفلية
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 12px Tajawal';
+            ctx.fillText(section.bottomBase.toFixed(2), centerX, bottomY + 18);
+
+            // القاعدة العلوية
+            ctx.fillText(section.topBase.toFixed(2), centerX, topY - 4);
+
+            // الضلع الأيسر l1
+            const midLeft = { x: (botLeft.x + topLeft.x) / 2, y: (botLeft.y + topLeft.y) / 2 };
+            ctx.save();
+            ctx.translate(midLeft.x, midLeft.y);
+            const angL = Math.atan2(topLeft.y - botLeft.y, topLeft.x - botLeft.x);
+            ctx.rotate(angL);
+            ctx.font = 'bold 11px Tajawal';
+            ctx.fillStyle = slantColor;
+            ctx.fillText(`l₁=${(section.l1 || 0).toFixed(2)}`, 0, -8);
+            ctx.restore();
+
+            // الضلع الأيمن l2
+            const midRight = { x: (botRight.x + topRight.x) / 2, y: (botRight.y + topRight.y) / 2 };
+            ctx.save();
+            ctx.translate(midRight.x, midRight.y);
+            const angR = Math.atan2(topRight.y - botRight.y, topRight.x - botRight.x);
+            ctx.rotate(angR);
+            ctx.font = 'bold 11px Tajawal';
+            ctx.fillStyle = slantColor;
+            ctx.fillText(`l₂=${(section.l2 || 0).toFixed(2)}`, 0, -8);
+            ctx.restore();
+
+            // الارتفاع (جانب القسم الأيسر)
+            const hX = botLeft.x - 15;
+            ctx.save();
+            ctx.translate(hX, (topY + bottomY) / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 10px Tajawal';
+            ctx.textAlign = 'center';
+            ctx.fillText(`h=${(section.sectionHeight || 0).toFixed(2)} م`, 0, 0);
+            ctx.restore();
+        });
+    }
+
+    // إضافة دعم السحب بالماوس للتمرير يا معلم
+    var scrollContainer = document.getElementById('canvasScroll');
+    var isDown = false;
+    var startX;
+    var scrollLeft;
+
+    if (scrollContainer) {
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; 
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
+    }
+
+    // إعادة الرسم عند تغيير حجم الشاشة (زي دوران الموبايل)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const canvas = document.getElementById('shapeCanvas');
+            if (canvas && canvas.width > 0) {
+                // نشوف لو فيه نتيجة آخر مرة اتحسبت
+                const a = document.getElementById('a')?.value;
+                const b = document.getElementById('b')?.value;
+                const L1 = document.getElementById('L1')?.value;
+                const L2 = document.getElementById('L2')?.value;
+                if (a && b && L1 && L2) {
+                    calculateArea();
+                }
+            }
+        }, 300);
+    });
+
+    // تشغيل الحساب تلقائياً بعد تحميل الصفحة (مع إعادة محاولة)
+    function tryAutoCalc(retries = 5) {
+        const a = document.getElementById('a');
+        const b = document.getElementById('b');
+        const L1 = document.getElementById('L1');
+        const L2 = document.getElementById('L2');
+        if (a && b && L1 && L2 && a.value && b.value && L1.value && L2.value) {
+            calculateArea();
+        } else if (retries > 0) {
+            setTimeout(() => tryAutoCalc(retries - 1), 200);
+        }
+    }
+    setTimeout(() => tryAutoCalc(), 100);
+
+    // ربط input events كنسخة احتياطية لـ oninput (علشان نضمن الشغل في SPA)
+    function bindInputEvents() {
+        const container = document.getElementById('main-content');
+        if (!container) { setTimeout(bindInputEvents, 100); return; }
+        container.querySelectorAll('#a, #b, #L1, #L2').forEach(el => {
+            if (el) el.addEventListener('input', calculateArea);
+        });
+        container.querySelectorAll('#parts, #manualAreas').forEach(el => {
+            if (el) el.addEventListener('input', calculateDivisions);
+        });
+        const dt = document.getElementById('divisionType');
+        if (dt) dt.addEventListener('change', toggleDivisionInputs);
+    }
+    bindInputEvents();
+
+    function computeSectionSlants(dh, H, L1, L2, swapped) {
+        const ratio = dh / H;
+        if (swapped) {
+            return { l1: ratio * L2, l2: ratio * L1 };
+        }
+        return { l1: ratio * L1, l2: ratio * L2 };
+    }
+
+    function calculateDiagonals(a, b, h) {
+        const baseDifference = Math.abs(b - a) / 2;
+        const diagonal1 = Math.sqrt(a * a + h * h - 2 * a * baseDifference);
+        const diagonal2 = Math.sqrt(b * b + h * h + 2 * b * baseDifference);
+        return { diagonal1, diagonal2 };
+    }
+
+    function convertToFeddans(m2) {
+        const feddan = 4200.83;
+        const qirat = 175.034;
+        const sahm = 7.293;
+
+        let remaining = m2;
+        let f = Math.floor(remaining / feddan);
+        remaining -= f * feddan;
+        let q = Math.floor(remaining / qirat);
+        remaining -= q * qirat;
+        let s = remaining / sahm;
+
+        return { feddan: f, qirat: q, sahm: s.toFixed(2) };
+    }
+
+    function formatFeddans(m2) {
+        const c = convertToFeddans(m2);
+        return `${c.feddan} ف، ${c.qirat} ق، ${c.sahm} س`;
+    }
+
+    function toggleDivisionInputs() {
+        const type = document.getElementById("divisionType").value;
+        document.getElementById("manualInput").classList.toggle('hidden', type !== 'manual');
+        document.getElementById("autoInput").classList.toggle('hidden', type !== 'auto');
+        calculateDivisions();
+    }
+
+    function calculateDivisions() {
+        const divisionType = document.getElementById("divisionType").value;
+        const a = parseFloat(document.getElementById("a").value);
+        const b = parseFloat(document.getElementById("b").value);
+        const L1 = parseFloat(document.getElementById("L1").value);
+        const L2 = parseFloat(document.getElementById("L2").value);
+
+        if (isNaN(a) || isNaN(b) || isNaN(L1) || isNaN(L2)) return;
+
+        const geo = computeTrapezoidGeometry(a, b, L1, L2);
+        if (!geo) return;
+        const h = geo.h;
+        const totalArea = ((a + b) / 2) * h;
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = `<h3>نتائج التقسيم:</h3>`;
+
+        const divisionsData = [];
+        let accumulatedHeight = 0;
+
+        if (divisionType === "manual") {
+            const manualAreas = document.getElementById("manualAreas").value.split(',').map(Number).filter(n => n > 0);
+            if (manualAreas.length === 0) return;
+
+            const sumAreas = manualAreas.reduce((sum, area) => sum + area, 0);
+            if (sumAreas > totalArea) {
+                resultsDiv.innerHTML += `<p style="color: #e74c3c;">مجموع الأقسام أكبر من المساحة الكلية!</p>`;
+                resultsDiv.classList.remove('hidden');
+                return;
+            }
+
+            let currentTopBase = a;
+            let currentBottomBase = b;
+            let remainingHeight = h;
+
+            let totalUsedArea = 0;
+
+            for (let i = 0; i < manualAreas.length; i++) {
+                const area = manualAreas[i];
+                const x = computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, area);
+
+                if (x === null || x <= 0 || x > remainingHeight) {
+                    resultsDiv.innerHTML += `<p>لا يمكن حساب القسم ${i + 1}</p>`;
+                    break;
+                }
+
+                const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
+                accumulatedHeight += x;
+                
+                const conv = convertToFeddans(area);
+                const manualSlant = computeSectionSlants(x, h, L1, L2, geo.swapped);
+                divisionsData.push({
+                    h: accumulatedHeight,
+                    area: area,
+                    base: newBase,
+                    topBase: currentTopBase,
+                    bottomBase: newBase,
+                    sectionHeight: x,
+                    l1: manualSlant.l1,
+                    l2: manualSlant.l2
+                });
+
+            // "القاعدة السفلية" -> newBase is the bottom base, currentTopBase is the top base
+            resultsDiv.innerHTML += `
+                <li>
+                    <strong>القسم ${i + 1}:</strong><br>
+                    المساحة: <span>${area.toFixed(2)}</span> متر² <small style="opacity:0.6">(${conv.feddan} ف، ${conv.qirat} ق، ${conv.sahm} س)</small><br>
+                    الارتفاع: <span>${x.toFixed(2)}</span> متر<br>
+                    القاعدة الجديدة: <span>${newBase.toFixed(2)}</span> متر<br>
+                    l₁ (الأيسر) = <span>${manualSlant.l1.toFixed(2)}</span> م | l₂ (الأيمن) = <span>${manualSlant.l2.toFixed(2)}</span> م
+                </li>
+            `;
+
+                currentTopBase = newBase;
+                remainingHeight -= x;
+                totalUsedArea += area;
+            }
+            if (remainingHeight > 0.01) {
+                const remainingArea = totalArea - totalUsedArea;
+                const rconv = convertToFeddans(remainingArea);
+                resultsDiv.innerHTML += `<p style="margin-top:10px;color:#ff9800;">المتبقي: <span>${remainingArea.toFixed(2)}</span> م² <small style="opacity:0.6">(${rconv.feddan} ف، ${rconv.qirat} ق، ${rconv.sahm} س)</small></p>`;
+            }
+        } else {
+            const parts = parseInt(document.getElementById("parts").value);
+            if (isNaN(parts) || parts <= 0) return;
+
+            const partArea = totalArea / parts;
+            let currentTopBase = a;
+            let currentBottomBase = b;
+            let remainingHeight = h;
+
+            let totalUsedArea = 0;
+
+            for (let i = 0; i < parts; i++) {
+                const x = computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, partArea);
+                if (x === null) {
+                    resultsDiv.innerHTML += `<p style="color: #e74c3c;">لا يمكن حساب القسم ${i + 1} — المساحة المطلوبة ${partArea.toFixed(2)} م² لا تتسع في الارتفاع المتبقي ${remainingHeight.toFixed(2)} م</p>`;
+                    break;
+                }
+
+                const newBase = currentTopBase + ((currentBottomBase - currentTopBase) / remainingHeight) * x;
+                accumulatedHeight += x;
+
+                const conv = convertToFeddans(partArea);
+                const autoSlant = computeSectionSlants(x, h, L1, L2, geo.swapped);
+                divisionsData.push({
+                    h: accumulatedHeight,
+                    area: partArea,
+                    base: newBase,
+                    topBase: currentTopBase,
+                    bottomBase: newBase,
+                    sectionHeight: x,
+                    l1: autoSlant.l1,
+                    l2: autoSlant.l2
+                });
+
+                resultsDiv.innerHTML += `
+                    <li>
+                        <strong>القسم ${i + 1}:</strong><br>
+                        المساحة: <span>${partArea.toFixed(2)}</span> متر² <small style="opacity:0.6">(${conv.feddan} ف، ${conv.qirat} ق، ${conv.sahm} س)</small><br>
+                        الارتفاع: <span>${x.toFixed(2)}</span> متر<br>
+                        القاعدة الجديدة: <span>${newBase.toFixed(2)}</span> متر<br>
+                        l₁ (الأيسر) = <span>${autoSlant.l1.toFixed(2)}</span> م | l₂ (الأيمن) = <span>${autoSlant.l2.toFixed(2)}</span> م
+                    </li>
+                `;
+                currentTopBase = newBase;
+                remainingHeight -= x;
+                totalUsedArea += partArea;
+            }
+            if (remainingHeight > 0.01) {
+                const remainingArea = totalArea - totalUsedArea;
+                const rconv = convertToFeddans(remainingArea);
+                resultsDiv.innerHTML += `<p style="margin-top:10px;color:#ff9800;">المتبقي: <span>${remainingArea.toFixed(2)}</span> م² <small style="opacity:0.6">(${rconv.feddan} ف، ${rconv.qirat} ق، ${rconv.sahm} س)</small></p>`;
+            }
+        }
+        resultsDiv.classList.remove('hidden');
+
+        // تحديث الرسمة بالأقسام والأقطار يا معلم
+        const diags = calculateDiagonals(a, b, h);
+        drawSectionTrapezoids(divisionsData);
+    }
+
+    function computeSectionHeight(currentTopBase, currentBottomBase, remainingHeight, area) {
+        const k = (currentBottomBase - currentTopBase) / remainingHeight;
+        if (Math.abs(k) < 0.0001) return area / currentTopBase; // لو مستطيل يعني
+        const Acoef = k;
+        const Bcoef = 2 * currentTopBase;
+        const Ccoef = -2 * area;
+        const disc = Bcoef * Bcoef - 4 * Acoef * Ccoef;
+        if (disc < 0) return null;
+        const x1 = (-Bcoef + Math.sqrt(disc)) / (2 * Acoef);
+        const x2 = (-Bcoef - Math.sqrt(disc)) / (2 * Acoef);
+        return (x1 > 0 && x1 <= remainingHeight + 0.1) ? x1 : (x2 > 0 && x2 <= remainingHeight + 0.1 ? x2 : null);
+    }
+
+    function saveResult() {
+        const a = document.getElementById("a").value;
+        const b = document.getElementById("b").value;
+        const L1 = document.getElementById("L1").value;
+        const L2 = document.getElementById("L2").value;
+        const resultText = document.getElementById("initialArea").innerText;
+        
+        // التقاط الرسم من الـ Canvas
+        const canvas = document.getElementById("shapeCanvas");
+        const drawing = (canvas && canvas.getContext) ? canvas.toDataURL('image/png') : null;
+        
+        const data = {
+            type: "شبه منحرف",
+            input: `القاعدة العلوية (a): ${a}\nالقاعدة السفلية (b): ${b}\nالضلع الأيسر (L1): ${L1}\nالضلع الأيمن (L2): ${L2}`,
+            result: resultText,
+            details: document.getElementById("results").innerText,
+            drawing: drawing
+        };
+
+        if (window.firebaseLogic && window.firebaseLogic.saveResult) {
+            window.firebaseLogic.saveResult(data)
+                .then(() => alert('تم حفظ النتيجة بنجاح يا ريس ✅'))
+                .catch(err => {
+                    console.error(err);
+                    alert('حصل مشكلة في الحفظ على السحابة، بس اتحفظت محلياً');
+                });
+        } else {
+            let savedResults = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            data.timestamp = new Date().toISOString();
+            savedResults.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(savedResults));
+            alert('تم الحفظ محلياً (Firebase غير متصل) ✅');
+        }
+    }
+</script>

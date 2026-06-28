@@ -1,0 +1,76 @@
+<title>حساب المكعب</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>طول الضلع (متر)</label>
+            <input type="number" id="side" placeholder="0.00" step="any">
+        </div>
+        <button class="btn-main" onclick="calculateCube()">احسب الحجم</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+    <button class="btn-main" onclick="saveCubeResult()" id="saveBtn" style="display: none;">
+        <i class="fas fa-save"></i> حفظ النتيجة
+    </button>
+</div>
+
+<script>
+    function calculateCube() {
+        const side = parseFloat(document.getElementById('side').value);
+        if (side > 0) {
+            const volume = Math.pow(side, 3);
+            const surfaceArea = 6 * side * side;
+            window._lastResult = { volume, surfaceArea, title: "المكعب" };
+            renderVolumeResult();
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('saveBtn').style.display = 'block';
+            window.lastCalc = { title: "المكعب", result: document.getElementById('resultCard').innerText };
+        }
+    }
+
+    function renderVolumeResult() {
+        const r = window._lastResult;
+        if (!r) return;
+        const resEl = document.getElementById('resultCard');
+        let html = `
+            <div class="result-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3 style="margin:0;">${r.title}</h3>
+                ${window.createUnitSelectorHTML ? window.createUnitSelectorHTML('volume', 'onVolUnitChange') : ''}
+            </div>
+            <div class="result-item" style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <span>الحجم:</span>
+                <span>${window.formatVolumeValue ? window.formatVolumeValue(r.volume) : r.volume.toFixed(2) + ' م³'}</span>
+            </div>
+        `;
+        if (r.surfaceArea !== undefined) {
+            html += `<div class="result-item" style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <span>المساحة السطحية:</span>
+                <span>${r.surfaceArea.toFixed(2)} م²</span>
+            </div>`;
+        }
+        resEl.innerHTML = html;
+    }
+
+    function onVolUnitChange() {
+        window.setSelectedUnit('volume', document.querySelector('.unit-selector').value);
+        renderVolumeResult();
+    }
+
+    function saveCubeResult() {
+        if (!window.lastCalc) return;
+        const data = {
+            type: "أحجام",
+            name: window.lastCalc.title,
+            result: window.lastCalc.result,
+            timestamp: new Date().toISOString()
+        };
+        if (window.firebaseLogic?.saveResult) {
+            window.firebaseLogic.saveResult(data).then(() => alert('تم الحفظ ✅')).catch(() => alert('تم الحفظ محلياً ✅'));
+        } else {
+            let s = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            s.push(data);
+            localStorage.setItem('savedResults', JSON.stringify(s));
+            alert('تم الحفظ محلياً ✅');
+        }
+    }
+</script>

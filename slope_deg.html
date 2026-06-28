@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>الميل بالدرجات والنسبة - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #5856D6;
+            --bg-dark: #000000;
+            --card-bg: rgba(28, 28, 30, 0.8);
+            --text-main: #FFFFFF;
+            --text-dim: #8E8E93;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            min-height: 100vh;
+        }
+
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            margin-right: 4px;
+            color: var(--text-dim);
+        }
+
+        .save-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            position: relative;
+            font-weight: 600;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+    </style>
+</head>
+<body>
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="font-size: 1.5rem; margin: 0;">الميل بالدرجات والنسبة</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>الميل كنسبة مئوية (%)</label>
+                <input type="number" id="slopePerc" placeholder="أدخل النسبة (مثلاً 5)" step="any">
+            </div>
+            <button class="btn-calc" onclick="calcPercToDeg()">تحويل إلى درجات</button>
+
+            <div class="divider">أو</div>
+
+            <div class="input-group">
+                <label>الميل بالدرجات (°)</label>
+                <input type="number" id="slopeDeg" placeholder="أدخل الدرجات (مثلاً 2.86)" step="any">
+            </div>
+            <button class="btn-calc" style="background: linear-gradient(135deg, var(--secondary-color), #af52de);" onclick="calcDegToPerc()">تحويل إلى نسبة %</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title" id="resTitle">النتيجة المحسوبة</div>
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label" id="resLabel">النتيجة</span>
+                    <div>
+                        <span class="result-value" id="resValue">0</span>
+                        <span class="unit" id="resUnit"></span>
+                    </div>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calcPercToDeg() {
+            const p = parseFloat(document.getElementById('slopePerc').value);
+            if (isNaN(p) || p < 0) {
+                alert('يرجى إدخال نسبة مئوية صحيحة (رقم موجب)');
+                return;
+            }
+
+            // angle = arctan(slope / 100)
+            const deg = Math.atan(p / 100) * (180 / Math.PI);
+            
+            showResult('تحويل النسبة إلى درجات', 'الميل بالدرجات', deg.toFixed(2), 'درجة (°)');
+
+            window.lastCalc = {
+                toolId: 'slope_deg',
+                type: 'تحويل ميل (نسبة إلى درجات)',
+                details: `النسبة: ${p}%`,
+                result: `${deg.toFixed(2)}°`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function calcDegToPerc() {
+            const d = parseFloat(document.getElementById('slopeDeg').value);
+            if (isNaN(d) || d < 0) {
+                alert('يرجى إدخال درجة ميل صحيحة (رقم موجب)');
+                return;
+            }
+
+            // percentage = tan(angle) * 100
+            const perc = Math.tan(d * (Math.PI / 180)) * 100;
+            
+            showResult('تحويل الدرجات إلى نسبة', 'الميل كنسبة مئوية', perc.toFixed(2), '%');
+
+            window.lastCalc = {
+                toolId: 'slope_deg',
+                type: 'تحويل ميل (درجات إلى نسبة)',
+                details: `الدرجات: ${d}°`,
+                result: `${perc.toFixed(2)}%`,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function showResult(title, label, value, unit) {
+            document.getElementById('resTitle').innerText = title;
+            document.getElementById('resLabel').innerText = label;
+            document.getElementById('resValue').innerText = value;
+            document.getElementById('resUnit').innerText = unit;
+            document.getElementById('resultCard').style.display = 'block';
+            
+            // Scroll to result
+            document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<title>التناسب والنسبة</title>
+<div class="calc-container">
+    <div class="card">
+        <h3>حساب التناسب (X : Y = A : B)</h3>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 1rem;">* أدخل 3 قيم لحساب الرابعة</p>
+        <div class="input-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <input type="number" id="valX" placeholder="X" style="width: 20%;">
+            <span>:</span>
+            <input type="number" id="valY" placeholder="Y" style="width: 20%;">
+            <span>=</span>
+            <input type="number" id="valA" placeholder="A" style="width: 20%;">
+            <span>:</span>
+            <input type="number" id="valB" placeholder="B" style="width: 20%;">
+        </div>
+        <button class="btn-main" onclick="calculateRatio()">احسب القيمة المفقودة</button>
+        <div id="resRatio" class="result-inline hidden"></div>
+    </div>
+</div>
+
+<style>
+    .result-inline {
+        margin-top: 1rem;
+        padding: 0.8rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .result-inline span { color: var(--accent-color); font-size: 1.2rem; }
+</style>
+
+<script>
+    function calculateRatio() {
+        const x = parseFloat(document.getElementById('valX').value);
+        const y = parseFloat(document.getElementById('valY').value);
+        const a = parseFloat(document.getElementById('valA').value);
+        const b = parseFloat(document.getElementById('valB').value);
+        const div = document.getElementById('resRatio');
+
+        let res, label;
+        if (isNaN(x) && !isNaN(y) && !isNaN(a) && !isNaN(b)) {
+            res = (y * a) / b; label = 'X';
+        } else if (isNaN(y) && !isNaN(x) && !isNaN(a) && !isNaN(b)) {
+            res = (x * b) / a; label = 'Y';
+        } else if (isNaN(a) && !isNaN(x) && !isNaN(y) && !isNaN(b)) {
+            res = (x * b) / y; label = 'A';
+        } else if (isNaN(b) && !isNaN(x) && !isNaN(y) && !isNaN(a)) {
+            res = (y * a) / x; label = 'B';
+        } else {
+            alert('يرجى إدخال 3 قيم فقط');
+            return;
+        }
+
+        div.innerHTML = `القيمة المفقودة ${label}: <span>${res.toFixed(4)}</span>`;
+        div.classList.remove('hidden');
+    }
+</script>

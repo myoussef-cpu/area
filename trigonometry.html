@@ -1,0 +1,35 @@
+<title>حساب المثلثات</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>الزاوية (بالدرجات)</label>
+            <input type="number" id="angle" placeholder="0" step="any">
+        </div>
+        <button class="btn-main" onclick="calculateTrig()">احسب</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    function calculateTrig() {
+        const deg = parseFloat(document.getElementById('angle').value);
+        const resCard = document.getElementById('resultCard');
+
+        if (!isNaN(deg)) {
+            const rad = deg * (Math.PI / 180);
+            const sin = Math.sin(rad);
+            const cos = Math.cos(rad);
+            const tan = Math.tan(rad);
+            
+            resCard.innerHTML = `
+                <h3>النتائج للزاوية ${deg}°:</h3>
+                <p>Sin: <span>${sin.toFixed(6)}</span></p>
+                <p>Cos: <span>${cos.toFixed(6)}</span></p>
+                <p>Tan: <span>${Math.abs(deg % 90) === 0 && deg % 180 !== 0 ? 'غير معرف' : tan.toFixed(6)}</span></p>
+                <p>بالراديان: <span>${rad.toFixed(6)}</span> rad</p>
+            `;
+            resCard.classList.remove('hidden');
+        }
+    }
+</script>

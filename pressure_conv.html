@@ -1,0 +1,57 @@
+<title>تحويل الضغط</title>
+<div class="calc-container">
+    <div class="card">
+        <div class="input-group">
+            <label>القيمة</label>
+            <input type="number" id="val" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>من</label>
+            <select id="fromUnit">
+                <option value="Pa">باسكال (Pa)</option>
+                <option value="bar">بار (bar)</option>
+                <option value="psi">PSI (lb/in²)</option>
+                <option value="atm">ضغط جوي (atm)</option>
+                <option value="mmHg">ملم زئبق (mmHg)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>إلى</label>
+            <select id="toUnit">
+                <option value="Pa">باسكال (Pa)</option>
+                <option value="bar">بار (bar)</option>
+                <option value="psi">PSI (lb/in²)</option>
+                <option value="atm">ضغط جوي (atm)</option>
+                <option value="mmHg">ملم زئبق (mmHg)</option>
+            </select>
+        </div>
+        <button class="btn-main" onclick="convertPressure()">تحويل</button>
+    </div>
+
+    <div id="resultCard" class="result-card hidden"></div>
+</div>
+
+<script>
+    const units = {
+        Pa: 1,
+        bar: 100000,
+        psi: 6894.76,
+        atm: 101325,
+        mmHg: 133.322
+    };
+
+    function convertPressure() {
+        const val = parseFloat(document.getElementById('val').value);
+        const from = document.getElementById('fromUnit').value;
+        const to = document.getElementById('toUnit').value;
+
+        if (!isNaN(val)) {
+            const pascals = val * units[from];
+            const result = pascals / units[to];
+            
+            const resCard = document.getElementById('resultCard');
+            resCard.innerHTML = `<h3>النتيجة:</h3><p><span>${result.toLocaleString()}</span> ${to}</p>`;
+            resCard.classList.remove('hidden');
+        }
+    }
+</script>
