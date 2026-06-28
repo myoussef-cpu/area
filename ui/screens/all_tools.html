@@ -1,0 +1,90 @@
+<div class="screen-alltools">
+    <link rel="stylesheet" href="../../styles/styles.css">
+<title>كل الأدوات الهندسية</title>
+
+<div class="all-tools-container">
+    <!-- بار البحث -->
+    <div class="search-section card">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="toolSearch" placeholder="ابحث عن أداة (مثلاً: خرسانة، مثلث...)" oninput="filterTools()">
+        </div>
+        <div class="category-filters" id="categoryFilters">
+            <!-- التصنيفات هتظهر هنا -->
+        </div>
+    </div>
+
+    <!-- شبكة الأدوات -->
+    <div id="toolsGrid" class="tools-grid">
+        <!-- الأدوات هتظهر هنا ديناميكياً -->
+    </div>
+</div>
+
+
+
+<script type="module">
+    import { TOOLS, TOOL_CATEGORIES } from '../../src/services/registry.js';
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    function init() {
+        renderFilters();
+        renderTools();
+    }
+
+    function renderFilters() {
+        const container = document.getElementById('categoryFilters');
+        let html = `<div class="cat-chip active" onclick="window.setCategory('all')">الكل</div>`;
+        
+        Object.values(TOOL_CATEGORIES).forEach(cat => {
+            html += `<div class="cat-chip" data-id="${cat.id}" onclick="window.setCategory('${cat.id}')">${cat.name}</div>`;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    window.setCategory = function(catId) {
+        currentCategory = catId;
+        document.querySelectorAll('.cat-chip').forEach(chip => {
+            chip.classList.toggle('active', (chip.dataset.id === catId) || (catId === 'all' && !chip.dataset.id));
+        });
+        renderTools();
+    }
+
+    window.filterTools = function() {
+        searchQuery = document.getElementById('toolSearch').value.toLowerCase();
+        renderTools();
+    }
+
+    function renderTools() {
+        const grid = document.getElementById('toolsGrid');
+        const filtered = TOOLS.filter(tool => {
+            const matchesCat = currentCategory === 'all' || tool.cat === currentCategory;
+            const matchesSearch = tool.name.toLowerCase().includes(searchQuery) || 
+                                tool.desc.toLowerCase().includes(searchQuery);
+            return matchesCat && matchesSearch;
+        });
+
+        grid.innerHTML = filtered.map(tool => `
+            <div class="tool-card" onclick="openTool('${tool.id}')">
+                <div class="tool-card-icon">
+                    <i class="${tool.icon}"></i>
+                </div>
+                <h4>${tool.name}</h4>
+                <p>${tool.desc}</p>
+            </div>
+        `).join('');
+    }
+
+    window.openTool = function(id) {
+        const tool = TOOLS.find(t => t.id === id);
+        if (tool) {
+            window.navigateTo(`${tool.cat}/${id}`);
+        }
+    }
+
+    init();
+</script>
+
+</div>

@@ -1,0 +1,94 @@
+<div class="screen-main">
+    <link rel="stylesheet" href="../../styles/styles.css">
+<title>الرئيسية</title>
+<div class="main-dashboard">
+    <!-- سكشن الترحيب -->
+    <div class="welcome-header">
+        <div class="welcome-text">
+            <h2>أهلاً بيك يا هندسة 👋</h2>
+            <p>جاهز نحسب مساحات النهاردة؟</p>
+        </div>
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </div>
+
+    <!-- شبكة الأدوات -->
+    <div class="section-title">الأدوات الهندسية</div>
+    <div class="tools-list" id="toolsList">
+        <!-- يتم توليدها ديناميكياً من registry.js -->
+    </div>
+
+    <!-- سكشن الوصول السريع -->
+    <div class="section-title">وصول سريع</div>
+    <div class="quick-scroll">
+        <div class="quick-item" onclick="navigateTo('saved_results')">
+            <div class="qc-icon" style="background: rgba(0,122,255,0.1); color: #007aff;">
+                <i class="fas fa-clock-rotate"></i>
+            </div>
+            <span>المحفوظات</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('calculator')">
+            <div class="qc-icon" style="background: rgba(255,149,0,0.1); color: #ff9500;">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <span>آلة حاسبة</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('area/trapezoid')">
+            <div class="qc-icon" style="background: rgba(52,199,89,0.1); color: #34c759;">
+                <i class="fas fa-draw-polygon"></i>
+            </div>
+            <span>شبه منحرف</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('area/triangle')">
+            <div class="qc-icon" style="background: rgba(175,82,222,0.1); color: #af52de;">
+                <i class="fas fa-triangle"></i>
+            </div>
+            <span>مثلث</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('area/circle_sector')">
+            <div class="qc-icon" style="background: rgba(90,200,250,0.1); color: #5ac8fa;">
+                <i class="fas fa-circle"></i>
+            </div>
+            <span>دائرة</span>
+        </div>
+        <div class="quick-item" onclick="navigateTo('all_tools')">
+            <div class="qc-icon" style="background: rgba(142,142,147,0.08); color: #8e8e93;">
+                <i class="fas fa-th"></i>
+            </div>
+            <span>كل الأدوات</span>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { TOOLS } from '../../src/services/registry.js';
+
+    const COLORS = [
+        { bg: '#e3f2fd', color: '#1e88e5' }, { bg: '#f1f8e9', color: '#7cb342' },
+        { bg: '#fff3e0', color: '#fb8c00' }, { bg: '#f3e5f5', color: '#8e24aa' },
+        { bg: '#e8f5e9', color: '#43a047' }, { bg: '#e0f7fa', color: '#00acc1' },
+        { bg: '#fce4ec', color: '#d81b60' }, { bg: '#fffde7', color: '#fbc02d' },
+        { bg: '#efebe9', color: '#5d4037' }, { bg: '#e8eaf6', color: '#3949ab' },
+        { bg: '#fbe9e7', color: '#d84315' }, { bg: '#e0f2f1', color: '#00897b' },
+        { bg: '#f3e5ab', color: '#f9a825' },
+    ];
+
+    const container = document.getElementById('toolsList');
+    container.innerHTML = TOOLS.map((tool, i) => {
+        const c = COLORS[i % COLORS.length];
+        return `<div class="tool-item" onclick="navigateTo('${tool.cat}/${tool.id}')">
+            <div class="tool-icon-box" style="--bg: ${c.bg}; --color: ${c.color};">
+                <i class="${tool.icon}"></i>
+            </div>
+            <div class="tool-details">
+                <h3>${tool.name}</h3>
+                <p>${tool.desc}</p>
+            </div>
+            <div class="tool-arrow"><i class="fas fa-chevron-left"></i></div>
+        </div>`;
+    }).join('');
+</script>
+
+
+</div>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب قوة الهيدروليك - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    
+</head>
+<body>
+<div class="tool-dark">
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب قوة الهيدروليك</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>قطر البستم (مليمتر)</label>
+                <input type="number" id="pistonDia" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>الضغط (Bar)</label>
+                <input type="number" id="pressure" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateHydraulic()">حساب القوة</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">نتائج حساب قوة الهيدروليك</div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">مساحة البستم</span>
+                    <span class="result-value" id="pistonArea">0</span>
+                    <span class="unit">سم²</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">القوة بالكجم</span>
+                    <span class="result-value" id="forceKg">0</span>
+                    <span class="unit">كجم</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">القوة الناتجة (بالطن)</span>
+                    <span class="result-value" id="forceTon">0</span>
+                    <span class="unit">طن</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">القوة بالنيوتن (تقريباً)</span>
+                    <span class="result-value" id="forceNewton">0</span>
+                    <span class="unit">N</span>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateHydraulic() {
+            const D = parseFloat(document.getElementById('pistonDia').value);
+            const P = parseFloat(document.getElementById('pressure').value);
+            
+            if (D > 0 && P > 0) {
+                // Calculation:
+                // Area (cm2) = PI * (D_mm / 20)^2
+                const areaCm2 = Math.PI * Math.pow((D / 20), 2);
+                // Force (kg) = Area (cm2) * Pressure (bar)
+                // Note: 1 bar = 1.0197 kg/cm2, we use 1:1 for common engineering estimates
+                const forceKg = areaCm2 * P;
+                const forceTon = forceKg / 1000;
+                const forceNewton = forceKg * 9.80665;
+                
+                // Update UI
+                document.getElementById('pistonArea').innerText = areaCm2.toFixed(2);
+                document.getElementById('forceKg').innerText = forceKg.toLocaleString(undefined, {maximumFractionDigits: 2});
+                document.getElementById('forceTon').innerText = forceTon.toLocaleString(undefined, {maximumFractionDigits: 3});
+                document.getElementById('forceNewton').innerText = forceNewton.toLocaleString(undefined, {maximumFractionDigits: 0});
+                
+                document.getElementById('resultCard').style.display = 'block';
+                
+                window.lastCalc = {
+                    toolId: 'hydraulic_force_calc',
+                    type: 'قوة الهيدروليك',
+                    details: `قطر ${D} مم، ضغط ${P} بار`,
+                    result: `${forceTon.toFixed(3)} طن (${forceKg.toFixed(2)} كجم)`,
+                    timestamp: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة للقطر والضغط (أرقام موجبة)');
+            }
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div class="screen-smart">
+    <link rel="stylesheet" href="../../styles/styles.css">
+<title id="toolTitle">أداة هندسية</title>
+
+<div class="smart-tool-container">
+    <div id="toolUI" class="card">
+        <!-- الواجهة هتتبني هنا ديناميكياً -->
+        <div class="loading-tool">جاري تحميل الأداة...</div>
+    </div>
+
+
+</div>
+
+
+
+<script type="module">
+    import { TOOLS } from '../../src/services/registry.js';
+
+    const getToolId = () => {
+        if (window.currentPageParams?.toolId) return window.currentPageParams.toolId;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('toolId')) return urlParams.get('toolId');
+        const hash = window.location.hash;
+        if (hash.includes('toolId=')) {
+            return hash.split('toolId=')[1].split('&')[0];
+        }
+        return null;
+    };
+
+    const toolId = getToolId();
+    const tool = TOOLS.find(t => t.id === toolId);
+
+    if (tool) {
+        window.parent.navigateTo(tool.cat + '/' + tool.id);
+        return;
+    }
+    document.getElementById('toolUI').innerHTML = `
+        <div class="card" style="text-align:center; padding: 40px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9500; margin-bottom: 20px;"></i>
+            <h3 style="margin-bottom: 10px;">عذراً، الأداة غير موجودة!</h3>
+            <p style="color: #8e8e93; margin-bottom: 20px;">يبدو أن الرابط الذي تحاول الوصول إليه غير صحيح أو تم نقل الأداة.</p>
+            <button class="btn-main" onclick="window.parent.navigateTo('all_tools')">استعرض كل الأدوات</button>
+        </div>
+    `;
+</script>
+
+</div>

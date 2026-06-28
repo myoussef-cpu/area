@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>مقياس الرسم - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    
+</head>
+<body>
+<div class="tool-dark">
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="font-size: 1.5rem; margin: 0;">حساب مقياس الرسم</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>مقياس الرسم (1 : X)</label>
+                <input type="number" id="scale" placeholder="مثلاً 500" step="any">
+            </div>
+
+            <div class="divider">احسب الطول الحقيقي</div>
+
+            <div class="input-group">
+                <label>الطول على الخريطة (سم)</label>
+                <input type="number" id="mapLen" placeholder="0.00" step="any">
+            </div>
+
+            <div class="divider">أو احسب الطول على الخريطة</div>
+
+            <div class="input-group">
+                <label>الطول الحقيقي (متر)</label>
+                <input type="number" id="realLen" placeholder="0.00" step="any">
+            </div>
+
+            <button class="btn-calc" onclick="calculateScale()">حساب النتائج</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">نتائج مقياس الرسم</div>
+            <div class="result-grid">
+                <div id="resRealItem" class="result-item full-width" style="display: none;">
+                    <span class="result-label">الطول الحقيقي</span>
+                    <span class="result-value" id="resReal">0</span>
+                    <span class="unit">متر</span>
+                </div>
+                <div id="resMapItem" class="result-item full-width" style="display: none;">
+                    <span class="result-label">الطول على الخريطة</span>
+                    <span class="result-value" id="resMap">0</span>
+                    <span class="unit">سم</span>
+                </div>
+                <div class="result-item full-width">
+                    <span class="result-label">المقياس المستخدم</span>
+                    <span class="result-value" id="resScaleUsed">1 : 0</span>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculateScale() {
+            const s = parseFloat(document.getElementById('scale').value);
+            const mInput = document.getElementById('mapLen').value;
+            const rInput = document.getElementById('realLen').value;
+            
+            if (isNaN(s) || s <= 0) {
+                alert('يرجى إدخال مقياس رسم صحيح (رقم موجب)');
+                return;
+            }
+
+            let mapLen, realLen, detailText, resultText;
+
+            if (mInput !== "" && !isNaN(parseFloat(mInput))) {
+                mapLen = parseFloat(mInput);
+                realLen = (mapLen * s) / 100;
+                document.getElementById('resReal').innerText = realLen.toFixed(2);
+                document.getElementById('resRealItem').style.display = 'flex';
+                document.getElementById('resMapItem').style.display = 'none';
+                detailText = `خريطة: ${mapLen} سم (مقياس 1:${s})`;
+                resultText = `حقيقي: ${realLen.toFixed(2)} متر`;
+            } else if (rInput !== "" && !isNaN(parseFloat(rInput))) {
+                realLen = parseFloat(rInput);
+                mapLen = (realLen * 100) / s;
+                document.getElementById('resMap').innerText = mapLen.toFixed(2);
+                document.getElementById('resMapItem').style.display = 'flex';
+                document.getElementById('resRealItem').style.display = 'none';
+                detailText = `حقيقي: ${realLen} متر (مقياس 1:${s})`;
+                resultText = `خريطة: ${mapLen.toFixed(2)} سم`;
+            } else {
+                alert('يرجى إدخال إما الطول على الخريطة أو الطول الحقيقي');
+                return;
+            }
+
+            document.getElementById('resScaleUsed').innerText = `1 : ${s}`;
+            document.getElementById('resultCard').style.display = 'block';
+
+            window.lastCalc = {
+                toolId: 'scale_map',
+                type: 'حساب مقياس الرسم',
+                details: detailText,
+                result: resultText,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</div>
+</body>
+</html>

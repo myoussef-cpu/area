@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حساب وزن الصاج والحديد - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    
+</head>
+<body>
+<div class="tool-dark">
+    <div class="calc-container">
+        <div class="header">
+            <a href="#" class="back-btn" onclick="window.parent.navigateTo('main')">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <h1 style="margin:0; font-size: 1.5rem;">حساب وزن ألواح الصاج</h1>
+        </div>
+
+        <div class="card">
+            <div class="input-group">
+                <label>نوع المادة</label>
+                <select id="material">
+                    <option value="7850">حديد (صلب) - 7850 كجم/م³</option>
+                    <option value="2700">ألومنيوم - 2700 كجم/م³</option>
+                    <option value="8960">نحاس - 8960 كجم/م³</option>
+                    <option value="8000">ستانلس ستيل - 8000 كجم/م³</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>الطول (متر)</label>
+                <input type="number" id="length" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>العرض (متر)</label>
+                <input type="number" id="width" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>السمك (مليمتر)</label>
+                <input type="number" id="thickness" placeholder="0.00" step="any">
+            </div>
+
+            <div class="input-group">
+                <label>العدد (اختياري)</label>
+                <input type="number" id="count" value="1" min="1">
+            </div>
+
+            <button class="btn-calc" onclick="calculatePlateWeight()">حساب الوزن</button>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">نتائج حساب وزن الصاج</div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">وزن اللوح الواحد</span>
+                    <span class="result-value" id="weightPerPlate">0</span>
+                    <span class="unit">كجم</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">المساحة السطحية</span>
+                    <span class="result-value" id="surfaceArea">0</span>
+                    <span class="unit">م²</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">إجمالي الوزن الصافي</span>
+                    <span class="result-value" id="totalWeightKg">0</span>
+                    <span class="unit">كجم</span>
+                </div>
+
+                <div class="result-item full-width">
+                    <span class="result-label">إجمالي الوزن (بالطن)</span>
+                    <span class="result-value" id="totalWeightTon">0</span>
+                    <span class="unit">طن</span>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveResult()">
+                <i class="fas fa-save"></i>
+                حفظ النتيجة في السجل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function calculatePlateWeight() {
+            const materialSelect = document.getElementById('material');
+            const density = parseFloat(materialSelect.value);
+            const materialName = materialSelect.options[materialSelect.selectedIndex].text.split('-')[0].trim();
+            const L = parseFloat(document.getElementById('length').value);
+            const W = parseFloat(document.getElementById('width').value);
+            const T_mm = parseFloat(document.getElementById('thickness').value);
+            const count = parseInt(document.getElementById('count').value) || 1;
+            
+            if (L > 0 && W > 0 && T_mm > 0) {
+                const T_m = T_mm / 1000; // convert mm to m
+                const volume = L * W * T_m;
+                const weightPerPlate = volume * density;
+                const totalWeightKg = weightPerPlate * count;
+                const totalWeightTon = totalWeightKg / 1000;
+                const area = L * W;
+                
+                // Update UI
+                document.getElementById('weightPerPlate').innerText = weightPerPlate.toFixed(2);
+                document.getElementById('surfaceArea').innerText = area.toFixed(2);
+                document.getElementById('totalWeightKg').innerText = totalWeightKg.toLocaleString(undefined, {maximumFractionDigits: 2});
+                document.getElementById('totalWeightTon').innerText = totalWeightTon.toLocaleString(undefined, {maximumFractionDigits: 4});
+                
+                document.getElementById('resultCard').style.display = 'block';
+                
+                window.lastCalc = {
+                    toolId: 'steel_plate_calc',
+                    type: `وزن ألواح ${materialName}`,
+                    details: `${L}x${W}x${T_mm} مم - العدد: ${count}`,
+                    result: `${totalWeightKg.toFixed(2)} كجم (${totalWeightTon.toFixed(4)} طن)`,
+                    timestamp: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة لجميع الحقول (أرقام موجبة)');
+            }
+        }
+
+        function saveResult() {
+            if (!window.lastCalc) return;
+            
+            const results = JSON.parse(localStorage.getItem('savedResults') || '[]');
+            results.unshift(window.lastCalc);
+            localStorage.setItem('savedResults', JSON.stringify(results.slice(0, 50)));
+            
+            if (window.parent && window.parent.firebaseLogic) {
+                window.parent.firebaseLogic.saveResult(window.lastCalc);
+            }
+            
+            alert('تم حفظ النتيجة بنجاح في السجل');
+        }
+    </script>
+</div>
+</body>
+</html>

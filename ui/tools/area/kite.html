@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مساحة شكل الطائرة الورقية - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    
+</head>
+<body>
+<div class="tool-volumes">
+    <a href="#" onclick="window.navigateTo('all_tools')" class="back-btn">
+        <i class="fas fa-arrow-right"></i>
+        العودة للأدوات
+    </a>
+
+    <div class="calc-container">
+        <div class="header">
+            <i class="fas fa-paper-plane"></i>
+            <h2>مساحة شكل الطائرة الورقية</h2>
+        </div>
+
+        <div class="input-group">
+            <label>القطر الأول (d1)</label>
+            <input type="number" id="d1" placeholder="أدخل طول القطر الأول" step="any">
+        </div>
+
+        <div class="input-group">
+            <label>القطر الثاني (d2)</label>
+            <input type="number" id="d2" placeholder="أدخل طول القطر الثاني" step="any">
+        </div>
+
+        <button class="btn-calc" onclick="calculateKite()">حساب المساحة</button>
+
+        <div id="resultCard" class="result-card">
+            <h3>النتائج:</h3>
+            <div id="resultsList"></div>
+            <button class="btn-calc save-btn" onclick="saveKiteResult()">حفظ النتيجة</button>
+        </div>
+    </div>
+
+    <script>
+        function onUnitChange(val) {
+            window.setSelectedUnit('area', val || document.querySelector('.unit-selector').value);
+            renderKiteResult();
+        }
+
+        function renderKiteResult() {
+            const r = window._lastResult;
+            if (!r) return;
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = `
+                <div class="result-item">
+                    <span>المساحة الكلية:</span>
+                    <span>${window.formatAreaValue(r.area)}</span>
+                </div>
+                <div class="result-item">
+                    <span>وحدة القياس:</span>
+                    <span>${window.createUnitSelectorHTML('area', 'onUnitChange')}</span>
+                </div>
+            `;
+        }
+
+        function calculateKite() {
+            const d1 = parseFloat(document.getElementById('d1').value);
+            const d2 = parseFloat(document.getElementById('d2').value);
+            
+            if (d1 > 0 && d2 > 0) {
+                const area = (d1 * d2) / 2;
+                
+                window._lastResult = {area, title: "الطائرة الورقية"};
+                renderKiteResult();
+                
+                document.getElementById('resultCard').classList.add('show');
+                
+                window.lastCalc = {
+                    title: "مساحة شكل الطائرة الورقية",
+                    result: `المساحة: ${area.toFixed(2)}`,
+                    date: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة للأقطار');
+            }
+        }
+
+        function saveKiteResult() {
+            if (window.firebaseLogic && window.firebaseLogic.saveCalculation) {
+                window.firebaseLogic.saveCalculation(window.lastCalc);
+            } else {
+                const saved = JSON.parse(localStorage.getItem('saved_calculations') || '[]');
+                saved.push(window.lastCalc);
+                localStorage.setItem('saved_calculations', JSON.stringify(saved));
+                alert('تم حفظ النتيجة محلياً');
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

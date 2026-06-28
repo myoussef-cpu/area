@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعداد المساعد الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/styles.css">
+    
+</head>
+<body>
+<div class="screen-setup">
+    <div class="setup-card">
+        <h1><i class="fas fa-robot" style="color:#3498db;"></i> إعداد المساعد الذكي</h1>
+        <p>عشان تستخدم المساعد الذكي، محتاج مفتاح NVIDIA API. اختار ملف `.env` أو أدخل المفتاح يدوياً.</p>
+
+        <div class="file-drop" id="fileDrop">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>اضغط هنا أو اسحب ملف .env</span>
+            <input type="file" id="fileInput" accept=".env,.txt" style="display:none;">
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="or-text">— أو أدخل المفتاح يدوياً —</div>
+
+        <div class="manual-input">
+            <label><i class="fas fa-key"></i> NVIDIA API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="nvapi-..." autocomplete="off">
+        </div>
+
+        <button class="btn" onclick="saveKey()"><i class="fas fa-save"></i> حفظ المفتاح</button>
+        <a class="btn btn-home" id="homeBtn" onclick="navigateTo('main')"><i class="fas fa-home"></i> العودة للتطبيق</a>
+    </div>
+
+    <script>
+        const fileDrop = document.getElementById('fileDrop');
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const homeBtn = document.getElementById('homeBtn');
+
+        // لو المفتاح محفوظ قبل كده
+        const saved = localStorage.getItem('NVIDIA_API_KEY');
+        if (saved) {
+            apiKeyInput.value = saved;
+            showStatus('المفتاح محفوظ مسبقاً!', 'success');
+            homeBtn.style.display = 'inline-block';
+        }
+
+        fileDrop.addEventListener('click', () => fileInput.click());
+        fileDrop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDrop.classList.add('dragover');
+        });
+        fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+        fileDrop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDrop.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                const match = content.match(/NVIDIA_API_KEY\s*=\s*(.+)/);
+                if (match) {
+                    const key = match[1].trim();
+                    apiKeyInput.value = key;
+                    localStorage.setItem('NVIDIA_API_KEY', key);
+                    showStatus('تم تحميل المفتاح بنجاح!', 'success');
+                    homeBtn.style.display = 'inline-block';
+                } else {
+                    showStatus('ملف .env مش فيه NVIDIA_API_KEY', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function saveKey() {
+            const key = apiKeyInput.value.trim();
+            if (!key) {
+                showStatus('أدخل المفتاح الأول!', 'error');
+                return;
+            }
+            localStorage.setItem('NVIDIA_API_KEY', key);
+            showStatus('تم حفظ المفتاح بنجاح!', 'success');
+            homeBtn.style.display = 'inline-block';
+        }
+
+        function showStatus(msg, type) {
+            status.textContent = msg;
+            status.className = 'status ' + type;
+        }
+    </script>
+</div>
+</body>
+</html>

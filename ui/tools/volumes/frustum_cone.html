@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حجم المخروط الناقص - المهندس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    
+</head>
+<body>
+<div class="tool-volumes">
+    <a href="#" onclick="window.navigateTo('all_tools')" class="back-btn">
+        <i class="fas fa-arrow-right"></i>
+        العودة للأدوات
+    </a>
+
+    <div class="calc-container">
+        <div class="header">
+            <i class="fas fa-filter"></i>
+            <h2>حجم المخروط الناقص</h2>
+        </div>
+
+        <div class="input-group">
+            <label>نصف قطر القاعدة الكبرى (R)</label>
+            <input type="number" id="radius1" placeholder="أدخل نصف القطر الأكبر" step="any">
+        </div>
+
+        <div class="input-group">
+            <label>نصف قطر القاعدة الصغرى (r)</label>
+            <input type="number" id="radius2" placeholder="أدخل نصف القطر الأصغر" step="any">
+        </div>
+
+        <div class="input-group">
+            <label>الارتفاع (h)</label>
+            <input type="number" id="height" placeholder="أدخل الارتفاع" step="any">
+        </div>
+
+        <button class="btn-calc" onclick="calculateFrustum()">حساب الحجم</button>
+
+        <div id="resultCard" class="result-card">
+            <h3>النتائج:</h3>
+            <div id="resultsList"></div>
+            <button class="btn-calc save-btn" onclick="saveFrustumResult()">حفظ النتيجة</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateFrustum() {
+            const R = parseFloat(document.getElementById('radius1').value);
+            const r = parseFloat(document.getElementById('radius2').value);
+            const h = parseFloat(document.getElementById('height').value);
+            
+            if (R >= 0 && r >= 0 && h > 0) {
+                const volume = (1/3) * Math.PI * h * (Math.pow(R, 2) + Math.pow(r, 2) + (R * r));
+                
+                window._lastResult = { volume, title: "المخروط الناقص" };
+                renderVolumeResult();
+                
+                document.getElementById('resultCard').classList.add('show');
+                
+                window.lastCalc = {
+                    title: "حجم المخروط الناقص",
+                    result: `الحجم: ${volume.toFixed(2)}`,
+                    date: new Date().toISOString()
+                };
+            } else {
+                alert('يرجى إدخال قيم صحيحة');
+            }
+        }
+
+        function renderVolumeResult() {
+            const r = window._lastResult;
+            if (!r) return;
+            const resEl = document.getElementById('resultsList');
+            let html = `
+                <div class="result-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <h3 style="margin:0;">${r.title}</h3>
+                    ${window.createUnitSelectorHTML ? window.createUnitSelectorHTML('volume', 'onVolUnitChange') : ''}
+                </div>
+                <div class="result-item">
+                    <span>الحجم الكلي:</span>
+                    <span>${window.formatVolumeValue ? window.formatVolumeValue(r.volume) : r.volume.toFixed(2) + ' وحدة مكعبة'}</span>
+                </div>
+            `;
+            resEl.innerHTML = html;
+        }
+
+        function onVolUnitChange() {
+            window.setSelectedUnit('volume', document.querySelector('.unit-selector').value);
+            renderVolumeResult();
+        }
+
+        function saveFrustumResult() {
+            if (window.firebaseLogic && window.firebaseLogic.saveCalculation) {
+                window.firebaseLogic.saveCalculation(window.lastCalc);
+            } else {
+                const saved = JSON.parse(localStorage.getItem('saved_calculations') || '[]');
+                saved.push(window.lastCalc);
+                localStorage.setItem('saved_calculations', JSON.stringify(saved));
+                alert('تم حفظ النتيجة محلياً');
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
